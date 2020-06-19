@@ -9,6 +9,8 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/RenderEngine.cpp
 	${PROJECT_NAME}/src/Game.h
 	${PROJECT_NAME}/src/Game.cpp
+	${PROJECT_NAME}/src/Object.h
+	${PROJECT_NAME}/src/Object.cpp
 )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
