@@ -4,7 +4,11 @@ set(PROJECT_NAME FirstGame)
 project(FirstGame)
 
 add_executable(${PROJECT_NAME}
-	${PROJECT_NAME}/src/Source.cpp
+	${PROJECT_NAME}/src/main.cpp
+	${PROJECT_NAME}/src/RenderEngine.h
+	${PROJECT_NAME}/src/RenderEngine.cpp
+	${PROJECT_NAME}/src/Game.h
+	${PROJECT_NAME}/src/Game.cpp
 )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
