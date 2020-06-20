@@ -8,10 +8,8 @@ Game game;
 int main()
 {
 	RenderEngine::init(1600, 900, "FirstGame");
-
-	//load level 
 	
-	//load models
+	//game.load()
 
 	//game init
 

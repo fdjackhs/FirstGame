@@ -11,9 +11,7 @@ namespace RenderEngine
 {
 	glm::vec2 SCREEN;
 	GLFWwindow* window = nullptr;
-
 	bool keys[1024];
-	//TODO: mouse pos & mouse buttons & scroll
 
 	//callback function difinitions
 	//-----------------------------
