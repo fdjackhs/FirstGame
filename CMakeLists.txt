@@ -16,6 +16,10 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/Object.h
 	${PROJECT_NAME}/src/Object.cpp
 	${PROJECT_NAME}/src/Shader.h
+	${PROJECT_NAME}/src/Mesh.h
+	${PROJECT_NAME}/src/Mesh.cpp
+	${PROJECT_NAME}/src/Model.h
+	${PROJECT_NAME}/src/Model.cpp
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )

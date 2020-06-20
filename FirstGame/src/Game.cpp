@@ -4,6 +4,8 @@
 
 #include "Game.h"
 
+#include "Model.h"
+
 Game::Game()
 {
 	basicShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
@@ -18,8 +20,8 @@ void Game::loop()
 {
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
-	RenderEngine::initTriangle();
-
+	//RenderEngine::initTriangle();
+	Model guitar("../FirstGame/Resources/models/backpack/backpack.obj");
 
 	while (!RenderEngine::windowShouldClose())
 	{
@@ -31,8 +33,10 @@ void Game::loop()
 
 		RenderEngine::clearScreen();
 
-		basicShader->use();
-		RenderEngine::drawTriangle();
+		//basicShader->use();
+		guitar.Draw(*basicShader);
+
+		//RenderEngine::drawTriangle();
 		
 		//Game::updateGameState(deltaTime)
 
