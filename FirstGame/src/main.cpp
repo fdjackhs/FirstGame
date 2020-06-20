@@ -3,16 +3,14 @@
 
 #include <iostream>
 
-Game game;
 
 int main()
 {
 	RenderEngine::init(1600, 900, "FirstGame");
-	
+
+	Game game;
 	//game.load()
-
 	//game init
-
 	game.loop();
 
 	RenderEngine::free();

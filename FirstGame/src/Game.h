@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderEngine.h"
+#include "Shader.h"
 
 class Game
 {
@@ -20,7 +21,7 @@ public:
 	void poolEvents();
 
 private:
-
+	std::shared_ptr<Shader> basicShader = nullptr;
 	//game state (game, pause)
 	//game speed
 };

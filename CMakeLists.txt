@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 set(PROJECT_NAME FirstGame)
 project(FirstGame)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+link_directories(${CMAKE_SOURCE_DIR}/lib)
+
 add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/main.cpp
 	${PROJECT_NAME}/src/RenderEngine.h
@@ -11,6 +15,9 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/Game.cpp
 	${PROJECT_NAME}/src/Object.h
 	${PROJECT_NAME}/src/Object.cpp
+	${PROJECT_NAME}/src/Shader.h
+	
+	${PROJECT_NAME}/src/stb_image.cpp
 )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -18,12 +25,16 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(external/glfw)
+add_subdirectory(includes/glfw)
 target_link_libraries(${PROJECT_NAME} glfw)
 
-add_subdirectory(external/glad)
+add_subdirectory(includes/glad)
 target_link_libraries(${PROJECT_NAME} glad)
+  
+include_directories(includes)
+include_directories(includes/stb)
+include_directories(includes/glm)
 
-include_directories(external/glm)
+target_link_libraries(${PROJECT_NAME} assimp-vc140-mt)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/)

@@ -21,4 +21,8 @@ namespace RenderEngine
 	void pollEvents();
 
 	void free();
+
+	//test shader
+	void initTriangle();
+	void drawTriangle();
 }

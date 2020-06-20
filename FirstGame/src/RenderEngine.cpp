@@ -13,13 +13,30 @@ namespace RenderEngine
 	GLFWwindow* window = nullptr;
 	bool keys[1024];
 
-	//callback function difinitions
-	//-----------------------------
-	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-	void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-	//-----------------------------
+	//callback functions
+	//------------------
+	void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		std::cout << key << std::endl;
+
+		if (action == GLFW_PRESS || action == GLFW_RELEASE)
+			keys[key] = true;
+
+		//dont forget clear keys
+	}
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+	{
+		glViewport(0, 0, width, height);
+	}
+	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+	{
+		std::cout << "xpos " << xpos << " ypos " << ypos << std::endl;
+	}
+	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		std::cout << "xoffset " << xoffset << " yoffset " << yoffset << std::endl;
+	}
+	//------------------
 
 	int init(unsigned int x, unsigned int y, const char* windowName)
 	{
@@ -62,6 +79,33 @@ namespace RenderEngine
 		return 0;
 	}
 
+	//Temporary, for test basic shader
+	unsigned int VBO, VAO;
+	void initTriangle()
+	{
+		float vertices[] = {
+			-0.5f, -0.5f, 0.0f,
+			 0.0f,  0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f
+		};
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+	void drawTriangle()
+	{
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+
 	void drawObjects(const std::vector<Object>& objects)
 	{
 
@@ -74,8 +118,8 @@ namespace RenderEngine
 
 	void clearScreen()
 	{
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void updateScreen()
@@ -93,28 +137,4 @@ namespace RenderEngine
 		glfwTerminate();
 	}
 
-	//callback functions
-	//------------------
-	void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
-	{
-		std::cout << key << std::endl;
-
-		if (action == GLFW_PRESS || action == GLFW_RELEASE)
-			keys[key] = true;
-
-		//dont forget clear keys
-	}
-	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-	{
-		glViewport(0, 0, width, height);
-	}
-	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-	{
-		std::cout << "xpos " << xpos << " ypos " << ypos << std::endl;
-	}
-	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-	{
-		std::cout << "xoffset " << xoffset << " yoffset " << yoffset << std::endl;
-	}
-	//------------------
 }

@@ -6,7 +6,7 @@
 
 Game::Game()
 {
-
+	basicShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
 }
 
 Game::~Game()
@@ -18,6 +18,9 @@ void Game::loop()
 {
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
+	RenderEngine::initTriangle();
+
+
 	while (!RenderEngine::windowShouldClose())
 	{
 		auto currTime = std::chrono::high_resolution_clock::now();
@@ -28,12 +31,12 @@ void Game::loop()
 
 		RenderEngine::clearScreen();
 
-		//Game::poolEvents()
-
+		basicShader->use();
+		RenderEngine::drawTriangle();
+		
 		//Game::updateGameState(deltaTime)
 
 		//RenderEngine::drawObjects(Game::all_objects)
-
 
 		RenderEngine::updateScreen();
 		RenderEngine::pollEvents();
