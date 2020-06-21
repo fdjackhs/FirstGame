@@ -1,7 +1,7 @@
+#include <iostream>
+
 #include "RenderEngine.h"
 #include "Game.h"
-
-#include <iostream>
 
 
 int main()

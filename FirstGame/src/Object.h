@@ -1,6 +1,7 @@
 #pragma once
-
 #include "glm/vec3.hpp"
+
+#include "Model.h"
 
 class Object
 {
@@ -9,7 +10,5 @@ public:
 	~Object();
 
 	glm::vec3 coords;
-	// model
-	// draw
-	// state
+	std::shared_ptr<Model> model;
 };

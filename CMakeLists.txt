@@ -20,6 +20,8 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/Mesh.cpp
 	${PROJECT_NAME}/src/Model.h
 	${PROJECT_NAME}/src/Model.cpp
+	${PROJECT_NAME}/src/Camera.h
+	${PROJECT_NAME}/src/Camera.cpp
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )
