@@ -1,14 +1,9 @@
-#include <chrono>
-#include <iostream>
-#include <thread>
 
 #include "Game.h"
 
-#include "Model.h"
-
 Game::Game()
 {
-	basicShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
+	//basicShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
 }
 
 Game::~Game()
@@ -18,27 +13,25 @@ Game::~Game()
 
 void Game::loop()
 {
-	auto lastTime = std::chrono::high_resolution_clock::now();
+	double lastTime = 0.0;
 
-	//RenderEngine::initTriangle();
-	Model guitar("../FirstGame/Resources/models/backpack/backpack.obj");
+	//Model guitar("../FirstGame/Resources/models/backpack/backpack.obj");
 
 	while (!RenderEngine::windowShouldClose())
 	{
-		auto currTime = std::chrono::high_resolution_clock::now();
-		auto deltaTime = currTime - lastTime;
-		auto lastTime = currTime;
+		double currTime = RenderEngine::getCurrTime();
+		RenderEngine::deltaTime = currTime - lastTime;
+		lastTime = currTime;
 
-		//std::cout << "Delta Time " << std::chrono::duration_cast<std::chrono::nanoseconds>(currTime - lastTime).count() << std::endl;
+		//std::cout << "Delta Time " << RenderEngine::deltaTime << std::endl;
+
+		processInput(RenderEngine::keys);
+
 
 		RenderEngine::clearScreen();
-
-		//basicShader->use();
-		guitar.Draw(*basicShader);
-
-		//RenderEngine::drawTriangle();
+		//RenderEngine::updateCameraView(deltaTime);
 		
-		//Game::updateGameState(deltaTime)
+			//Game::updateGameState(deltaTime)
 
 		//RenderEngine::drawObjects(Game::all_objects)
 
@@ -55,15 +48,17 @@ void Game::load()
 
 }
 
-void Game::updateGameState()
+void Game::updateGameState(float deltaTime)
 {
 	//TODO: update game logic
+
 }
 
-void Game::poolEvents()
+void Game::processInput(bool* keys)
 {
-	//TODO: pool events
+	//TODO: process release keys
 
-	//for (auto&& x : RenderEngine::keys)
-	//	x = false;
+	//RenderEngine::camera->ProcessKeyboard(Camera::FORWARD, deltaTime);
+
+	RenderEngine::clearKeys();
 }
