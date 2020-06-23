@@ -9,6 +9,24 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 //------------------
 
+
+namespace RenderEngine
+{
+	glm::vec2 SCREEN;
+	GLFWwindow* window;
+	bool keys[1024];
+
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+	std::shared_ptr<Camera> camera;
+
+	double deltaTime;
+
+	ResourceManager resourceManager;
+	std::map<std::string, unsigned int> shaders;
+}
+
 int RenderEngine::init(float x, float y, const char* windowName)
 {
 	SCREEN.x = x;
@@ -49,6 +67,9 @@ int RenderEngine::init(float x, float y, const char* windowName)
 
 	camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
 
+	Shader shader("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
+	shaders["guitar"] = shader.ID;
+
 	return 0;
 }
 
@@ -86,7 +107,7 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::drawObjects(const std::vector<Object>& objects)
+void RenderEngine::drawObjects(const std::map<std::string, std::vector<Object>>& objects)
 {
 
 }

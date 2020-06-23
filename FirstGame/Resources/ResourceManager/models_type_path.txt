@@ -1,0 +1,10 @@
+[
+	{
+		"type" : "BLUE_STAR",
+		"path" : "../FirstGame/Resources/models/backpack/backpack.obj"
+	},
+	{
+		"type" : "default",
+		"path" : "path"
+	}
+]

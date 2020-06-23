@@ -1,0 +1,12 @@
+[
+	{
+		"type" : "BLUE_STAR",
+		"path_vertex" : "../FirstGame/Resources/shaders/1.basic_vertex_shader.vs",
+		"path_fragment" : "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs"
+	},
+	{
+		"type" : "default",
+		"path_vertex" : "path",
+		"path_fragment" : "path"
+	}
+]

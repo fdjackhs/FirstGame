@@ -1,0 +1,2 @@
+../FirstGame/Resources/ResourceManager/level1.txt
+../FirstGame/Resources/ResourceManager/level2.txt

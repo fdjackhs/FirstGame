@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <map>
 
 #include "RenderEngine.h"
 
@@ -13,10 +14,11 @@ public:
 	Game(Game&&) = delete;				//??
 	Game& operator==(Game&) = delete;	//??
 
-	std::vector<Object> objects;
+	std::map<std::string, std::vector<Object>> objects;
 
 	void loop();
 	void load();
+	void createObject(ObjectAttributes attributes);
 	void updateGameState(float deltaTime);
 	void processInput(bool* keys);
 

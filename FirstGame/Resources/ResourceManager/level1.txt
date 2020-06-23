@@ -1,0 +1,12 @@
+[
+	{
+		"type": "BLUE_STAR",
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "-10.0",
+		
+		"scale": "1.0",
+		
+		"optionalProperties": "obj1"
+	}
+]
