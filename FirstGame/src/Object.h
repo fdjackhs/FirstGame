@@ -2,14 +2,15 @@
 #include "glm/vec3.hpp"
 
 #include "Model.h"
-#include "ModelTypes.h"
 
 class Object
 {
 public:
-	Object(const glm::vec3& pos, const std::string& pathToModel);
+	Object(unsigned int ID, const glm::vec3& pos, float scale, const std::string& opt_prop);
 	~Object();
 
-	glm::vec3 coords;
-	//std::shared_ptr<Model> model;
+	unsigned int modelID;
+	glm::vec3 position;
+	float scale;
+	std::string optionalProperties;
 };

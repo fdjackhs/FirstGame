@@ -22,6 +22,9 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/Model.cpp
 	${PROJECT_NAME}/src/Camera.h
 	${PROJECT_NAME}/src/Camera.cpp
+	${PROJECT_NAME}/src/ResourceManager.h
+	${PROJECT_NAME}/src/ResourceManager.cpp
+	${PROJECT_NAME}/src/ObjectAttributes.h
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )

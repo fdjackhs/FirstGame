@@ -24,7 +24,6 @@ namespace RenderEngine
 	double deltaTime;
 
 	ResourceManager resourceManager;
-	std::map<std::string, unsigned int> shaders;
 }
 
 int RenderEngine::init(float x, float y, const char* windowName)
@@ -55,7 +54,6 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-	//glViewport(0, 0, width, height);
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGL())
@@ -65,10 +63,11 @@ int RenderEngine::init(float x, float y, const char* windowName)
 		return -1;
 	}
 
-	camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+	glViewport(0, 0, (int)SCREEN.x, (int)SCREEN.y);
 
-	Shader shader("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
-	shaders["guitar"] = shader.ID;
+	glEnable(GL_DEPTH_TEST);
+
+	camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
 
 	return 0;
 }
@@ -91,12 +90,11 @@ bool RenderEngine::windowShouldClose()
 void RenderEngine::clearScreen()
 {
 	glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderEngine::updateCameraView()
 {
-	model = glm::mat4(1.0f);
 	view = camera->GetViewMatrix();
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 100.0f);
 }
@@ -107,9 +105,35 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::drawObjects(const std::map<std::string, std::vector<Object>>& objects)
+void RenderEngine::drawObjects(const std::vector<Object>& objects)
 {
 
+	for (auto&& x : objects)
+	{
+		resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.use();
+
+		resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.setMat4("projection", projection);
+		resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.setMat4("view", view);
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, x.position);
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+
+		//glUseProgram(resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.ID);
+
+		//int vertexColorLocation = glGetUniformLocation(resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.ID, "ourColor");
+		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+		//resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.setVec4("ourColor", { 0.0f, greenValue, 0.0f, 1.0f });
+
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+
+		resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second.setMat4("model", model);
+
+		resourceManager.models[resourceManager.modelIndex_shaderIndex[x.modelID].first].second.Draw(resourceManager.shaders[resourceManager.modelIndex_shaderIndex[x.modelID].second].second);
+	}
 }
 
 void RenderEngine::pollEvents()
@@ -117,23 +141,17 @@ void RenderEngine::pollEvents()
 	glfwPollEvents();
 }
 
-void RenderEngine::clearKeys()
-{
-	for (auto&& x : keys)
-		x = false;
-}
-
-
 //callback functions
 //------------------
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-	std::cout << key << std::endl;
-
-	if (action == GLFW_PRESS || action == GLFW_RELEASE)
+	if (action == GLFW_PRESS)
+	{
+		//std::cout << key << " " << action << std::endl;
 		RenderEngine::keys[key] = true;
-
-	//dont forget clear keys
+	}
+	if (action == GLFW_RELEASE)
+		RenderEngine::keys[key] = false;
 }
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -141,10 +159,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	std::cout << "xpos " << xpos << " ypos " << ypos << std::endl;
+	//std::cout << "xpos " << xpos << " ypos " << ypos << std::endl;
 }
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	std::cout << "xoffset " << xoffset << " yoffset " << yoffset << std::endl;
+	//std::cout << "xoffset " << xoffset << " yoffset " << yoffset << std::endl;
 }
 //------------------

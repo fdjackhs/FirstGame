@@ -2,7 +2,6 @@
 
 Game::Game()
 {
-	//basicShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
 }
 
 Game::~Game()
@@ -13,10 +12,6 @@ Game::~Game()
 void Game::loop()
 {
 	double lastTime = 0.0;
-
-	//Shader basicShader("../FirstGame/Resources/shaders/1.basic_vertex_shader.vs", "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs");
-	//Model guitar("../FirstGame/Resources/models/backpack/backpack.obj");
-
 
 	while (!RenderEngine::windowShouldClose())
 	{
@@ -29,10 +24,8 @@ void Game::loop()
 		processInput(RenderEngine::keys);
 
 		RenderEngine::clearScreen();
-
+		
 		RenderEngine::updateCameraView();
-
-		//guitar.Draw(basicShader);
 
 		//Game::updateGameState(deltaTime)
 
@@ -55,9 +48,16 @@ void Game::load()
 	}
 }
 
-void Game::createObject(ObjectAttributes attributes)
+void Game::createObject(const ObjectAttributes& attributes)
 {
+	Object obj(attributes.ID,
+			   glm::vec3{ stof(attributes.posx),
+						  stof(attributes.posy),
+						  stof(attributes.posz) },
+			   stof(attributes.scale),
+			   "");
 
+	objects.push_back(obj);
 }
 
 void Game::updateGameState(float deltaTime)
@@ -68,8 +68,6 @@ void Game::updateGameState(float deltaTime)
 
 void Game::processInput(bool* keys)
 {
-	//TODO: process release keys
-
 	if (keys[87])
 		RenderEngine::camera->ProcessKeyboard(Camera::FORWARD, (float)RenderEngine::deltaTime);
 	if (keys[83])
@@ -78,6 +76,4 @@ void Game::processInput(bool* keys)
 		RenderEngine::camera->ProcessKeyboard(Camera::LEFT, (float)RenderEngine::deltaTime);
 	if (keys[68])
 		RenderEngine::camera->ProcessKeyboard(Camera::RIGHT, (float)RenderEngine::deltaTime);
-
-	RenderEngine::clearKeys();
 }

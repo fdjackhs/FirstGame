@@ -78,10 +78,10 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 		for (unsigned int i = 0; i < d.Size(); i++)
 		{
 			rapidjson::Value& type = d[i]["type"];
-			rapidjson::Value& path_fragment = d[i]["path_fragment"];
 			rapidjson::Value& path_vertex = d[i]["path_vertex"];
+			rapidjson::Value& path_fragment = d[i]["path_fragment"];
 
-			shader_pairs[type.GetString()] = { path_fragment.GetString(), path_vertex.GetString() };
+			shader_pairs[type.GetString()] = { path_vertex.GetString(), path_fragment.GetString() };
 		}
 
 		pair_File.close();

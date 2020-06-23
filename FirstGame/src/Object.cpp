@@ -1,9 +1,11 @@
 #include "Object.h"
 
-Object::Object(const glm::vec3& pos, const std::string& pathToModel)
+Object::Object(unsigned int ID, const glm::vec3& pos, float scl, const std::string& opt_prop)
 {
-	glm::vec3 coords = pos;
-	//model = std::make_shared<Model>("../FirstGame/Resources/models/backpack/backpack.obj");
+	modelID = ID;
+	position = pos;
+	scale = scl;
+	optionalProperties = opt_prop;
 }
 
 Object::~Object()

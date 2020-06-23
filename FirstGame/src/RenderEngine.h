@@ -41,8 +41,7 @@ namespace RenderEngine
 	void updateCameraView();
 	void updateScreen();
 
-	void drawObjects(const std::map<std::string, std::vector<Object>>& objects);
+	void drawObjects(const std::vector<Object>& objects);
 
 	void pollEvents();
-	void clearKeys();
 };

@@ -14,11 +14,11 @@ public:
 	Game(Game&&) = delete;				//??
 	Game& operator==(Game&) = delete;	//??
 
-	std::map<std::string, std::vector<Object>> objects;
+	std::vector<Object> objects;
 
 	void loop();
 	void load();
-	void createObject(ObjectAttributes attributes);
+	void createObject(const ObjectAttributes& attributes);
 	void updateGameState(float deltaTime);
 	void processInput(bool* keys);
 
