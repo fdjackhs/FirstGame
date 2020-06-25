@@ -20,7 +20,7 @@ public:
 	void load();
 	void createObject(const ObjectAttributes& attributes);
 	void updateGameState(float deltaTime);
-	void processInput(bool* keys);
+	void processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll);
 
 private:
 	//game state (game, pause)

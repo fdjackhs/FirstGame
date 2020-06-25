@@ -16,7 +16,16 @@ namespace RenderEngine
 {
 	extern glm::vec2 SCREEN;
 	extern GLFWwindow* window;
-	extern bool keys[1024];
+
+	//keyboard
+	extern bool keys[349];
+	//mouse
+	extern bool enteredWindow;
+	extern bool buttons[12];
+	extern glm::vec2 cursorCoords;
+	extern glm::vec3 startCursorPos;
+	extern bool firstMouse;
+	extern int scroll;
 	
 	extern glm::mat4 model;
 	extern glm::mat4 view;
@@ -29,7 +38,6 @@ namespace RenderEngine
 
 	//Render routines
 	//----------------------------------------------
-	//TODO: mouse pos & mouse buttons & scroll
 
 	int init(float x, float y, const char* windowName);
 	void free();
@@ -40,6 +48,8 @@ namespace RenderEngine
 	void clearScreen();
 	void updateCameraView();
 	void updateScreen();
+
+	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 
 	void drawObjects(const std::vector<Object>& objects);
 

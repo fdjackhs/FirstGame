@@ -6,7 +6,7 @@
 
 int main()
 {
-	RenderEngine::init(1600, 900, "FirstGame");
+	RenderEngine::init(1600, 800, "FirstGame");
 
 	Game game;
 	game.load();
