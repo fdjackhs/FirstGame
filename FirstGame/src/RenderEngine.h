@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <math.h>
+#include <time.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,6 +13,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "ResourceManager.h"
+#include "SelectArea.h"
 
 namespace RenderEngine
 {
@@ -32,7 +35,7 @@ namespace RenderEngine
 	extern glm::mat4 projection;
 	extern std::shared_ptr<Camera> camera;
 	
-	extern double deltaTime;
+	extern float deltaTime;
 	
 	extern ResourceManager resourceManager;
 
@@ -50,8 +53,9 @@ namespace RenderEngine
 	void updateScreen();
 
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
+	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
 
-	void drawObjects(const std::vector<Object>& objects);
+	void drawObjects(std::vector<std::shared_ptr<Object>>& objects, select_area& selectArea);
 
 	void pollEvents();
 };

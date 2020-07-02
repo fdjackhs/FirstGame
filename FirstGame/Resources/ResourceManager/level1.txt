@@ -1,12 +1,42 @@
 [
 	{
-		"type": "BLUE_STAR",
+		"models_type": ["UNIT"],
 		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
 		
-		"scale": "1.0",
+		"scale": "0.1",
 		
-		"optionalProperties": "obj1"
+		"optionalProperties": "UNIT"
+	},
+	{
+		"models_type": ["UNIT"],
+		"posx": "1.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"optionalProperties": "UNIT"
+	},
+	{
+		"models_type": ["UNIT"],
+		"posx": "2.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"optionalProperties": "UNIT"
+	},
+	{
+		"models_type": ["UNIT"],
+		"posx": "3.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"optionalProperties": "UNIT"
 	}
 ]

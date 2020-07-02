@@ -1,10 +1,12 @@
 [
 	{
-		"type" : "BLUE_STAR",
-		"path" : "../FirstGame/Resources/models/backpack/backpack.obj"
+		"type" : "UNIT",
+		"path" : "../FirstGame/Resources/models/Planet/sun.obj",
+		"shader_type" : "BASIC"
 	},
 	{
 		"type" : "default",
-		"path" : "path"
+		"path" : "default",
+		"shader_type" : "default"
 	}
 ]

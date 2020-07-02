@@ -3,7 +3,7 @@
 
 struct ObjectAttributes
 {
-	unsigned int ID; //for resource manager
+	std::vector<unsigned int> IDs; //for resource manager
 
 	std::string posx;
 	std::string posy;

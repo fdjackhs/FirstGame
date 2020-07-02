@@ -30,15 +30,27 @@ public:
 	std::vector<std::pair<std::string, Shader>> shaders;
 	std::vector<std::pair<std::string, Model>> models;
 
+	std::shared_ptr<Shader> m_stencilShader;
+	std::shared_ptr<Shader> m_areaShader;
+
 	//list of loaded pairs models & shaders
 	//first - model index, second - shader index
 	std::vector<std::pair<unsigned int, unsigned int>> modelIndex_shaderIndex;
+
+	//manually created objects
+	std::vector<std::pair<unsigned int, unsigned int>> m_manuallyCreaatedObjects;
 
 	ResourceManager();
 
 	//void init();
 	void loadListPathLevels();
-	void loadPairs(const char* path, std::map<std::string, std::string>& vector_pairs);
+	void loadModelPairs(const char* path, std::map<std::string, std::string>& vector_pairs);
 	void loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs);
 	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
+
+	//return VBO - need for update
+	uint32_t createObject(GLfloat* vertices, const std::string& vertexPath, const std::string& fragmentPath, GLuint& vao);
+	//void updateVBO(uint32_t vbo, std::vector<GLfloat>& vertices);
+
+	void updateVBO(uint32_t vbo, GLfloat* vertices);
 };
