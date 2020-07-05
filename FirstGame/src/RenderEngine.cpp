@@ -125,7 +125,7 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects, select_area& selectArea)
+void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, select_area& selectArea*/)
 {
 	//draw objects
 	//------------
@@ -133,6 +133,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects, se
 	{
 		for (unsigned int modelID = 0; modelID < obj->m_modelIDs.size(); modelID++)
 		{
+			//for stencil
+			//-----------
 			if (obj->m_selected)
 			{
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -148,11 +150,15 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects, se
 
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, { position.x, position.y, position.z });
-				model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+
+				if (obj->m_selected)
+					model = glm::scale(model, glm::vec3(obj->m_scale * 1.2, obj->m_scale * 1.2, obj->m_scale * 1.2));
+				else
+					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
 
 				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.setMat4("model", model);
 				resourceManager.models[resourceManager.modelIndex_shaderIndex[modelID].first].second.Draw(resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second);
-				//---------------------
+
 
 			//draw stencil
 			//------------
@@ -183,28 +189,23 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects, se
 
 	//draw area
 	//-----------------------------
-	
-	if (selectArea.radius > 0.0f)
+	for (unsigned int modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)
 	{
-		selectArea.updateVertices();
-		resourceManager.updateVBO(selectArea.vbo, selectArea.vertices);
+		uint32_t modelIndex  = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].first;
+		uint32_t shaderIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].second;
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, selectArea.centerInWorldCoords);
+		model = glm::translate(model, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_position);
 
-		RenderEngine::resourceManager.m_areaShader->use();
-		for (auto&& object : RenderEngine::resourceManager.m_manuallyCreaatedObjects)
-		{
+		resourceManager.shaders[shaderIndex].second.use();
+		resourceManager.shaders[shaderIndex].second.setMat4("view", view);
+		resourceManager.shaders[shaderIndex].second.setMat4("projection", projection);
+		resourceManager.shaders[shaderIndex].second.setMat4("model", model);
 
-			RenderEngine::resourceManager.m_areaShader->setMat4("view", view);
-			RenderEngine::resourceManager.m_areaShader->setMat4("projection", projection);
-			RenderEngine::resourceManager.m_areaShader->setMat4("model", model);
-
-			glBindVertexArray(selectArea.vao);
-			glLineWidth(3);
-			glDrawElements(GL_LINE_LOOP, selectArea.size / 3, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-		}
+		glBindVertexArray(RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_VAO);
+		glLineWidth(3);
+		glDrawElements(GL_LINE_LOOP, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_vertices.size() / 3, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 	}
 }
 

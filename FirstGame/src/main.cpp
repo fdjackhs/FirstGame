@@ -9,9 +9,7 @@ int main()
 {	
 	RenderEngine::init(1600, 800, "FirstGame");
 
-	Game game;
-	game.load();
-	//game init
+	Game game(0);
 	game.loop();
 
 	RenderEngine::free();

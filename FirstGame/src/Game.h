@@ -9,7 +9,7 @@
 class Game
 {
 public:
-	Game();
+	Game(unsigned int level);
 	~Game();
 
 	Game(Game&) = delete;				//??
@@ -17,7 +17,6 @@ public:
 	Game& operator==(Game&) = delete;	//??
 
 	void loop();
-	void load();
 	void createObject(const ObjectAttributes& attributes);
 	void updateGameState(float deltaTime);
 	void processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll);
@@ -25,7 +24,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Object>> objects;
-	select_area m_area;
+	std::shared_ptr<select_area> m_area;
 
 	//game state (game, pause)
 	//game speed

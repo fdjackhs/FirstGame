@@ -18,9 +18,6 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scal
 	  
 	m_front = float((rand() * 10000) % (31415 * 2)) / 10000.0f;
 	m_actualPosition = m_position;
-
-	m_visible.push_back(true);	//first always model
-	m_visible.push_back(false); //second and subsequent - is areas, buffs, effects, etc...
 }
 
 void Unit::action(float deltaTime)

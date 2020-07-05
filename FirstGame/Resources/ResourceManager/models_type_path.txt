@@ -2,7 +2,7 @@
 	{
 		"type" : "UNIT",
 		"path" : "../FirstGame/Resources/models/Planet/sun.obj",
-		"shader_type" : "BASIC"
+		"shader_type" : "UNIT"
 	},
 	{
 		"type" : "default",

@@ -14,13 +14,11 @@ public:
 	~Object();
 
 	bool m_selected;
-	glm::vec3 m_position;
 	float m_scale;
+	glm::vec3 m_position;
 	std::string m_optionalProperties;
 
 	std::vector<unsigned int> m_modelIDs;
-	std::vector<bool> m_visible;
-
 
 	virtual void action(float);
 	virtual glm::vec3 GetPosition() const;

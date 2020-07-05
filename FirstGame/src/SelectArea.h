@@ -3,34 +3,25 @@
 
 #include <glm/glm.hpp>
 
+#include "RenderEngine.h"
+#include "Object.h"
+
+
 #define pi 3.141592f
 #define pi2 2.0f * pi
 
-struct select_area
+class select_area
 {
+public:
 	bool firstTime;
 	float radius;
-	float radiusInWorldCoords;
+	uint32_t ID;
 
 	glm::vec2 areaStartPosition;
-	glm::vec2 center;
+	glm::vec3 m_position;
 
-	glm::vec3 centerInWorldCoords;
+	/**/std::vector<GLfloat> vertices;
 
-	//for drawing
-	//-----------
-	static const uint32_t size = 240;
-	GLfloat vertices[size];
-	GLuint vao, vbo;
-
-	void updateVertices()
-	{
-		for (unsigned int i = 0; i < (size / 3); i++)
-		{
-			float angle = pi2 * float(i) / (size / 3);
-
-			vertices[i * 3 + 0]	= radiusInWorldCoords * (float)cos(angle);
-			vertices[i * 3 + 2] = radiusInWorldCoords * (float)sin(angle);
-		}
-	}
+	select_area(uint32_t id);
+	void updateVertices();
 };

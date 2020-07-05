@@ -96,7 +96,6 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
 {
 	m_stencilShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.stencil_shader.vs", "../FirstGame/Resources/shaders/1.stencil_shader.fs");
-	m_areaShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 
 	std::string levelData;
 	std::ifstream levelFile;
@@ -181,40 +180,43 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 	}
 }
 
-GLuint ResourceManager::createObject(GLfloat* vertices, const std::string& vertexPath, const std::string& fragmentPath, GLuint& vao)
+GLuint ResourceManager::createObject(std::vector<GLfloat> vertices, const std::string& vertexPath, const std::string& fragmentPath)
 {
 	Shader shader(vertexPath.c_str(), fragmentPath.c_str());
-	shaders.push_back({ "", shader });
+	shaders.push_back({ "AREA", shader });
 	uint32_t shaderIndex = shaders.size() - 1;
 
-	GLuint indices[80];
-	for (uint32_t i = 0; i < 80; i++) indices[i] = i;
+	std::vector<GLuint> indices(vertices.size() / 3);
+	for (uint32_t i = 0; i < indices.size(); i++) indices[i] = i;
 
-	GLuint VBO, VAO, EBO;
+	GLuint VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 240, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	m_manuallyCreaatedObjects.push_back({ VAO, shaderIndex });
+	ManuallyCreatedObject manObj(VAO, VBO, EBO, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), vertices);
+	m_manuallyCreaatedObjects.push_back(manObj);
 
-	vao = VAO;
-	return VBO;
+	m_manCrObj_indexs.push_back({ m_manuallyCreaatedObjects.size() - 1, shaderIndex });
+
+	return m_manCrObj_indexs.size() - 1;
 }
 
-void ResourceManager::updateVBO(uint32_t vbo, GLfloat* vertices)
+void ResourceManager::updateVBO(uint32_t id, std::vector<GLfloat>& vertices)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 240, vertices, GL_STATIC_DRAW);
+	GLuint VBO = m_manuallyCreaatedObjects[id].m_VBO;
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
 }

@@ -8,9 +8,6 @@ Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_position = pos;
 	m_scale = scl;
 	m_optionalProperties = opt_prop;
-	
-	m_visible.push_back(true);	//first always model
-	m_visible.push_back(false); //second and subsequent - is areas, buffs, effects, etc...
 }
 
 Object::~Object()

@@ -6,16 +6,16 @@
 class Unit : public Object
 {
 public:
-	Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop);
-
-	std::string m_state;
 
 	float m_speed;
 	float m_front;
 
+	std::string m_state;
+
 	glm::vec3 m_target;
 	glm::vec3 m_actualPosition;
 
+	Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop);
 	void action(float deltaTime);
 	glm::vec3 GetPosition() const;
 };
