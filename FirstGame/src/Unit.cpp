@@ -7,14 +7,17 @@
 
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop)
 {
+	//Object(ID, pos, scale, opt_prop);
+
 	m_modelIDs = ID;
 	m_position = pos;
+	m_targetPos = m_position;
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
 
 	m_selected = false;
 	m_state = "rest";
-	m_speed = 0.00005f;
+	m_speed = 1.00000f;
 	  
 	m_front = float((rand() * 10000) % (31415 * 2)) / 10000.0f;
 	m_actualPosition = m_position;
@@ -22,6 +25,12 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scal
 
 void Unit::action(float deltaTime)
 {
+	if (glm::distance(m_position, m_targetPos) > 0.01f)
+		m_state = "move";
+	else
+		m_state = "rest";
+
+
 	//glm::vec3(sin(angle), 0.0f, cos(angle));
 	if (m_state == "rest")
 	{
@@ -52,15 +61,24 @@ void Unit::action(float deltaTime)
 
 		//m_front += 0.01f;
 		//m_actualPosition = glm::vec3(m_position.x + sin(m_front), 0.0f, m_position.z + cos(m_front));
+		
+
+
 	}
 	else if (m_state == "move")
 	{
-		m_position = m_actualPosition;
+		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
+
+		m_position += move_vector * m_speed * deltaTime;
+
+		while (false);
+		//m_position = m_actualPosition;
 	}
-	m_actualPosition = m_position;
+	//m_actualPosition = m_position;
 }
 
 glm::vec3 Unit::GetPosition() const
 {
-	return m_actualPosition;
+	//return m_actualPosition;
+	return m_position;
 }

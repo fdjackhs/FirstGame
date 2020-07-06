@@ -16,10 +16,12 @@ public:
 	bool m_selected;
 	float m_scale;
 	glm::vec3 m_position;
+	glm::vec3 m_targetPos;
 	std::string m_optionalProperties;
 
 	std::vector<unsigned int> m_modelIDs;
 
 	virtual void action(float);
+	virtual void setTargetPosition(glm::vec3& target);
 	virtual glm::vec3 GetPosition() const;
 };

@@ -4,7 +4,8 @@
 select_area::select_area(uint32_t id)
 {
 	ID = id;
-	firstTime = true;
+	firstTime = true; 
+	previusTime = false;
 	areaStartPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	vertices = move(std::vector<GLfloat>(240));
 }

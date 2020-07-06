@@ -14,6 +14,7 @@ class select_area
 {
 public:
 	bool firstTime;
+	bool previusTime;
 	float radius;
 	uint32_t ID;
 

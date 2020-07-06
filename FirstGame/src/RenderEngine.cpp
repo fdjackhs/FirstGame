@@ -151,9 +151,9 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, 
 				glm::mat4 model = glm::mat4(1.0f);
 				model = glm::translate(model, { position.x, position.y, position.z });
 
-				if (obj->m_selected)
-					model = glm::scale(model, glm::vec3(obj->m_scale * 1.2, obj->m_scale * 1.2, obj->m_scale * 1.2));
-				else
+				//if (obj->m_selected)
+				//	model = glm::scale(model, glm::vec3(obj->m_scale * 1.2, obj->m_scale * 1.2, obj->m_scale * 1.2));
+				//else
 					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
 
 				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.setMat4("model", model);
