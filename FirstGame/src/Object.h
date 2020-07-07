@@ -15,8 +15,14 @@ public:
 
 	bool m_selected;
 	float m_scale;
+
+	std::string m_state;
+
 	glm::vec3 m_position;
 	glm::vec3 m_targetPos;
+
+	glm::vec3 m_gravityOffset;
+
 	std::string m_optionalProperties;
 
 	std::vector<unsigned int> m_modelIDs;

@@ -21,6 +21,7 @@ public:
 	void updateGameState(float deltaTime);
 	void processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll);
 	void selectUnits();
+	void updatePhysics();
 
 private:
 	std::vector<std::shared_ptr<Object>> objects;

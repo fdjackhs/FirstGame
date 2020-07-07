@@ -10,8 +10,6 @@ public:
 	float m_speed;
 	float m_front;
 
-	std::string m_state;
-
 	//glm::vec3 m_target;
 	glm::vec3 m_actualPosition;
 

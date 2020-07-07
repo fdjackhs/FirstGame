@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Unit.h"
 
 #include <math.h>
@@ -25,20 +27,16 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scal
 
 void Unit::action(float deltaTime)
 {
-	if (glm::distance(m_position, m_targetPos) > 0.01f)
-		m_state = "move";
-	else
-		m_state = "rest";
-
 
 	//glm::vec3(sin(angle), 0.0f, cos(angle));
 	if (m_state == "rest")
 	{
+		m_position += m_gravityOffset * deltaTime;
 		/*
 		float left = m_front - 1.0f;
 		float right = m_front + 1.0f;
 
-		glm::vec2 point1(m_actualPosition.x + sin(left), m_actualPosition.z + cos(left));
+		glm::vec2 point1(m_actualPosition.x + sin(left), m_actualPosition.z + 55cos(left));
 		glm::vec2 point2(m_actualPosition.x + sin(right), m_actualPosition.z + cos(right));
 
 		float dist1 = glm::distance(point1, glm::vec2(m_actualPosition.x, m_actualPosition.z));
@@ -62,19 +60,18 @@ void Unit::action(float deltaTime)
 		//m_front += 0.01f;
 		//m_actualPosition = glm::vec3(m_position.x + sin(m_front), 0.0f, m_position.z + cos(m_front));
 		
-
-
 	}
 	else if (m_state == "move")
 	{
 		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
-
 		m_position += move_vector * m_speed * deltaTime;
-
-		while (false);
-		//m_position = m_actualPosition;
 	}
 	//m_actualPosition = m_position;
+
+	if (glm::distance(m_position, m_targetPos) < 0.1f)
+	{
+		m_state = "rest";
+	}
 }
 
 glm::vec3 Unit::GetPosition() const

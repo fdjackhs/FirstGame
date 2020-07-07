@@ -75,8 +75,33 @@ void Game::createObject(const ObjectAttributes& attributes)
 	}
 }
 
+void Game::updatePhysics()
+{
+	for (uint32_t i = 0; i < objects.size(); i++)
+	{
+		glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
+
+		for (uint32_t j = 0; j < objects.size(); j++)
+		{
+			if (j != i)
+			{
+				float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.01f;
+				if (force < 0.02)
+					force = 0.0f;
+				glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
+
+				totoalGravityVector += temp;
+			}
+		}
+
+		objects[i]->m_gravityOffset = totoalGravityVector;
+	}
+}
+
 void Game::updateGameState(float deltaTime)
 {
+	updatePhysics();
+
 	selectUnits();
 
 	for (auto&& obj : objects)
@@ -214,7 +239,10 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 			for (auto&& obj : objects)
 			{
 				if (obj->m_selected)
+				{
 					obj->setTargetPosition(targetPos);
+					obj->m_state = "move";
+				}
 			}
 			
 			//collapse select area
