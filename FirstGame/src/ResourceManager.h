@@ -18,6 +18,12 @@ struct shader_path
 	std::string fragment;
 };
 
+struct model_bunch //path to model and type of shader for that model
+{
+	std::string path;
+	std::string shader_type;
+};
+
 class ResourceManager
 {
 public:
@@ -26,7 +32,7 @@ public:
 	//first - type of shader, second - path to shader;
 	std::map<std::string, shader_path> shaders_type_path; // load in constuctor
 	//first - type of model, second - path to model;
-	std::map<std::string, std::string> models_type_path; // load in constuctor
+	std::map<std::string, model_bunch> models_type_path; // load in constuctor
 
 	std::vector<std::pair<std::string, Shader>> shaders;
 	std::vector<std::pair<std::string, Model>> models;
@@ -42,11 +48,12 @@ public:
 	//first - manCrObj index, second - shader index
 	std::vector<std::pair<unsigned int, unsigned int>> m_manCrObj_indexs;
 
+
 	ResourceManager();
 
 	//void init();
 	void loadListPathLevels();
-	void loadModelPairs(const char* path, std::map<std::string, std::string>& vector_pairs);
+	void loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs);
 	void loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs);
 	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
 

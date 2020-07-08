@@ -25,6 +25,14 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/ResourceManager.h
 	${PROJECT_NAME}/src/ResourceManager.cpp
 	${PROJECT_NAME}/src/ObjectAttributes.h
+	${PROJECT_NAME}/src/Unit.h
+	${PROJECT_NAME}/src/Unit.cpp
+	${PROJECT_NAME}/src/SelectArea.h
+	${PROJECT_NAME}/src/SelectArea.cpp
+	${PROJECT_NAME}/src/ManuallyCreatedObject.h
+	${PROJECT_NAME}/src/ManuallyCreatedObject.cpp
+	${PROJECT_NAME}/src/Planet.h
+	${PROJECT_NAME}/src/Planet.cpp
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )

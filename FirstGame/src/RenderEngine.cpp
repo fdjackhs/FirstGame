@@ -85,7 +85,7 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	//
-	camera = std::make_shared<Camera>(glm::vec3(0.0f, 10.0f, 0.0f));
+	camera = std::make_shared<Camera>(glm::vec3(0.0f, 300.0f, 0.0f));
 	RenderEngine::firstMouse = true;
 	srand(unsigned int(time(NULL)));
 
@@ -116,7 +116,7 @@ void RenderEngine::clearScreen()
 void RenderEngine::updateCameraView()
 {
 	view = camera->GetViewMatrix();
-	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 1000.0f);
 }
 
 void RenderEngine::updateScreen()
@@ -125,8 +125,12 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, select_area& selectArea*/)
+static int counter = 0;
+
+void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
+//void RenderEngine::drawObjects(std::vector<Object*>& objects)
 {
+	std::cout << objects.size() << std::endl;
 	//draw objects
 	//------------
 	for (auto&& obj : objects)
@@ -143,9 +147,12 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, 
 
 				//draw original objects
 				//---------------------
-				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.use();
-				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.setMat4("projection", projection);
-				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.setMat4("view", view);
+				uint32_t shader_index = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[modelID]].second;
+				uint32_t model_index  = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[modelID]].first;
+
+				resourceManager.shaders[shader_index].second.use();
+				resourceManager.shaders[shader_index].second.setMat4("projection", projection);
+				resourceManager.shaders[shader_index].second.setMat4("view", view);
 				glm::vec3 position = obj->GetPosition();
 
 				glm::mat4 model = glm::mat4(1.0f);
@@ -156,9 +163,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, 
 				//else
 					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
 
-				resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second.setMat4("model", model);
-				resourceManager.models[resourceManager.modelIndex_shaderIndex[modelID].first].second.Draw(resourceManager.shaders[resourceManager.modelIndex_shaderIndex[modelID].second].second);
-
+				resourceManager.shaders[shader_index].second.setMat4("model", model);
+				resourceManager.models[model_index].second.Draw(resourceManager.shaders[shader_index].second);
 
 			//draw stencil
 			//------------
@@ -177,7 +183,7 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, 
 				model = glm::scale(model, glm::vec3(obj->m_scale * 1.7f, obj->m_scale * 1.7f, obj->m_scale * 1.7f));
 
 				resourceManager.m_stencilShader->setMat4("model", model);
-				resourceManager.models[resourceManager.modelIndex_shaderIndex[modelID].first].second.Draw(*resourceManager.m_stencilShader);
+				resourceManager.models[model_index].second.Draw(*resourceManager.m_stencilShader);
 
 				glStencilMask(0xFF);
 				glStencilFunc(GL_ALWAYS, 0, 0xFF);
@@ -186,7 +192,6 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, 
 			//------------
 		}
 	}
-
 	//draw area
 	//-----------------------------
 	for (unsigned int modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)

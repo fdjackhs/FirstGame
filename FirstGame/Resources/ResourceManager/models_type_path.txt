@@ -1,7 +1,12 @@
 [
 	{
 		"type" : "UNIT",
-		"path" : "../FirstGame/Resources/models/Planet/sun.obj",
+		"path" : "../FirstGame/resources/models/Unit/unit.obj",
+		"shader_type" : "UNIT"
+	},
+	{
+		"type" : "PLANET",
+		"path" : "../FirstGame/resources/models/Planet/Planet.obj",
 		"shader_type" : "UNIT"
 	},
 	{
