@@ -28,7 +28,7 @@ void ResourceManager::loadListPathLevels()
 	}
 }
 
-void ResourceManager::loadModelPairs(const char* path, std::map<std::string, std::string>& vector_pairs)
+void ResourceManager::loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs)
 {
 	std::ifstream pair_File;
 	pair_File.open(path);
@@ -49,7 +49,7 @@ void ResourceManager::loadModelPairs(const char* path, std::map<std::string, std
 			rapidjson::Value& path = d[i]["path"];
 			rapidjson::Value& shaderType = d[i]["shader_type"];
 
-			vector_pairs[type.GetString()] = path.GetString();
+			vector_pairs[type.GetString()] = { path.GetString(), shaderType.GetString() };
 		}
 
 		pair_File.close();
@@ -131,7 +131,7 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 			unsigned int model_index = -1;
 			if (findedModel == models.end()) // if model not loaded
 			{
-				Model model((models_type_path[type.GetString()]).c_str());
+				Model model((models_type_path[type.GetString()].path).c_str());
 				models.push_back({ type.GetString(), model });
 				model_index = models.size() - 1;
 			}
@@ -140,21 +140,23 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 				model_index = findedModel - models.begin();
 			}
 
+			std::string type_of_shader = models_type_path[type.GetString()].shader_type;
 
 			auto findedShader = std::find_if(
 				shaders.begin(), shaders.end(),
-				[&type](const std::pair<std::string, Shader>& x) { return x.first == type.GetString(); });
+				[&type_of_shader](const std::pair<std::string, Shader>& x) { return x.first == type_of_shader; });
 
 			unsigned int shader_index = -1;
 			if (findedShader == shaders.end()) // if shader not loaded
 			{
-				Shader shader((shaders_type_path[type.GetString()].vertex).c_str(), (shaders_type_path[type.GetString()].fragment).c_str());
-				shaders.push_back({ type.GetString(), shader });
+				Shader shader((shaders_type_path[type_of_shader].vertex).c_str(),
+							  (shaders_type_path[type_of_shader].fragment).c_str());
+
+				shaders.push_back({ type_of_shader, shader });
 				shader_index = shaders.size() - 1;
 			}
 			else
 			{
-
 				shader_index = findedShader - shaders.begin();
 			}
 
@@ -162,11 +164,11 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 			indexes.push_back((modelIndex_shaderIndex.size() - 1));
 		}
 
-
 		rapidjson::Value& posx = d[i]["posx"];
 		rapidjson::Value& posy = d[i]["posy"];
 		rapidjson::Value& posz = d[i]["posz"];
 		rapidjson::Value& scale = d[i]["scale"];
+		rapidjson::Value& exsist = d[i]["exsist"];
 		rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
 
 		ObjectAttributes temp{  indexes,
@@ -174,6 +176,7 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 								posy.GetString(), 
 								posz.GetString(), 
 								scale.GetString(), 
+								exsist.GetString(),
 								optionalProperties.GetString() };
 
 		objectsAttrib.push_back(temp);

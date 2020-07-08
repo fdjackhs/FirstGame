@@ -11,5 +11,7 @@ struct ObjectAttributes
 
 	std::string scale;
 
+	std::string exsist;
+
 	std::string optionalProperties;
 };

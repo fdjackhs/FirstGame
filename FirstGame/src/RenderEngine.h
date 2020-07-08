@@ -57,7 +57,8 @@ namespace RenderEngine
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
 
-	void drawObjects(std::vector<std::shared_ptr<Object>>& objects/*, select_area& selectArea*/);
+	void drawObjects(std::vector<std::shared_ptr<Object>>& objects); 
+	//void drawObjects(std::vector<Object*>& objects);
 
 	void pollEvents();
 };

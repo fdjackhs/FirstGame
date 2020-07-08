@@ -16,6 +16,8 @@ public:
 	bool m_selected;
 	float m_scale;
 
+	std::string m_type;
+
 	std::string m_state;
 
 	glm::vec3 m_position;

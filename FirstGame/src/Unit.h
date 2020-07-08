@@ -8,12 +8,10 @@ class Unit : public Object
 public:
 
 	float m_speed;
-	float m_front;
 
-	//glm::vec3 m_target;
-	glm::vec3 m_actualPosition;
+	Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop);
+	Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const glm::vec3& target);
 
-	Unit(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop);
 	void action(float deltaTime);
 	glm::vec3 GetPosition() const;
 };

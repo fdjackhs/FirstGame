@@ -53,25 +53,46 @@ void Game::createObject(const ObjectAttributes& attributes)
 {
 	if (attributes.optionalProperties == "UNIT")
 	{
-		Unit* unit = new Unit(attributes.IDs,
-							  glm::vec3{ stof(attributes.posx),
-										 stof(attributes.posy),
-										 stof(attributes.posz) },
-							  stof(attributes.scale),
-							  "");
-		std::shared_ptr<Object> obj(unit);
-		objects.push_back(obj);
+		if (m_common_unit_index.size() == 0)
+			m_common_unit_index = attributes.IDs;
 	}
-	else
+
+	if (attributes.exsist == "true")
 	{
-		Object* unit = new Object(attributes.IDs,
-								  glm::vec3{ stof(attributes.posx),
-											 stof(attributes.posy),
-											 stof(attributes.posz) },
-								  stof(attributes.scale),
-								  "");
-		std::shared_ptr<Object> obj(unit);
-		objects.push_back(obj);
+		if (attributes.optionalProperties == "UNIT")
+		{
+			Unit* ptr_unit = new Unit(attributes.IDs,
+				glm::vec3{ stof(attributes.posx),
+						   stof(attributes.posy),
+						   stof(attributes.posz) },
+				stof(attributes.scale),
+				"");
+			std::shared_ptr<Object> sp_unit(ptr_unit);
+			objects.push_back(sp_unit);
+		}
+		else if (attributes.optionalProperties == "PLANET")
+		{
+			Planet* ptr_planet = new Planet(attributes.IDs,
+				glm::vec3{ stof(attributes.posx),
+						   stof(attributes.posy),
+						   stof(attributes.posz) },
+				stof(attributes.scale),
+				"",
+				this);
+			std::shared_ptr<Object> sh_planet(ptr_planet);
+			objects.push_back(sh_planet);
+		}
+		else
+		{
+			Object* ptr_obj = new Object(attributes.IDs,
+				glm::vec3{ stof(attributes.posx),
+						   stof(attributes.posy),
+						   stof(attributes.posz) },
+				stof(attributes.scale),
+				"");
+			std::shared_ptr<Object> sh_obj(ptr_obj);
+			objects.push_back(sh_obj);
+		}
 	}
 }
 
@@ -85,8 +106,8 @@ void Game::updatePhysics()
 		{
 			if (j != i)
 			{
-				float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.01f;
-				if (force < 0.02)
+				float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.2f;
+				if (force < 0.15)
 					force = 0.0f;
 				glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
 
@@ -102,27 +123,40 @@ void Game::updateGameState(float deltaTime)
 {
 	updatePhysics();
 
-	selectUnits();
-
-	for (auto&& obj : objects)
+	for (auto i = 0; i < objects.size(); i++)
 	{
-		obj->action(deltaTime);
+		objects[i]->action(deltaTime);
 	}
+
+	selectUnits();
 }
 
 void Game::selectUnits()
 {
 	for (auto&& obj : objects)
 	{
-		if (glm::distance(m_area->m_position, obj->m_position) <= m_area->radius)
+		if (obj->m_type == "Unit")
 		{
-			obj->m_selected = true;
-		}
-		else
-		{
-			obj->m_selected = false;
+			if (glm::distance(m_area->m_position, obj->m_position) <= m_area->radius)
+			{
+				obj->m_selected = true;
+			}
+			else
+			{
+				obj->m_selected = false;
+			}
 		}
 	}
+}
+
+void Game::createUnit(const glm::vec3& position, const glm::vec3& targetPosition)
+{
+	
+	Unit* ptr_unit = new Unit(m_common_unit_index, position, targetPosition);
+	
+	objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
+
+	//objects.
 }
 
 void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll)
@@ -144,14 +178,14 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	//process mouse scroll
 	//--------------------
 	if (scroll == 1)
-		RenderEngine::camera->Position.y -= 0.5f;
+		RenderEngine::camera->Position.y -= 5.0f;
 	if (scroll == -1)
-		RenderEngine::camera->Position.y += 0.5f;
+		RenderEngine::camera->Position.y += 5.0f;
 
-	if (RenderEngine::camera->Position.y < 3)
-		RenderEngine::camera->Position.y = 3;
-	if (RenderEngine::camera->Position.y > 40)
-		RenderEngine::camera->Position.y = 40;
+	if (RenderEngine::camera->Position.y < 10)
+		RenderEngine::camera->Position.y = 10;
+	if (RenderEngine::camera->Position.y > 1000)
+		RenderEngine::camera->Position.y = 1000;
 
 	RenderEngine::scroll = 0;
 
