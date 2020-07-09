@@ -1,6 +1,6 @@
 # Blender v2.82 (sub 7) OBJ File: ''
 # www.blender.org
-mtllib unit.mtl
+mtllib Red_unit.mtl
 o Sphere
 v 0.000000 0.994138 -0.108119
 v 0.000000 0.976621 -0.214970

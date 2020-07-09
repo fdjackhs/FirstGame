@@ -169,15 +169,18 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 		rapidjson::Value& posz = d[i]["posz"];
 		rapidjson::Value& scale = d[i]["scale"];
 		rapidjson::Value& exsist = d[i]["exsist"];
-		rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
+		//rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
 
-		ObjectAttributes temp{  indexes,
+		rapidjson::Value& object_type = d[i]["object_type"];
+		m_complete_models[object_type.GetString()] = indexes;
+
+		ObjectAttributes temp{  object_type.GetString(),
 								posx.GetString(), 
 								posy.GetString(), 
 								posz.GetString(), 
 								scale.GetString(), 
 								exsist.GetString(),
-								optionalProperties.GetString() };
+								"" };
 
 		objectsAttrib.push_back(temp);
 	}

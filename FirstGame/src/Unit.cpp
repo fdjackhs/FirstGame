@@ -7,7 +7,7 @@
 #define pi 3.141592
 #define pi2 2 * pi
 
-Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop)
+Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop, const std::string fraction)
 {
 	m_modelIDs = ID;
 	m_position = position;
@@ -19,9 +19,15 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float
 	m_selected = false;
 	m_state = "rest";
 	m_speed = 10.00000f;
+
+	m_gravityOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	m_physics_counter = 0;
+
+	m_fraction = fraction; //color
 }
 
-Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const glm::vec3& target)
+Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const glm::vec3& target, const std::string fraction)
 {
 	m_modelIDs = ID;
 	m_position = position;
@@ -33,6 +39,12 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const
 	m_selected = false;
 	m_state = "move";
 	m_speed = 10.00000f;
+
+	m_gravityOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	m_physics_counter = 0;
+
+	m_fraction = fraction; //color
 }
 
 void Unit::action(float deltaTime)

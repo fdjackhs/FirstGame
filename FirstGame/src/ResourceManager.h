@@ -44,6 +44,16 @@ public:
 	//first - model index, second - shader index
 	std::vector<std::pair<unsigned int, unsigned int>> modelIndex_shaderIndex;
 
+	//ready-made bundles of a list of models and shaders for them
+	/*
+		When a new object is created during the game, it receives a list of models 
+		of which it consists (and shaders for specifically these models) of this map, 
+		but during rendering this map is not used because the object (for example, a red unit) 
+		already has a list of pair indices {model index, shader index} 
+		which are stored in the std::vector modelIndex_shaderIndex 
+	*/
+	std::map<std::string, std::vector<unsigned int>> m_complete_models;
+
 	//manually created objects
 	//first - manCrObj index, second - shader index
 	std::vector<std::pair<unsigned int, unsigned int>> m_manCrObj_indexs;

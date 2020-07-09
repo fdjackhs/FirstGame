@@ -2,7 +2,7 @@
 
 Object::Object() {}
 
-Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scl, const std::string& opt_prop)
+Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scl, const std::string& opt_prop, const std::string fraction)
 {
 	m_modelIDs = ID;
 	m_position = pos;
@@ -11,6 +11,9 @@ Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_optionalProperties = opt_prop;
 	m_selected = false;
 	m_type = "Object";
+	m_physics_counter = 0;
+
+	m_fraction = fraction; //color
 }
 
 Object::~Object()

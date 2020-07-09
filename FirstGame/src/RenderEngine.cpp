@@ -130,7 +130,7 @@ static int counter = 0;
 void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 //void RenderEngine::drawObjects(std::vector<Object*>& objects)
 {
-	std::cout << objects.size() << std::endl;
+	//std::cout << objects.size() << std::endl;
 	//draw objects
 	//------------
 	for (auto&& obj : objects)

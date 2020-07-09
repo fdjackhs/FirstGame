@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, Game* game)
+Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, Game* game, const std::string fraction)
 {
 	m_modelIDs = ID;
 	m_position = pos;
@@ -17,6 +17,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_reloading = 0.0f;
 
 	m_gameState = game;
+
+	m_fraction = fraction; //color
 }
 
 void Planet::action(float deltaTime)
@@ -36,7 +38,11 @@ void Planet::action(float deltaTime)
 		target.y = 0.0f;
 		target.z = m_position.z + cos(angle) * 20.0f;
 		
-		m_gameState->createUnit(m_position, target);
+		if (m_fraction == "RED")
+			m_gameState->createUnit("RED_UNIT", m_position, target, "RED");
+
+		if (m_fraction == "BLUE")
+			m_gameState->createUnit("BLUE_UNIT", m_position, target, "BLUE");
 	}
 }
 

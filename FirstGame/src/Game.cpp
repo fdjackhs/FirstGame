@@ -2,6 +2,9 @@
 
 Game::Game(unsigned int level)
 {
+	m_player_fraction = "RED";
+	m_ai_fraction = "BLUE";
+
 	std::vector<ObjectAttributes> objectsAttribs;
 	RenderEngine::resourceManager.loadLevel(0, objectsAttribs);
 
@@ -51,45 +54,62 @@ void Game::loop()
 
 void Game::createObject(const ObjectAttributes& attributes)
 {
-	if (attributes.optionalProperties == "UNIT")
-	{
-		if (m_common_unit_index.size() == 0)
-			m_common_unit_index = attributes.IDs;
-	}
-
 	if (attributes.exsist == "true")
 	{
-		if (attributes.optionalProperties == "UNIT")
+		if (attributes.object_type == "RED_UNIT")
 		{
-			Unit* ptr_unit = new Unit(attributes.IDs,
-				glm::vec3{ stof(attributes.posx),
-						   stof(attributes.posy),
-						   stof(attributes.posz) },
-				stof(attributes.scale),
-				"");
+			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+									  glm::vec3{ stof(attributes.posx),
+									  		     stof(attributes.posy),
+									  		     stof(attributes.posz) },
+									  stof(attributes.scale),
+									  "", "RED");
 			std::shared_ptr<Object> sp_unit(ptr_unit);
 			objects.push_back(sp_unit);
 		}
-		else if (attributes.optionalProperties == "PLANET")
+		else if (attributes.object_type == "BLUE_UNIT")
 		{
-			Planet* ptr_planet = new Planet(attributes.IDs,
+			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 				glm::vec3{ stof(attributes.posx),
 						   stof(attributes.posy),
 						   stof(attributes.posz) },
 				stof(attributes.scale),
-				"",
-				this);
+				"", "BLUE");
+			std::shared_ptr<Object> sp_unit(ptr_unit);
+			objects.push_back(sp_unit);
+		}
+		else if (attributes.object_type == "RED_PLANET")
+		{
+			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+											glm::vec3{ stof(attributes.posx),
+													   stof(attributes.posy),
+													   stof(attributes.posz) },
+											stof(attributes.scale),
+											"",
+											this, "RED");
+			std::shared_ptr<Object> sh_planet(ptr_planet);
+			objects.push_back(sh_planet);
+		}
+		else if (attributes.object_type == "BLUE_PLANET")
+		{
+			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+											glm::vec3{ stof(attributes.posx),
+													   stof(attributes.posy),
+													   stof(attributes.posz) },
+											stof(attributes.scale),
+											"",
+											this, "BLUE");
 			std::shared_ptr<Object> sh_planet(ptr_planet);
 			objects.push_back(sh_planet);
 		}
 		else
 		{
-			Object* ptr_obj = new Object(attributes.IDs,
-				glm::vec3{ stof(attributes.posx),
-						   stof(attributes.posy),
-						   stof(attributes.posz) },
-				stof(attributes.scale),
-				"");
+			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+										 glm::vec3{ stof(attributes.posx),
+										 		    stof(attributes.posy),
+										 		    stof(attributes.posz) },
+										 stof(attributes.scale),
+										 "", "");
 			std::shared_ptr<Object> sh_obj(ptr_obj);
 			objects.push_back(sh_obj);
 		}
@@ -100,28 +120,39 @@ void Game::updatePhysics()
 {
 	for (uint32_t i = 0; i < objects.size(); i++)
 	{
-		glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
-
-		for (uint32_t j = 0; j < objects.size(); j++)
+		if (objects[i]->m_physics_counter > 1)
 		{
-			if (j != i)
+			objects[i]->m_physics_counter = 0;
+
+			glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
+
+			for (uint32_t j = 0; j < objects.size(); j++)
 			{
-				float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.2f;
-				if (force < 0.15)
-					force = 0.0f;
-				glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
+				if (j != i)
+				{
+					float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.2f;
+					if (force < 0.15)
+						force = 0.0f;
+					glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
 
-				totoalGravityVector += temp;
+					totoalGravityVector += temp;
+				}
 			}
-		}
 
-		objects[i]->m_gravityOffset = totoalGravityVector;
+			objects[i]->m_gravityOffset = totoalGravityVector;
+		}
+		else
+		{
+			objects[i]->m_physics_counter++;
+		}
 	}
 }
 
 void Game::updateGameState(float deltaTime)
 {
 	updatePhysics();
+
+	std::cout << objects.size() << std::endl;
 
 	for (auto i = 0; i < objects.size(); i++)
 	{
@@ -135,7 +166,7 @@ void Game::selectUnits()
 {
 	for (auto&& obj : objects)
 	{
-		if (obj->m_type == "Unit")
+		if (obj->m_type == "Unit" && obj->m_fraction == m_player_fraction)
 		{
 			if (glm::distance(m_area->m_position, obj->m_position) <= m_area->radius)
 			{
@@ -149,10 +180,9 @@ void Game::selectUnits()
 	}
 }
 
-void Game::createUnit(const glm::vec3& position, const glm::vec3& targetPosition)
+void Game::createUnit(const std::string& unitType, const glm::vec3& position, const glm::vec3& targetPosition, const std::string& fraction)
 {
-	
-	Unit* ptr_unit = new Unit(m_common_unit_index, position, targetPosition);
+	Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[unitType], position, targetPosition, fraction);
 	
 	objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
 

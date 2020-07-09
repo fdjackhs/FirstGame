@@ -1,6 +1,6 @@
 [
 	{
-		"type" : "UNIT",
+		"type" : "BASIC",
 		"path_vertex" : "../FirstGame/Resources/shaders/1.basic_vertex_shader.vs",
 		"path_fragment" : "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs"
 	},
