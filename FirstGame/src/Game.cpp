@@ -34,7 +34,7 @@ void Game::loop()
 		RenderEngine::deltaTime = currTime - lastTime;
 		lastTime = currTime;
 
-		//std::cout << "Delta Time " << RenderEngine::deltaTime << std::endl;
+		//std::cout << "fps " << 1.0f / RenderEngine::deltaTime << std::endl;
 
 		processInput(RenderEngine::keys, RenderEngine::buttons, RenderEngine::cursorCoords, RenderEngine::scroll);
 
@@ -70,11 +70,11 @@ void Game::createObject(const ObjectAttributes& attributes)
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
 			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-				glm::vec3{ stof(attributes.posx),
-						   stof(attributes.posy),
-						   stof(attributes.posz) },
-				stof(attributes.scale),
-				"", "BLUE");
+									  glm::vec3{ stof(attributes.posx),
+											     stof(attributes.posy),
+											     stof(attributes.posz) },
+									  stof(attributes.scale),
+									  "", "BLUE");
 			std::shared_ptr<Object> sp_unit(ptr_unit);
 			objects.push_back(sp_unit);
 		}
@@ -116,6 +116,47 @@ void Game::createObject(const ObjectAttributes& attributes)
 	}
 }
 
+void Game::unitToUnitCollisionDetected()
+{
+	bool flag = false;
+	for (uint32_t i = 0; i < objects.size(); i++)
+	{
+		for (uint32_t j = 0; j < objects.size(); j++)
+		{
+			//std::cout << "distance " << glm::distance(objects[i]->m_position, objects[j]->m_position) << std::endl;
+
+			if (i != j && 
+				objects[i]->m_annihilated == false && objects[j]->m_annihilated == false && 
+				objects[i]->m_type == "Unit"	   && objects[j]->m_type == "Unit" && 
+				objects[i]->m_fraction != objects[j]->m_fraction)
+			{
+				if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
+				{
+					flag = true;
+
+					objects[i]->m_annihilated = true;
+					objects[j]->m_annihilated = true;
+				}
+			}
+		}
+	}
+
+	if (flag)
+	{
+		for (int iter = 0; iter < objects.size();)
+		{
+			if (objects[iter]->m_annihilated)
+			{
+				objects.erase(objects.begin() + iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+	}
+}
+
 void Game::updatePhysics()
 {
 	for (uint32_t i = 0; i < objects.size(); i++)
@@ -128,14 +169,20 @@ void Game::updatePhysics()
 
 			for (uint32_t j = 0; j < objects.size(); j++)
 			{
-				if (j != i)
+				if (j != i &&
+					objects[i]->m_type == "Unit" && objects[j]->m_type == "Unit")
 				{
 					float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.2f;
 					if (force < 0.15)
 						force = 0.0f;
 					glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
 
-					totoalGravityVector += temp;
+					//if (objects[i]->m_fraction != objects[j]->m_fraction)
+						//totoalGravityVector -= temp * 1000.0f;
+					//else
+					
+					if (objects[i]->m_fraction == objects[j]->m_fraction)
+						totoalGravityVector += temp;
 				}
 			}
 
@@ -152,7 +199,8 @@ void Game::updateGameState(float deltaTime)
 {
 	updatePhysics();
 
-	std::cout << objects.size() << std::endl;
+	unitToUnitCollisionDetected();
+	//std::cout << objects.size() << std::endl;
 
 	for (auto i = 0; i < objects.size(); i++)
 	{
@@ -300,12 +348,29 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 		if (m_area->previusTime && m_area->firstTime)
 		{
 			glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
+
+			std::string state = "move";
+
+			for (auto&& obj : objects)
+			{
+				if (obj->m_type == "Planet" && glm::distance(obj->m_position, targetPos) < obj->m_radius)
+				{
+					if (obj->m_fraction == m_player_fraction)
+						state = "update";
+					else
+						state = "attack";
+
+					targetPos = obj->m_position;
+				}
+			}
+
+
 			for (auto&& obj : objects)
 			{
 				if (obj->m_selected)
 				{
 					obj->setTargetPosition(targetPos);
-					obj->m_state = "move";
+					obj->m_state = state;
 				}
 			}
 			

@@ -19,6 +19,9 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_gameState = game;
 
 	m_fraction = fraction; //color
+	m_annihilated = false;
+
+	m_radius = 9.0f;
 }
 
 void Planet::action(float deltaTime)
