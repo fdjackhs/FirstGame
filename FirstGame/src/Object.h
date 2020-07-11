@@ -16,6 +16,10 @@ public:
 	bool m_annihilated;
 	bool m_selected;
 	float m_scale;
+	float m_healthPoints;
+
+	float m_reloadingTime;
+	float m_level;
 
 	float m_radius;
 
@@ -32,6 +36,8 @@ public:
 	std::string m_fraction; //color
 
 	std::vector<unsigned int> m_modelIDs;
+	//Indices of all models to be displayed
+	std::vector<unsigned int> m_indexes_of_displayd_models;
 
 	std::string m_optionalProperties;
 

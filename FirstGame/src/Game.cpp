@@ -116,7 +116,7 @@ void Game::createObject(const ObjectAttributes& attributes)
 	}
 }
 
-void Game::unitToUnitCollisionDetected()
+void Game::collisionsDetected()
 {
 	bool flag = false;
 	for (uint32_t i = 0; i < objects.size(); i++)
@@ -126,16 +126,89 @@ void Game::unitToUnitCollisionDetected()
 			//std::cout << "distance " << glm::distance(objects[i]->m_position, objects[j]->m_position) << std::endl;
 
 			if (i != j && 
-				objects[i]->m_annihilated == false && objects[j]->m_annihilated == false && 
-				objects[i]->m_type == "Unit"	   && objects[j]->m_type == "Unit" && 
-				objects[i]->m_fraction != objects[j]->m_fraction)
+				objects[i]->m_annihilated == false && objects[j]->m_annihilated == false)
 			{
-				if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
+				if (objects[i]->m_type == "Unit" && objects[j]->m_type == "Unit")
 				{
-					flag = true;
+					if (objects[i]->m_fraction != objects[j]->m_fraction)
+					{
+						if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
+						{
+							flag = true;
 
-					objects[i]->m_annihilated = true;
-					objects[j]->m_annihilated = true;
+							objects[i]->m_annihilated = true;
+							objects[j]->m_annihilated = true;
+						}
+					}
+				}
+				else //unit planet
+				{
+					uint32_t indexOfPlanet = (objects[i]->m_type == "Planet" ? i : j);
+					uint32_t indexOfUnit   = (objects[i]->m_type == "Unit" ? i : j);
+
+					{
+						if (objects[indexOfUnit]->m_state == "update" && objects[i]->m_fraction == objects[j]->m_fraction) // Unit and Planet same color
+						{
+							if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
+							{
+								flag = true;
+								objects[indexOfUnit]->m_annihilated = true;
+
+								objects[indexOfPlanet]->m_healthPoints += 1.0f;
+
+								if (objects[indexOfPlanet]->m_healthPoints == 200.0f)
+								{
+									objects[indexOfPlanet]->m_healthPoints = 100.0f;
+									objects[indexOfPlanet]->m_level += 1;
+								}
+
+								//objects[indexOfPlanet]->m_reloadingTime -= 0.01f;
+
+								//Planet hp++;
+							}
+						}
+
+						if (objects[indexOfUnit]->m_state == "attack" && objects[i]->m_fraction != objects[j]->m_fraction) // Unit and Planet different color
+						{
+							if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
+							{
+								flag = true;
+								objects[indexOfUnit]->m_annihilated = true;
+
+								objects[indexOfPlanet]->m_healthPoints -= 1.0f;
+
+								if (objects[indexOfPlanet]->m_fraction != "NEUTRAL")
+								{
+
+									if (objects[indexOfPlanet]->m_healthPoints == 0.0f)
+									{
+										objects[indexOfPlanet]->m_fraction = "NEUTRAL";
+
+										objects[indexOfPlanet]->m_indexes_of_displayd_models.clear();
+										objects[indexOfPlanet]->m_indexes_of_displayd_models.push_back(2);
+									}
+								}
+								else // planet neutral
+								{
+									if (objects[indexOfPlanet]->m_healthPoints == -1.0f)
+									{
+										objects[indexOfPlanet]->m_fraction = m_player_fraction;
+										objects[indexOfPlanet]->m_healthPoints = 1.0f;
+
+										objects[indexOfPlanet]->m_indexes_of_displayd_models.clear();
+										objects[indexOfPlanet]->m_indexes_of_displayd_models.push_back(0);
+
+									}
+								}
+
+
+
+								//objects[indexOfPlanet]->m_reloadingTime += 0.01f;
+
+								//Planet hp--;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -161,7 +234,7 @@ void Game::updatePhysics()
 {
 	for (uint32_t i = 0; i < objects.size(); i++)
 	{
-		if (objects[i]->m_physics_counter > 1)
+		if (objects[i]->m_physics_counter > 2)
 		{
 			objects[i]->m_physics_counter = 0;
 
@@ -172,16 +245,27 @@ void Game::updatePhysics()
 				if (j != i &&
 					objects[i]->m_type == "Unit" && objects[j]->m_type == "Unit")
 				{
-					float force = 1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position)) * 0.2f;
-					if (force < 0.15)
-						force = 0.0f;
+					float force = (1.0f / sqrt(glm::distance(objects[i]->m_position, objects[j]->m_position))) * 0.2f;
+
+					if (objects[i]->m_fraction != objects[j]->m_fraction)
+					{
+						//std::cout << "force " << force << std::endl;
+						if (force < 0.08)
+							force = 0.0f;
+						else
+							force = -(force * 10.0f);
+					}
+					else
+					{
+						if (force < 0.15)
+							force = 0.0f;
+					}
+
 					glm::vec3 temp = glm::normalize(objects[i]->m_position - objects[j]->m_position) * force;
 
 					//if (objects[i]->m_fraction != objects[j]->m_fraction)
-						//totoalGravityVector -= temp * 1000.0f;
-					//else
-					
-					if (objects[i]->m_fraction == objects[j]->m_fraction)
+					//	totoalGravityVector -= temp;
+					//else if (objects[i]->m_fraction == objects[j]->m_fraction)
 						totoalGravityVector += temp;
 				}
 			}
@@ -199,8 +283,7 @@ void Game::updateGameState(float deltaTime)
 {
 	updatePhysics();
 
-	unitToUnitCollisionDetected();
-	//std::cout << objects.size() << std::endl;
+	collisionsDetected();
 
 	for (auto i = 0; i < objects.size(); i++)
 	{
@@ -364,7 +447,6 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 				}
 			}
 
-
 			for (auto&& obj : objects)
 			{
 				if (obj->m_selected)
@@ -387,3 +469,16 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	lastCursorCoords = cursorCoords;
 }
 
+//TODO
+/*
+	- добавить нейтральные планеты
+	- интерфейс (хп планет, и ускоритель времени как в тотал вар)
+	- замерять производительность
+
+	- при передвижении толпа юнитов не стремится в одну точку, а двигаются как б строем
+	- баг с исчезновением юнитов когда их становится много
+	- общая оптимизация (сократить количество вложенных циклов, сделать свою функцию distance без извлечения корня, и.т.д.)
+	- улучшить графику и добавить опенгл фитчи (например, отправлять в шейдер модельки не по одной а все сразу)
+	- при расчёте физики можно пользоваться многопоточкой
+	- редактор карт?
+*/

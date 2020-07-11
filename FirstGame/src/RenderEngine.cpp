@@ -135,7 +135,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 	//------------
 	for (auto&& obj : objects)
 	{
-		for (unsigned int modelID = 0; modelID < obj->m_modelIDs.size(); modelID++)
+		for (auto&& index : obj->m_indexes_of_displayd_models)
+		//for (unsigned int modelID = 0; modelID < obj->m_modelIDs.size(); modelID++)
 		{
 			//for stencil
 			//-----------
@@ -147,8 +148,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 
 				//draw original objects
 				//---------------------
-				uint32_t shader_index = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[modelID]].second;
-				uint32_t model_index  = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[modelID]].first;
+				uint32_t shader_index = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[index]].second;
+				uint32_t model_index  = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[index]].first;
 
 				resourceManager.shaders[shader_index].second.use();
 				resourceManager.shaders[shader_index].second.setMat4("projection", projection);

@@ -10,6 +10,8 @@
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop, const std::string fraction)
 {
 	m_modelIDs = ID;
+	m_indexes_of_displayd_models.push_back(0);
+
 	m_position = position;
 	m_targetPos = m_position;
 	m_scale = scale;
@@ -33,6 +35,8 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const glm::vec3& target, const std::string fraction)
 {
 	m_modelIDs = ID;
+	m_indexes_of_displayd_models.push_back(0);
+
 	m_position = position;
 	m_targetPos = target;
 	m_scale = 1.0f;
@@ -59,10 +63,18 @@ void Unit::action(float deltaTime)
 	{
 		m_position += m_gravityOffset * deltaTime;
 	}
-	else if (m_state == "move" || m_state == "update")
+	else if (m_state == "move" || m_state == "update" || m_state == "attack")
 	{
+		float distance = glm::distance(m_position, m_targetPos);
+		float speed = m_speed;
+		if (distance < 5.0f)
+		{
+			m_position += m_gravityOffset * deltaTime;
+			speed = distance;
+		}
+
 		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
-		m_position += move_vector * m_speed * deltaTime;
+		m_position += move_vector * speed * deltaTime;
 	}
 	else
 	{

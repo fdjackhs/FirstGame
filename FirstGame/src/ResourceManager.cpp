@@ -131,7 +131,8 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 			unsigned int model_index = -1;
 			if (findedModel == models.end()) // if model not loaded
 			{
-				Model model((models_type_path[type.GetString()].path).c_str());
+				const char* str = (models_type_path[type.GetString()].path).c_str();
+				Model model(str);
 				models.push_back({ type.GetString(), model });
 				model_index = models.size() - 1;
 			}
@@ -172,7 +173,8 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 		//rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
 
 		rapidjson::Value& object_type = d[i]["object_type"];
-		m_complete_models[object_type.GetString()] = indexes;
+		std::string str = object_type.GetString();
+		m_complete_models[str] = indexes;
 
 		ObjectAttributes temp{  object_type.GetString(),
 								posx.GetString(), 

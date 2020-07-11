@@ -20,6 +20,11 @@
 		"shader_type" : "BASIC"
 	},
 	{
+		"type" : "NEUTRAL_PLANET",
+		"path" : "../FirstGame/resources/models/Neutral_planet/Neutral_planet.obj",
+		"shader_type" : "BASIC"
+	},
+	{
 		"type" : "default",
 		"path" : "default",
 		"shader_type" : "default"

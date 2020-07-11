@@ -24,7 +24,7 @@ public:
 	void processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll);
 	void selectUnits();
 	void updatePhysics();
-	void unitToUnitCollisionDetected();
+	void collisionsDetected();
 	//void unitToPlanetCollisionDetected();
 
 	//for fast creating units during the game
