@@ -16,11 +16,17 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 		m_indexes_of_displayd_models.push_back(0);
 	if (m_fraction == "BLUE")
 		m_indexes_of_displayd_models.push_back(1);
+
+	m_healthPoints = 1.0f;
+
 	if (m_fraction == "NEUTRAL")
+	{
 		m_indexes_of_displayd_models.push_back(2);
+		m_healthPoints = 0.0f;
+	}
+
 
 	m_position = pos;
-	m_targetPos = m_position;
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
 	m_selected = false;
@@ -30,11 +36,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_reloadingTime = 1.0f;
 	
 	m_level = 1;
-	m_healthPoints = 1.0f;
 
 	m_gameState = game;
-
-	m_annihilated = false;
 
 	m_radius = 9.0f;
 }
@@ -46,7 +49,7 @@ void Planet::action(float deltaTime)
 		m_reloading += deltaTime;
 
 		float base_angle = float((rand() * 10000) % (31415 * 2)) / 10000.0f;
-		float angle_stride = pi2 / m_level;
+		float angle_stride = float(pi2) / m_level;
 
 		if (m_reloading >= m_reloadingTime)
 		{
@@ -57,9 +60,9 @@ void Planet::action(float deltaTime)
 				glm::vec3 target = m_position;
 
 
-				target.x = m_position.x + sin(base_angle + (angle_stride * i)) * 20.0f;
+				target.x = m_position.x + sin(base_angle + (angle_stride * i)) * (10.0f + float(rand() % 20));
 				target.y = 0.0f;
-				target.z = m_position.z + cos(base_angle + (angle_stride * i)) * 20.0f;
+				target.z = m_position.z + cos(base_angle + (angle_stride * i)) * (10.0f + float(rand() % 20));
 
 				if (m_fraction == "RED")
 					m_gameState->createUnit("RED_UNIT", m_position, target, "RED");

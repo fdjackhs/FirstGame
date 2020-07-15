@@ -6,6 +6,11 @@
 class Unit : public Object
 {
 public:
+	bool m_annihilated;
+	int m_physics_counter;
+	glm::vec3 m_targetPos;
+	std::string m_state;
+	glm::vec3 m_gravityOffset;
 
 	float m_speed;
 
@@ -14,4 +19,5 @@ public:
 
 	void action(float deltaTime);
 	glm::vec3 GetPosition() const;
+	void setTargetPosition(glm::vec3& target);
 };

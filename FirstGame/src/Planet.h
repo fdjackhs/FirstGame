@@ -9,6 +9,9 @@ extern class Game;
 class Planet : public Object
 {
 public:
+	float m_healthPoints;
+	float m_reloadingTime;
+	float m_level;
 
 	float m_reloading;
 	Game* m_gameState;

@@ -80,9 +80,18 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glViewport(0, 0, (int)SCREEN.x, (int)SCREEN.y);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	//glStencilMask(0xFF);
+	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	//glStencilMask(0xFF);
+
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//
 	camera = std::make_shared<Camera>(glm::vec3(0.0f, 300.0f, 0.0f));
@@ -111,6 +120,7 @@ void RenderEngine::clearScreen()
 {
 	glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//glDisable(GL_DEPTH_TEST);
 }
 
 void RenderEngine::updateCameraView()
@@ -124,19 +134,18 @@ void RenderEngine::updateScreen()
 	glfwSwapBuffers(window);
 }
 
-
-static int counter = 0;
-
 void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
-//void RenderEngine::drawObjects(std::vector<Object*>& objects)
 {
 	//std::cout << objects.size() << std::endl;
 	//draw objects
 	//------------
 	for (auto&& obj : objects)
 	{
+		if (obj->m_fraction == "RED" && obj->m_type == "Planet")
+			while (false);
+
+
 		for (auto&& index : obj->m_indexes_of_displayd_models)
-		//for (unsigned int modelID = 0; modelID < obj->m_modelIDs.size(); modelID++)
 		{
 			//for stencil
 			//-----------
@@ -157,12 +166,18 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 				glm::vec3 position = obj->GetPosition();
 
 				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, { position.x, position.y, position.z });
-
-				//if (obj->m_selected)
-				//	model = glm::scale(model, glm::vec3(obj->m_scale * 1.2, obj->m_scale * 1.2, obj->m_scale * 1.2));
-				//else
+				
+				
+				if (obj->m_fraction == "RED" && obj->m_type == "Planet" && index != 0)
+				{
+					model = glm::scale(model, glm::vec3(obj->m_scale * 0.3, obj->m_scale * 0.3, obj->m_scale * 0.3));
+					model = glm::translate(model, { position.x, position.y, position.z });
+				}
+				else
+				{
+					model = glm::translate(model, { position.x, position.y, position.z });
 					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+				}
 
 				resourceManager.shaders[shader_index].second.setMat4("model", model);
 				resourceManager.models[model_index].second.Draw(resourceManager.shaders[shader_index].second);
@@ -186,8 +201,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 				resourceManager.m_stencilShader->setMat4("model", model);
 				resourceManager.models[model_index].second.Draw(*resourceManager.m_stencilShader);
 
-				glStencilMask(0xFF);
 				glStencilFunc(GL_ALWAYS, 0, 0xFF);
+				glStencilMask(0xFF);
 				glEnable(GL_DEPTH_TEST);
 			}
 			//------------
@@ -208,10 +223,12 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 		resourceManager.shaders[shaderIndex].second.setMat4("projection", projection);
 		resourceManager.shaders[shaderIndex].second.setMat4("model", model);
 
+		glDisable(GL_DEPTH_TEST);
 		glBindVertexArray(RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_VAO);
 		glLineWidth(3);
 		glDrawElements(GL_LINE_LOOP, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_vertices.size() / 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+		glEnable(GL_DEPTH_TEST);
 	}
 }
 

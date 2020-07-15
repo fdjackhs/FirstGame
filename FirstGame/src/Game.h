@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "RenderEngine.h"
 #include "Unit.h"
@@ -25,7 +26,6 @@ public:
 	void selectUnits();
 	void updatePhysics();
 	void collisionsDetected();
-	//void unitToPlanetCollisionDetected();
 
 	//for fast creating units during the game
 	std::vector<unsigned int> m_common_unit_index;

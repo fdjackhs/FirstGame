@@ -88,6 +88,11 @@ void Unit::action(float deltaTime)
 	}
 }
 
+void Unit::setTargetPosition(glm::vec3& target)
+{
+	m_targetPos = target;
+}
+
 glm::vec3 Unit::GetPosition() const
 {
 	return m_position;

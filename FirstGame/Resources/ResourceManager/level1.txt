@@ -2,9 +2,9 @@
 	{
 		"object_type": "RED_PLANET",
 		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
-		"posx": "0.0",
+		"posx": "-100.0",
 		"posy": "0.0",
-		"posz": "0.0",
+		"posz": "-100.0",
 		
 		"scale": "1.0",
 		
@@ -15,7 +15,20 @@
 	{
 		"object_type": "BLUE_PLANET",
 		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
-		"posx": "50.0",
+		"posx": "100.0",
+		"posy": "0.0",
+		"posz": "100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "BLUE_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
 		
@@ -23,7 +36,33 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "BLUE_PLANET"
+		"optionalProperties": "NEUTRAL_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "-100.0",
+		"posy": "0.0",
+		"posz": "100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "100.0",
+		"posy": "0.0",
+		"posz": "-100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
 	},
 	{
 		"object_type": "RED_UNIT",
