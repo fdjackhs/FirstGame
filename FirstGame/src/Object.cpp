@@ -11,7 +11,8 @@ Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_scale = scl;
 	m_optionalProperties = opt_prop;
 	m_selected = false;
-	m_type = "Object";
+
+	m_type = OBJECT;
 
 	m_fraction = fraction; //color
 }

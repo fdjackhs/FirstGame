@@ -2,8 +2,6 @@
 
 #include "Unit.h"
 
-#include <math.h>
-
 #define pi 3.141592
 #define pi2 2 * pi
 
@@ -17,7 +15,8 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
 
-	m_type = "Unit";
+	m_type = UNIT;
+
 	m_selected = false;
 	m_state = "rest";
 	m_speed = 10.00000f;
@@ -42,7 +41,8 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const
 	m_scale = 1.0f;
 	m_optionalProperties = "";
 
-	m_type = "Unit";
+	m_type = UNIT;
+
 	m_selected = false;
 	m_state = "move";
 	m_speed = 10.00000f;

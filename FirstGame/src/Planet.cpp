@@ -2,8 +2,6 @@
 
 #include "Planet.h"
 
-#include <math.h>
-
 #define pi 3.141592
 #define pi2 2 * pi
 
@@ -30,7 +28,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
 	m_selected = false;
-	m_type = "Planet";
+
+	m_type = PLANET;
 
 	m_reloading = 0.0f;
 	m_reloadingTime = 1.0f;

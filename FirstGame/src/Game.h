@@ -27,6 +27,8 @@ public:
 	void updatePhysics();
 	void collisionsDetected();
 
+	inline bool closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance); //custom distance
+
 	//for fast creating units during the game
 	std::vector<unsigned int> m_common_unit_index;
 

@@ -6,7 +6,7 @@
 #include <glfw/glfw3.h>
 
 int main()
-{	
+{
 	RenderEngine::init(1600, 800, "FirstGame");
 
 	Game game(0);

@@ -141,8 +141,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 	//------------
 	for (auto&& obj : objects)
 	{
-		if (obj->m_fraction == "RED" && obj->m_type == "Planet")
-			while (false);
+		//if (obj->m_fraction == "RED" && obj->m_type == Obect::ObjectType::PLANET)
+		//	while (false);
 
 
 		for (auto&& index : obj->m_indexes_of_displayd_models)
@@ -168,12 +168,14 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 				glm::mat4 model = glm::mat4(1.0f);
 				
 				
+				/*
 				if (obj->m_fraction == "RED" && obj->m_type == "Planet" && index != 0)
 				{
 					model = glm::scale(model, glm::vec3(obj->m_scale * 0.3, obj->m_scale * 0.3, obj->m_scale * 0.3));
 					model = glm::translate(model, { position.x, position.y, position.z });
 				}
 				else
+				*/
 				{
 					model = glm::translate(model, { position.x, position.y, position.z });
 					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
@@ -231,8 +233,6 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 		glEnable(GL_DEPTH_TEST);
 	}
 }
-
-
 
 glm::vec3 RenderEngine::cursorCoordToWorldCoords(const glm::vec2& cursorPos)
 {
