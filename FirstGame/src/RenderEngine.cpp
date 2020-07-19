@@ -37,6 +37,8 @@ namespace RenderEngine
 	float deltaTime;
 
 	ResourceManager resourceManager;
+
+	std::vector<modelGroupAttribs> modelsGroups;
 }
 
 int RenderEngine::init(float x, float y, const char* windowName)
@@ -67,6 +69,8 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetCursorEnterCallback(window, cursor_enter_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	glfwSwapInterval(0);
 
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -134,6 +138,139 @@ void RenderEngine::updateScreen()
 	glfwSwapBuffers(window);
 }
 
+
+void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects)
+{
+	for (auto&& group : modelsGroups)
+		group.matrices.clear();
+
+	for (auto&& obj : objects)
+	{
+		modelGroupAttribs modelAttributes;
+
+		for (auto&& index : obj->m_indexes_of_displayd_models)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, obj->m_position);
+			model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+
+			uint32_t indexOfModelInResourceManager = obj->m_modelIDs[index];
+			modelsGroups[indexOfModelInResourceManager].matrices.push_back(model);
+		}
+	}
+}
+
+void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
+{
+	//draw units (instansing)
+	//-----------------------------
+	for (auto&& group : modelsGroups)
+	{
+		if (group.matrices.size() > 30)
+			drawGroupOfObjects(group);
+		else
+			drawSingleObject(group);
+	}
+
+	//draw area
+	//-----------------------------
+	for (unsigned int modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)
+	{
+		uint32_t modelIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].first;
+		uint32_t shaderIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].second;
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_position);
+
+		resourceManager.shaders[shaderIndex].second.use();
+		resourceManager.shaders[shaderIndex].second.setMat4("view", view);
+		resourceManager.shaders[shaderIndex].second.setMat4("projection", projection);
+		resourceManager.shaders[shaderIndex].second.setMat4("model", model);
+
+		glDisable(GL_DEPTH_TEST);
+		glBindVertexArray(RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_VAO);
+		glLineWidth(3);
+		glDrawElements(GL_LINE_LOOP, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_vertices.size() / 3, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+		glEnable(GL_DEPTH_TEST);
+	}
+}
+
+void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
+{
+	if (!group.bufferIsCreated)
+	{
+		glGenBuffers(1, &group.buffer);
+		group.bufferIsCreated = true;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, group.buffer);
+	glBufferData(GL_ARRAY_BUFFER, group.matrices.size() * sizeof(glm::mat4), &group.matrices[0], GL_STATIC_DRAW);
+
+
+	for (unsigned int i = 0; i < resourceManager.models[group.model_index].second.meshes.size(); i++)
+	{
+		unsigned int VAO = resourceManager.models[group.model_index].second.meshes[i].VAO;
+		glBindVertexArray(VAO);
+		// set attribute pointers for matrix (4 times vec4)
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+	}
+
+
+	//it's draw groups function
+	//by default INSTANSING shader has index - 1
+	resourceManager.shaders[group.shaders_indices[1]].second.use();
+	resourceManager.shaders[group.shaders_indices[1]].second.setMat4("projection", projection);
+	resourceManager.shaders[group.shaders_indices[1]].second.setMat4("view", view);
+
+
+	resourceManager.shaders[group.shaders_indices[1]].second.setInt("texture_diffuse1", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, resourceManager.models[group.model_index].second.textures_loaded[0].id);
+
+	for (unsigned int i = 0; i < resourceManager.models[group.model_index].second.meshes.size(); i++)
+	{
+		glBindVertexArray(resourceManager.models[group.model_index].second.meshes[i].VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, resourceManager.models[group.model_index].second.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, group.matrices.size());
+		glBindVertexArray(0);
+	}
+}
+
+void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
+{
+	//draw planets
+	for (auto&& matrix : group.matrices)
+	{
+		//draw original objects
+		//---------------------
+
+		//it's draw single object function
+		//by default BASIC shader has index - 0
+		resourceManager.shaders[group.shaders_indices[0]].second.use();
+		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("projection", projection);
+		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("view", view);
+
+		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("model", matrix);
+
+		resourceManager.models[group.model_index].second.Draw(resourceManager.shaders[group.shaders_indices[0]].second);
+	}
+}
+
+/*
 void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 {
 	//std::cout << objects.size() << std::endl;
@@ -167,19 +304,8 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 
 				glm::mat4 model = glm::mat4(1.0f);
 				
-				
-				/*
-				if (obj->m_fraction == "RED" && obj->m_type == "Planet" && index != 0)
-				{
-					model = glm::scale(model, glm::vec3(obj->m_scale * 0.3, obj->m_scale * 0.3, obj->m_scale * 0.3));
-					model = glm::translate(model, { position.x, position.y, position.z });
-				}
-				else
-				*/
-				{
-					model = glm::translate(model, { position.x, position.y, position.z });
-					model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
-				}
+				model = glm::translate(model, position);
+				model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
 
 				resourceManager.shaders[shader_index].second.setMat4("model", model);
 				resourceManager.models[model_index].second.Draw(resourceManager.shaders[shader_index].second);
@@ -197,7 +323,7 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 				resourceManager.m_stencilShader->setMat4("view", view);
 
 				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, { position.x, position.y, position.z });
+				model = glm::translate(model, position);
 				model = glm::scale(model, glm::vec3(obj->m_scale * 1.7f, obj->m_scale * 1.7f, obj->m_scale * 1.7f));
 
 				resourceManager.m_stencilShader->setMat4("model", model);
@@ -233,6 +359,7 @@ void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 		glEnable(GL_DEPTH_TEST);
 	}
 }
+*/
 
 glm::vec3 RenderEngine::cursorCoordToWorldCoords(const glm::vec2& cursorPos)
 {

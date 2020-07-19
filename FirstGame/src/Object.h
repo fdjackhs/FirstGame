@@ -22,8 +22,6 @@ public:
 
 	glm::vec3 m_position;
 
-	//std::string m_type;
-
 	std::vector<unsigned int> m_modelIDs;
 	//Indices of all models to be displayed
 	std::vector<unsigned int> m_indexes_of_displayd_models;

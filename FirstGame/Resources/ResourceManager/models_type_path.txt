@@ -2,31 +2,31 @@
 	{
 		"type" : "RED_UNIT",
 		"path" : "../FirstGame/resources/models/Red_unit/Red_unit.obj",
-		"shader_type" : "BASIC"
+		"shaders_types" : ["BASIC", "INSTANSING"]
 	},
 	{
 		"type" : "RED_PLANET",
 		"path" : "../FirstGame/resources/models/Red_planet/Red_planet.obj",
-		"shader_type" : "BASIC"
+		"shaders_types" : ["BASIC", "INSTANSING"]
 	},
 	{
 		"type" : "BLUE_UNIT",
 		"path" : "../FirstGame/resources/models/Blue_unit/Blue_unit.obj",
-		"shader_type" : "BASIC"
+		"shaders_types" : ["BASIC", "INSTANSING"]
 	},
 	{
 		"type" : "BLUE_PLANET",
 		"path" : "../FirstGame/resources/models/Blue_planet/Blue_planet.obj",
-		"shader_type" : "BASIC"
+		"shaders_types" : ["BASIC", "INSTANSING"]
 	},
 	{
 		"type" : "NEUTRAL_PLANET",
 		"path" : "../FirstGame/resources/models/Neutral_planet/Neutral_planet.obj",
-		"shader_type" : "BASIC"
+		"shaders_types" : ["BASIC", "INSTANSING"]
 	},
 	{
 		"type" : "default",
 		"path" : "default",
-		"shader_type" : "default"
+		"shaders_types" : ["default"]
 	}
 ]

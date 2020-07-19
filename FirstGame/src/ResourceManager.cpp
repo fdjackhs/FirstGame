@@ -45,11 +45,17 @@ void ResourceManager::loadModelPairs(const char* path, std::map<std::string, mod
 
 		for (unsigned int i = 0; i < d.Size(); i++)
 		{
+			rapidjson::Value& shaders_types = d[i]["shaders_types"];
+			auto&& array_shaders_types = shaders_types.GetArray();
+
+			std::vector<std::string> shadersTypes;
+			for (auto&& s_type : array_shaders_types)
+				shadersTypes.push_back(s_type.GetString());
+
 			rapidjson::Value& type = d[i]["type"];
 			rapidjson::Value& path = d[i]["path"];
-			rapidjson::Value& shaderType = d[i]["shader_type"];
 
-			vector_pairs[type.GetString()] = { path.GetString(), shaderType.GetString() };
+			vector_pairs[type.GetString()] = { path.GetString(), shadersTypes };
 		}
 
 		pair_File.close();
@@ -95,23 +101,10 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 
 void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
 {
+	//why it's here?
 	m_stencilShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.stencil_shader.vs", "../FirstGame/Resources/shaders/1.stencil_shader.fs");
 
-	std::string levelData;
-	std::ifstream levelFile;
-
-	try
-	{
-		levelFile.open(listPathLevels[number]);
-		std::stringstream levelDataStream;
-		levelDataStream << levelFile.rdbuf();
-		levelData = levelDataStream.str();
-		levelFile.close();
-	}
-	catch (std::ifstream::failure)
-	{
-		std::cout << "ResourceManager load level is failed" << std::endl;
-	}
+	std::string levelData = readFile(listPathLevels[number]);
 
 	rapidjson::Document d;
 	d.Parse(levelData.c_str());
@@ -124,45 +117,11 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 		std::vector<size_t> indexes;
 		for (auto&& type : types)
 		{
-			auto findedModel = std::find_if(
-				models.begin(), models.end(),
-				[&type](const std::pair<std::string, Model>& x) { return x.first == type.GetString(); });
+			uint32_t model_index = getModelIndex(type.GetString());
+			std::vector<uint32_t> shaders_indices = getShadersIndices(type.GetString());
 
-			unsigned int model_index = -1;
-			if (findedModel == models.end()) // if model not loaded
-			{
-				const char* str = (models_type_path[type.GetString()].path).c_str();
-				Model model(str);
-				models.push_back({ type.GetString(), model });
-				model_index = models.size() - 1;
-			}
-			else
-			{
-				model_index = findedModel - models.begin();
-			}
-
-			std::string type_of_shader = models_type_path[type.GetString()].shader_type;
-
-			auto findedShader = std::find_if(
-				shaders.begin(), shaders.end(),
-				[&type_of_shader](const std::pair<std::string, Shader>& x) { return x.first == type_of_shader; });
-
-			unsigned int shader_index = -1;
-			if (findedShader == shaders.end()) // if shader not loaded
-			{
-				Shader shader((shaders_type_path[type_of_shader].vertex).c_str(),
-							  (shaders_type_path[type_of_shader].fragment).c_str());
-
-				shaders.push_back({ type_of_shader, shader });
-				shader_index = shaders.size() - 1;
-			}
-			else
-			{
-				shader_index = findedShader - shaders.begin();
-			}
-
-			modelIndex_shaderIndex.push_back({ model_index, shader_index });
-			indexes.push_back((modelIndex_shaderIndex.size() - 1));
+			modelIndex_shadersIndices.push_back({ model_index, shaders_indices });
+			indexes.push_back((modelIndex_shadersIndices.size() - 1));
 		}
 
 		rapidjson::Value& posx = d[i]["posx"];
@@ -186,6 +145,76 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 
 		objectsAttrib.push_back(temp);
 	}
+}
+
+uint32_t ResourceManager::getModelIndex(const std::string& type_of_model)
+{
+	auto findedModel = std::find_if(models.begin(), models.end(),
+									[&type_of_model](const std::pair<std::string, Model>& x) { return x.first == type_of_model; });
+
+	unsigned int model_index = -1;
+	if (findedModel == models.end()) // if model not loaded
+	{
+		Model model(models_type_path[type_of_model].path.c_str());
+		models.push_back({ type_of_model, model });
+		model_index = models.size() - 1;
+	}
+	else
+	{
+		model_index = findedModel - models.begin();
+	}
+
+	return model_index;
+}
+
+std::vector<uint32_t> ResourceManager::getShadersIndices(const std::string& type_of_model)
+{
+	std::vector<uint32_t> shaders_indices;
+
+	for (auto&& type_of_shader : models_type_path[type_of_model].shaders_types)
+	{
+		auto findedShader = std::find_if(shaders.begin(), shaders.end(),
+										 [&type_of_shader](const std::pair<std::string, Shader>& x) { return x.first == type_of_shader; });
+
+		unsigned int shader_index = -1;
+		if (findedShader == shaders.end()) // if shader not loaded
+		{
+			Shader shader((shaders_type_path[type_of_shader].vertex).c_str(),
+				(shaders_type_path[type_of_shader].fragment).c_str());
+
+			shaders.push_back({ type_of_shader, shader });
+			shader_index = shaders.size() - 1;
+		}
+		else
+		{
+			shader_index = findedShader - shaders.begin();
+		}
+
+		shaders_indices.push_back(shader_index);
+	}
+
+	return shaders_indices;
+}
+
+std::string ResourceManager::readFile(const std::string& path)
+{
+	std::ifstream levelFile;
+	std::string data;
+
+	try
+	{
+		levelFile.open(path);
+		std::stringstream levelDataStream;
+		levelDataStream << levelFile.rdbuf();
+		data = levelDataStream.str();
+		levelFile.close();
+	}
+	catch (std::ifstream::failure)
+	{
+		std::cout << "ResourceManager load level is failed" << std::endl;
+	}
+
+	return data;
 }
 
 GLuint ResourceManager::createObject(std::vector<GLfloat> vertices, const std::string& vertexPath, const std::string& fragmentPath)

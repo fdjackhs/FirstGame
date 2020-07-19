@@ -41,6 +41,18 @@ namespace RenderEngine
 	
 	extern ResourceManager resourceManager;
 
+	struct modelGroupAttribs
+	{
+		bool bufferIsCreated;
+		uint32_t buffer;
+
+		uint32_t model_index;
+		std::vector<uint32_t> shaders_indices;
+
+		std::vector<glm::mat4> matrices;
+	};
+	extern std::vector<modelGroupAttribs> modelsGroups;
+
 	//Render routines
 	//----------------------------------------------
 
@@ -58,6 +70,8 @@ namespace RenderEngine
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
 
-	void drawObjects(std::vector<std::shared_ptr<Object>>& objects); 
-	
+	void drawObjects(std::vector<std::shared_ptr<Object>>& objects);
+	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
+	void drawGroupOfObjects(RenderEngine::modelGroupAttribs& group);
+	void drawSingleObject(RenderEngine::modelGroupAttribs& group);
 };

@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/ManuallyCreatedObject.cpp
 	${PROJECT_NAME}/src/Planet.h
 	${PROJECT_NAME}/src/Planet.cpp
+	${PROJECT_NAME}/src/Profile.h
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )

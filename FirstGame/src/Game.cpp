@@ -9,14 +9,15 @@ Game::Game(unsigned int level)
 	std::vector<ObjectAttributes> objectsAttribs;
 	RenderEngine::resourceManager.loadLevel(0, objectsAttribs);
 
+	// temporary here
+	// create models groups
+	for (auto&& x : RenderEngine::resourceManager.modelIndex_shadersIndices)
+		RenderEngine::modelsGroups.push_back({ false, 0, x.first, x.second, std::vector<glm::mat4>() });
+
 	for (auto&& x : objectsAttribs)
-	{
-		//for(int i = 0; i < 200; i++)
-			createObject(x);
-	}
+		createObject(x);
 
 	//create objects manually
-
 	uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 	m_area = std::make_shared<select_area>(id);
 }
@@ -36,31 +37,37 @@ void Game::loop()
 	{
 		LOG_DURATION("--- main loop");
 
-		float currTime = RenderEngine::getCurrTime();
-		RenderEngine::deltaTime = currTime - lastTime;
-		lastTime = currTime;
-
-		//std::cout << "fps " << 1.0f / RenderEngine::deltaTime << std::endl;
+		{
+			LOG_DURATION("calculate deltaTime");
+			float currTime = RenderEngine::getCurrTime();
+			RenderEngine::deltaTime = currTime - lastTime;
+			lastTime = currTime;
+		}
 
 
 		{
-			//LOG_DURATION("process input");
+			LOG_DURATION("process input");
 			processInput(RenderEngine::keys, RenderEngine::buttons, RenderEngine::cursorCoords, RenderEngine::scroll);
 		}
 
 		{
-			//LOG_DURATION("clearScreen");
+			LOG_DURATION("clearScreen");
 			RenderEngine::clearScreen();
 		}
 
 		{
-			//LOG_DURATION("updateCameraView");
+			LOG_DURATION("updateCameraView");
 			RenderEngine::updateCameraView();
 		}
 
 		{
-			//LOG_DURATION("updateGameState");
+			LOG_DURATION("updateGameState");
 			updateGameState(RenderEngine::deltaTime);
+		}
+
+		{
+			LOG_DURATION("genModelMatrices");
+			RenderEngine::genModelMatrices(Game::objects);
 		}
 
 		{
@@ -68,53 +75,72 @@ void Game::loop()
 			RenderEngine::drawObjects(Game::objects);
 		}
 
-		RenderEngine::updateScreen();
-		RenderEngine::pollEvents();
-
-		if (RenderEngine::deltaTime > 0.016f)
 		{
-			counter++;
-		}
-		else
-		{
-			counter = 0;
+			LOG_DURATION("updateScreen");
+			RenderEngine::updateScreen();
 		}
 
-		if (counter > 5)
 		{
-			std::cerr << std::endl;
-			std::cout << objects.size() << std::endl;
-			system("pause");
+			LOG_DURATION("pollEvents");
+			RenderEngine::pollEvents();
+		}
+
+
+		{
+			LOG_DURATION("Profile");
+			if (RenderEngine::deltaTime > 1.0f / 60.0f)
+			{
+				counter++;
+			}
+			else
+			{
+				counter = 0;
+			}
+
+			if (counter > 5)
+			{
+				std::cerr << std::endl;
+				std::cerr << "total objects " << objects.size() << std::endl;
+				for (auto&& group : RenderEngine::modelsGroups)
+				{
+					std::cerr << "buffer " << group.buffer << " model_index " << group.model_index << " matrices.size " << group.matrices.size() << std::endl;
+				}
+
+				std::cerr << std::endl;
+				std::cout << objects.size() << std::endl;
+				system("pause");
+			}
 		}
 	}
 }
 
-static float redcounter = 0;
-static float bluecounter = 0;
-
 void Game::createObject(const ObjectAttributes& attributes)
 {
-	redcounter += 0.1f; 
-
-	bluecounter -= 0.1f;
-
 	if (attributes.exsist == "true")
 	{
 		if (attributes.object_type == "RED_UNIT")
 		{
-			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-									  glm::vec3{ stof(attributes.posx) + redcounter,
-									  		     stof(attributes.posy),
-									  		     stof(attributes.posz) },
-									  stof(attributes.scale),
-									  "", "RED");
-			std::shared_ptr<Object> sp_unit(ptr_unit);
-			objects.push_back(sp_unit);
+			float x = 0;
+			float z = 0;
+			//for (x = 0; x < 500; x++)
+			{
+			//	for (z = 0; z < 50; z++)
+				{
+					Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+						glm::vec3{ stof(attributes.posx) + x,
+								   stof(attributes.posy),
+								   stof(attributes.posz) + z},
+						stof(attributes.scale),
+						"", "RED");
+					std::shared_ptr<Object> sp_unit(ptr_unit);
+					objects.push_back(sp_unit);
+				}
+			}
 		}
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
 			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-									  glm::vec3{ stof(attributes.posx) + bluecounter,
+									  glm::vec3{ stof(attributes.posx),
 											     stof(attributes.posy),
 											     stof(attributes.posz) },
 									  stof(attributes.scale),
@@ -172,10 +198,20 @@ void Game::createObject(const ObjectAttributes& attributes)
 	}
 }
 
+static int collDtct_counter = 0;
+static int collDtctParts = 20;
+
 void Game::collisionsDetected()
 {
 	bool flag = false;
-	for (uint32_t i = 0; i < objects.size(); i++)
+
+	collDtct_counter = (collDtct_counter + 1) % collDtctParts;
+	uint32_t partSize = objects.size() / collDtctParts;
+	uint32_t start = partSize * collDtct_counter;
+	uint32_t end = start + partSize;
+
+	for (uint32_t i = start; i < end; i++)
+	//for (uint32_t i = 0; i < objects.size(); i++)
 	{
 		if (objects[i]->m_type == Object::ObjectType::UNIT)
 		{
@@ -224,7 +260,7 @@ void Game::collisionsDetected()
 
 								planet->m_healthPoints += 1.0f;
 
-								if (planet->m_healthPoints == 200.0f)
+								if (planet->m_healthPoints == 101.0f)
 								{
 									planet->m_healthPoints = 100.0f;
 									planet->m_level += 1;
@@ -289,7 +325,7 @@ void Game::collisionsDetected()
 }
 
 static int phys_counter = 0;
-static int parts = 10;
+static int parts = 20;
 
 void Game::updatePhysics()
 {
@@ -353,13 +389,13 @@ void Game::updatePhysics()
 void Game::updateGameState(float deltaTime)
 {
 	{
-		LOG_DURATION("updatePhysics");
-		updatePhysics();
+		//LOG_DURATION("updatePhysics");
+		//updatePhysics();
 	}
 
 	{
-		LOG_DURATION("collisionsDetected");
-		collisionsDetected();
+		//LOG_DURATION("collisionsDetected");
+		//collisionsDetected();
 	}
 
 	{

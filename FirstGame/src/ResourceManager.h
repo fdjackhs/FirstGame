@@ -7,6 +7,10 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 #include "Model.h"
 #include "ObjectAttributes.h"
@@ -18,10 +22,11 @@ struct shader_path
 	std::string fragment;
 };
 
-struct model_bunch //path to model and type of shader for that model
+struct model_bunch //path to model and types of shaders for that model
 {
 	std::string path;
-	std::string shader_type;
+	// All shaders that may be needed to render this model (at least there should be BASIC and INSTANSING shaders)
+	std::vector<std::string> shaders_types;
 };
 
 class ResourceManager
@@ -42,7 +47,7 @@ public:
 
 	//list of loaded pairs models & shaders
 	//first - model index, second - shader index
-	std::vector<std::pair<unsigned int, unsigned int>> modelIndex_shaderIndex;
+	std::vector<std::pair<unsigned int, std::vector<unsigned int>>> modelIndex_shadersIndices;
 
 	//ready-made bundles of a list of models and shaders for them
 	/*
@@ -70,4 +75,9 @@ public:
 	//return index - need for update
 	uint32_t createObject(std::vector<GLfloat> vertices, const std::string& vertexPath, const std::string& fragmentPath);
 	void updateVBO(uint32_t vbo, std::vector<GLfloat>& vertices);
+
+private:
+	uint32_t getModelIndex(const std::string& type_of_model);
+	std::vector<uint32_t> getShadersIndices(const std::string& type_of_shader);
+	std::string readFile(const std::string& path);
 };

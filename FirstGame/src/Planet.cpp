@@ -34,6 +34,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_reloading = 0.0f;
 	m_reloadingTime = 1.0f;
 	
+	m_healthPoints = 100.0f;
+
 	m_level = 1;
 
 	m_gameState = game;

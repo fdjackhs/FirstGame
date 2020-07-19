@@ -30,11 +30,11 @@ public:
 	inline bool closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance); //custom distance
 
 	//for fast creating units during the game
-	std::vector<unsigned int> m_common_unit_index;
+	//std::vector<unsigned int> m_common_unit_index;
 
 private:
 	std::vector<std::shared_ptr<Object>> objects;
-	//std::vector<Object*> objects;
+
 	std::shared_ptr<select_area> m_area;
 
 	std::string m_player_fraction;
