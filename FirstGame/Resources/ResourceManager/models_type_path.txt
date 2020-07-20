@@ -2,31 +2,43 @@
 	{
 		"type" : "RED_UNIT",
 		"path" : "../FirstGame/resources/models/Red_unit/Red_unit.obj",
-		"shaders_types" : ["BASIC", "INSTANSING"]
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true"
 	},
 	{
 		"type" : "RED_PLANET",
 		"path" : "../FirstGame/resources/models/Red_planet/Red_planet.obj",
-		"shaders_types" : ["BASIC", "INSTANSING"]
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true"
 	},
 	{
 		"type" : "BLUE_UNIT",
 		"path" : "../FirstGame/resources/models/Blue_unit/Blue_unit.obj",
-		"shaders_types" : ["BASIC", "INSTANSING"]
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true"
 	},
 	{
 		"type" : "BLUE_PLANET",
 		"path" : "../FirstGame/resources/models/Blue_planet/Blue_planet.obj",
-		"shaders_types" : ["BASIC", "INSTANSING"]
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true"
 	},
 	{
 		"type" : "NEUTRAL_PLANET",
 		"path" : "../FirstGame/resources/models/Neutral_planet/Neutral_planet.obj",
-		"shaders_types" : ["BASIC", "INSTANSING"]
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true"
+	},
+	{
+		"type" : "STENCIL",
+		"path" : "../FirstGame/resources/models/Stencil/Stencil.obj",
+		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
+		"depth_test" : "false"
 	},
 	{
 		"type" : "default",
 		"path" : "default",
-		"shaders_types" : ["default"]
+		"shaders_types" : ["default"],
+		"depth_test" : "default"
 	}
 ]

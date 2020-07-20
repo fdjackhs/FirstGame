@@ -21,4 +21,7 @@ public:
 	void action(float deltaTime);
 	glm::vec3 GetPosition() const;
 	void setTargetPosition(glm::vec3& target);
+
+	void select();
+	void deselect();
 };

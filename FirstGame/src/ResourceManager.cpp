@@ -54,8 +54,10 @@ void ResourceManager::loadModelPairs(const char* path, std::map<std::string, mod
 
 			rapidjson::Value& type = d[i]["type"];
 			rapidjson::Value& path = d[i]["path"];
+			rapidjson::Value& depth_test = d[i]["depth_test"];
+			std::string s_dt = depth_test.GetString();
 
-			vector_pairs[type.GetString()] = { path.GetString(), shadersTypes };
+			vector_pairs[type.GetString()] = { path.GetString(), shadersTypes, { (s_dt == "true" ? true : false) } };
 		}
 
 		pair_File.close();
@@ -102,7 +104,7 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
 {
 	//why it's here?
-	m_stencilShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.stencil_shader.vs", "../FirstGame/Resources/shaders/1.stencil_shader.fs");
+	//m_stencilShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.stencil_shader.vs", "../FirstGame/Resources/shaders/1.stencil_shader.fs");
 
 	std::string levelData = readFile(listPathLevels[number]);
 
@@ -150,13 +152,13 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 uint32_t ResourceManager::getModelIndex(const std::string& type_of_model)
 {
 	auto findedModel = std::find_if(models.begin(), models.end(),
-									[&type_of_model](const std::pair<std::string, Model>& x) { return x.first == type_of_model; });
+									[&type_of_model](const std::tuple<std::string, Model, rendering_parameters>& x) { return std::get<0>(x) == type_of_model; });
 
 	unsigned int model_index = -1;
 	if (findedModel == models.end()) // if model not loaded
 	{
 		Model model(models_type_path[type_of_model].path.c_str());
-		models.push_back({ type_of_model, model });
+		models.push_back({ type_of_model, model, models_type_path[type_of_model].rend_params });
 		model_index = models.size() - 1;
 	}
 	else

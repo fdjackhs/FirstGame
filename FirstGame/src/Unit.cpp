@@ -8,7 +8,7 @@
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop, const std::string fraction)
 {
 	m_modelIDs = ID;
-	m_indexes_of_displayd_models.push_back(0);
+	m_indexes_of_displayd_models.push_back(1);
 
 	m_position = position;
 	m_targetPos = m_position;
@@ -34,7 +34,7 @@ Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, const glm::vec3& target, const std::string fraction)
 {
 	m_modelIDs = ID;
-	m_indexes_of_displayd_models.push_back(0);
+	m_indexes_of_displayd_models.push_back(1);
 
 	m_position = position;
 	m_targetPos = target;
@@ -96,4 +96,26 @@ void Unit::setTargetPosition(glm::vec3& target)
 glm::vec3 Unit::GetPosition() const
 {
 	return m_position;
+}
+
+void Unit::select()
+{
+	if (!m_selected)
+	{
+		m_selected = true;
+
+		m_indexes_of_displayd_models.clear();
+		m_indexes_of_displayd_models.push_back(0);
+		m_indexes_of_displayd_models.push_back(1);
+	}
+}
+
+void Unit::deselect()
+{
+	if (m_selected)
+	{
+		m_selected = false;
+		m_indexes_of_displayd_models.clear();
+		m_indexes_of_displayd_models.push_back(1);
+	}
 }

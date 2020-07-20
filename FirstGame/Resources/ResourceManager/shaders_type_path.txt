@@ -10,6 +10,16 @@
 		"path_fragment" : "../FirstGame/Resources/shaders/1.instansing_fragment_shader.fs"
 	},
 	{
+		"type" : "STENCIL_B",
+		"path_vertex" : "../FirstGame/Resources/shaders/1.stencil_basic_shader.vs",
+		"path_fragment" : "../FirstGame/Resources/shaders/1.stencil_basic_shader.fs"
+	},
+	{
+		"type" : "STENCIL_I",
+		"path_vertex" : "../FirstGame/Resources/shaders/1.stencil_instansing_shader.vs",
+		"path_fragment" : "../FirstGame/Resources/shaders/1.stencil_instansing_shader.fs"
+	},
+	{
 		"type" : "default",
 		"path_vertex" : "path",
 		"path_fragment" : "path"

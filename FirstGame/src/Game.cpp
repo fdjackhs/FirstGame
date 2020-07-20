@@ -12,8 +12,8 @@ Game::Game(unsigned int level)
 	// temporary here
 	// create models groups
 	for (auto&& x : RenderEngine::resourceManager.modelIndex_shadersIndices)
-		RenderEngine::modelsGroups.push_back({ false, 0, x.first, x.second, std::vector<glm::mat4>() });
-
+		RenderEngine::modelsGroups.push_back({ std::get<2>(RenderEngine::resourceManager.models[x.first]).depth_test, false, 0, x.first, x.second, std::vector<glm::mat4>() });
+	
 	for (auto&& x : objectsAttribs)
 		createObject(x);
 
@@ -86,9 +86,11 @@ void Game::loop()
 		}
 
 
+		std::cerr << "objects " << objects.size() << std::endl;
+
 		{
 			LOG_DURATION("Profile");
-			if (RenderEngine::deltaTime > 1.0f / 60.0f)
+			if (RenderEngine::deltaTime > 1.0f / 59.0f)
 			{
 				counter++;
 			}
@@ -97,7 +99,7 @@ void Game::loop()
 				counter = 0;
 			}
 
-			if (counter > 5)
+			if (counter > 100)
 			{
 				std::cerr << std::endl;
 				std::cerr << "total objects " << objects.size() << std::endl;
@@ -127,11 +129,11 @@ void Game::createObject(const ObjectAttributes& attributes)
 			//	for (z = 0; z < 50; z++)
 				{
 					Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-						glm::vec3{ stof(attributes.posx) + x,
-								   stof(attributes.posy),
-								   stof(attributes.posz) + z},
-						stof(attributes.scale),
-						"", "RED");
+											  glm::vec3{ stof(attributes.posx) + x,
+											  		     stof(attributes.posy),
+											  		     stof(attributes.posz) + z},
+											  stof(attributes.scale),
+											  "", "RED");
 					std::shared_ptr<Object> sp_unit(ptr_unit);
 					objects.push_back(sp_unit);
 				}
@@ -390,12 +392,12 @@ void Game::updateGameState(float deltaTime)
 {
 	{
 		//LOG_DURATION("updatePhysics");
-		//updatePhysics();
+		updatePhysics();
 	}
 
 	{
 		//LOG_DURATION("collisionsDetected");
-		//collisionsDetected();
+		collisionsDetected();
 	}
 
 	{
@@ -419,11 +421,11 @@ void Game::selectUnits()
 			Unit* unit = (Unit*)obj.get();
 			if (glm::distance(m_area->m_position, obj->m_position) <= m_area->radius)
 			{
-				unit->m_selected = true;
+				unit->select();
 			}
 			else
 			{
-				unit->m_selected = false;
+				unit->deselect();
 			}
 		}
 	}
@@ -601,7 +603,6 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 
 //TODO
 /*
-	- общая оптимизация (сократить количество вложенных циклов, сделать свою функцию distance без извлечения корня, и.т.д.)
 	- добавить границы карты
 	- добавить бокс (фон)
 
@@ -614,7 +615,6 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 		у объекта есть индесы).
 
 	- при передвижении толпа юнитов не стремится в одну точку, а двигаются как бы строем
-	- улучшить графику и добавить опенгл фитчи (например, отправлять в шейдер модельки не по одной а все сразу)
 	- при расчёте физики можно пользоваться многопоточкой
 	- редактор карт?
 
@@ -637,4 +637,7 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 
 		- общая оптимизация (сократить количество вложенных циклов, сделать свою функцию distance без извлечения корня, и.т.д.)
 
+		- улучшить графику и добавить опенгл фитчи (например, отправлять в шейдер модельки не по одной а все сразу)
+
+		- общая оптимизация (сократить количество вложенных циклов, сделать свою функцию distance без извлечения корня, и.т.д.)
 */

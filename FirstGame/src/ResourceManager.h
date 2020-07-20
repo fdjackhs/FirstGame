@@ -22,11 +22,17 @@ struct shader_path
 	std::string fragment;
 };
 
+struct rendering_parameters
+{
+	bool depth_test;
+};
+
 struct model_bunch //path to model and types of shaders for that model
 {
 	std::string path;
 	// All shaders that may be needed to render this model (at least there should be BASIC and INSTANSING shaders)
 	std::vector<std::string> shaders_types;
+	rendering_parameters rend_params;
 };
 
 class ResourceManager
@@ -40,10 +46,10 @@ public:
 	std::map<std::string, model_bunch> models_type_path; // load in constuctor
 
 	std::vector<std::pair<std::string, Shader>> shaders;
-	std::vector<std::pair<std::string, Model>> models;
+	std::vector<std::tuple<std::string, Model, rendering_parameters>> models;
 	std::vector<ManuallyCreatedObject> m_manuallyCreaatedObjects;
 
-	std::shared_ptr<Shader> m_stencilShader;
+	//std::shared_ptr<Shader> m_stencilShader;
 
 	//list of loaded pairs models & shaders
 	//first - model index, second - shader index

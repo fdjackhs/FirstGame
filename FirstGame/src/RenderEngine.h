@@ -43,6 +43,7 @@ namespace RenderEngine
 
 	struct modelGroupAttribs
 	{
+		bool depth;
 		bool bufferIsCreated;
 		uint32_t buffer;
 

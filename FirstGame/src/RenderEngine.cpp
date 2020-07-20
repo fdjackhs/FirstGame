@@ -97,6 +97,8 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glfwSwapInterval(1);
+
 	//
 	camera = std::make_shared<Camera>(glm::vec3(0.0f, 300.0f, 0.0f));
 	RenderEngine::firstMouse = true;
@@ -146,7 +148,8 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 
 	for (auto&& obj : objects)
 	{
-		modelGroupAttribs modelAttributes;
+		if (obj->m_fraction == "RED" && obj->m_type == Object::ObjectType::UNIT)
+			while (false);
 
 		for (auto&& index : obj->m_indexes_of_displayd_models)
 		{
@@ -154,18 +157,20 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 			model = glm::translate(model, obj->m_position);
 			model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
 
-			uint32_t indexOfModelInResourceManager = obj->m_modelIDs[index];
-			modelsGroups[indexOfModelInResourceManager].matrices.push_back(model);
+			modelsGroups[obj->m_modelIDs[index]].matrices.push_back(model);
 		}
 	}
 }
 
 void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
 {
-	//draw units (instansing)
-	//-----------------------------
 	for (auto&& group : modelsGroups)
 	{
+		if (group.depth)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+
 		if (group.matrices.size() > 30)
 			drawGroupOfObjects(group);
 		else
@@ -208,9 +213,9 @@ void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
 	glBufferData(GL_ARRAY_BUFFER, group.matrices.size() * sizeof(glm::mat4), &group.matrices[0], GL_STATIC_DRAW);
 
 
-	for (unsigned int i = 0; i < resourceManager.models[group.model_index].second.meshes.size(); i++)
+	for (unsigned int i = 0; i < std::get<1>(resourceManager.models[group.model_index]).meshes.size(); i++)
 	{
-		unsigned int VAO = resourceManager.models[group.model_index].second.meshes[i].VAO;
+		unsigned int VAO = std::get<1>(resourceManager.models[group.model_index]).meshes[i].VAO;
 		glBindVertexArray(VAO);
 		// set attribute pointers for matrix (4 times vec4)
 		glEnableVertexAttribArray(3);
@@ -238,14 +243,17 @@ void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
 	resourceManager.shaders[group.shaders_indices[1]].second.setMat4("view", view);
 
 
-	resourceManager.shaders[group.shaders_indices[1]].second.setInt("texture_diffuse1", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, resourceManager.models[group.model_index].second.textures_loaded[0].id);
-
-	for (unsigned int i = 0; i < resourceManager.models[group.model_index].second.meshes.size(); i++)
+	if (!std::get<1>(resourceManager.models[group.model_index]).textures_loaded.empty())
 	{
-		glBindVertexArray(resourceManager.models[group.model_index].second.meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, resourceManager.models[group.model_index].second.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, group.matrices.size());
+		resourceManager.shaders[group.shaders_indices[1]].second.setInt("texture_diffuse1", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, std::get<1>(resourceManager.models[group.model_index]).textures_loaded[0].id);
+	}
+
+	for (unsigned int i = 0; i < std::get<1>(resourceManager.models[group.model_index]).meshes.size(); i++)
+	{
+		glBindVertexArray(std::get<1>(resourceManager.models[group.model_index]).meshes[i].VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, std::get<1>(resourceManager.models[group.model_index]).meshes[i].indices.size(), GL_UNSIGNED_INT, 0, group.matrices.size());
 		glBindVertexArray(0);
 	}
 }
@@ -266,7 +274,7 @@ void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
 
 		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("model", matrix);
 
-		resourceManager.models[group.model_index].second.Draw(resourceManager.shaders[group.shaders_indices[0]].second);
+		std::get<1>(resourceManager.models[group.model_index]).Draw(resourceManager.shaders[group.shaders_indices[0]].second);
 	}
 }
 
