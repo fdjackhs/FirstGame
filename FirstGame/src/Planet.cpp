@@ -27,7 +27,6 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_position = pos;
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
-	m_selected = false;
 
 	m_type = PLANET;
 

@@ -85,14 +85,9 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_STENCIL_TEST);
 
-	//glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	//glStencilMask(0xFF);
-	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	//glStencilMask(0xFF);
-
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -131,6 +126,12 @@ void RenderEngine::clearScreen()
 
 void RenderEngine::updateCameraView()
 {
+	float offset = (camera->finalCameraPoint - camera->Position.y) * 0.07f;
+	camera->Position.y += offset;
+
+	//camera->Position.y = camera->finalCameraPoint;
+
+
 	view = camera->GetViewMatrix();
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 1000.0f);
 }
@@ -141,7 +142,7 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects)
+void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Unit>>& red_unit, std::vector<std::shared_ptr<Unit>>& blue_unit)
 {
 	for (auto&& group : modelsGroups)
 		group.matrices.clear();
@@ -162,7 +163,7 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 	}
 }
 
-void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
+void RenderEngine::drawObjects()
 {
 	for (auto&& group : modelsGroups)
 	{
@@ -263,111 +264,17 @@ void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
 	//draw planets
 	for (auto&& matrix : group.matrices)
 	{
-		//draw original objects
-		//---------------------
-
 		//it's draw single object function
 		//by default BASIC shader has index - 0
 		resourceManager.shaders[group.shaders_indices[0]].second.use();
+
 		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("projection", projection);
 		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("view", view);
-
 		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("model", matrix);
 
 		std::get<1>(resourceManager.models[group.model_index]).Draw(resourceManager.shaders[group.shaders_indices[0]].second);
 	}
 }
-
-/*
-void RenderEngine::drawObjects(std::vector<std::shared_ptr<Object>>& objects)
-{
-	//std::cout << objects.size() << std::endl;
-	//draw objects
-	//------------
-	for (auto&& obj : objects)
-	{
-		//if (obj->m_fraction == "RED" && obj->m_type == Obect::ObjectType::PLANET)
-		//	while (false);
-
-
-		for (auto&& index : obj->m_indexes_of_displayd_models)
-		{
-			//for stencil
-			//-----------
-			if (obj->m_selected)
-			{
-				glStencilFunc(GL_ALWAYS, 1, 0xFF);
-				glStencilMask(0xFF);
-			}
-
-				//draw original objects
-				//---------------------
-				uint32_t shader_index = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[index]].second;
-				uint32_t model_index  = resourceManager.modelIndex_shaderIndex[obj->m_modelIDs[index]].first;
-
-				resourceManager.shaders[shader_index].second.use();
-				resourceManager.shaders[shader_index].second.setMat4("projection", projection);
-				resourceManager.shaders[shader_index].second.setMat4("view", view);
-				glm::vec3 position = obj->GetPosition();
-
-				glm::mat4 model = glm::mat4(1.0f);
-				
-				model = glm::translate(model, position);
-				model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
-
-				resourceManager.shaders[shader_index].second.setMat4("model", model);
-				resourceManager.models[model_index].second.Draw(resourceManager.shaders[shader_index].second);
-
-			//draw stencil
-			//------------
-			if (obj->m_selected)
-			{
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				glStencilMask(0x00);
-
-				glDisable(GL_DEPTH_TEST);
-				resourceManager.m_stencilShader->use();
-				resourceManager.m_stencilShader->setMat4("projection", projection);
-				resourceManager.m_stencilShader->setMat4("view", view);
-
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, position);
-				model = glm::scale(model, glm::vec3(obj->m_scale * 1.7f, obj->m_scale * 1.7f, obj->m_scale * 1.7f));
-
-				resourceManager.m_stencilShader->setMat4("model", model);
-				resourceManager.models[model_index].second.Draw(*resourceManager.m_stencilShader);
-
-				glStencilFunc(GL_ALWAYS, 0, 0xFF);
-				glStencilMask(0xFF);
-				glEnable(GL_DEPTH_TEST);
-			}
-			//------------
-		}
-	}
-	//draw area
-	//-----------------------------
-	for (unsigned int modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)
-	{
-		uint32_t modelIndex  = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].first;
-		uint32_t shaderIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].second;
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_position);
-
-		resourceManager.shaders[shaderIndex].second.use();
-		resourceManager.shaders[shaderIndex].second.setMat4("view", view);
-		resourceManager.shaders[shaderIndex].second.setMat4("projection", projection);
-		resourceManager.shaders[shaderIndex].second.setMat4("model", model);
-
-		glDisable(GL_DEPTH_TEST);
-		glBindVertexArray(RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_VAO);
-		glLineWidth(3);
-		glDrawElements(GL_LINE_LOOP, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_vertices.size() / 3, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-		glEnable(GL_DEPTH_TEST);
-	}
-}
-*/
 
 glm::vec3 RenderEngine::cursorCoordToWorldCoords(const glm::vec2& cursorPos)
 {

@@ -1,5 +1,4 @@
-[
-	{
+[{
 		"object_type": "RED_PLANET",
 		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
 		"posx": "-100.0",
@@ -89,5 +88,32 @@
 		"exsist": "false",
 		
 		"optionalProperties": "BLUE_UNIT"
+	},
+	
+	{
+		"object_type": "TEST",
+		"models_type": ["TEST"],
+		"posx": "0.0",
+		"posy": "100.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "TEST"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON", "BUTTON_DOWN"],
+		"posx": "0.8",
+		"posy": "-0.8",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "BUTTON"
 	}
 ]

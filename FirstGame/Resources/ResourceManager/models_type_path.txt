@@ -35,6 +35,25 @@
 		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
 		"depth_test" : "false"
 	},
+	
+	{
+		"type" : "TEST",
+		"path" : "../FirstGame/resources/models/testModel/untitled.obj",
+		"shaders_types" : ["BASIC"],
+		"depth_test" : "false"
+	},
+	{
+		"type" : "BUTTON",
+		"path" : "../FirstGame/resources/models/Button/Button.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false"
+	},
+	{
+		"type" : "BUTTON_DOWN",
+		"path" : "../FirstGame/resources/models/Button/ButtonDOWN.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false"
+	},
 	{
 		"type" : "default",
 		"path" : "default",

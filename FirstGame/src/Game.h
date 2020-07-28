@@ -7,6 +7,7 @@
 #include "Unit.h"
 #include "Planet.h"
 #include "SelectArea.h"
+#include "Button.h"
 
 class Game
 {
@@ -33,7 +34,12 @@ public:
 	//std::vector<unsigned int> m_common_unit_index;
 
 private:
+	bool m_pause;
+
 	std::vector<std::shared_ptr<Object>> objects;
+	
+	std::vector<std::shared_ptr<Unit>> red_units;
+	std::vector<std::shared_ptr<Unit>> blue_units;
 
 	std::shared_ptr<select_area> m_area;
 

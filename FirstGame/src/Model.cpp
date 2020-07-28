@@ -149,6 +149,8 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
 	int width, height, nrComponents;
 	unsigned char* image = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
+	stbi_set_flip_vertically_on_load(true);
+
 	if (image)
 	{
 		GLenum format;

@@ -20,6 +20,8 @@ Game::Game(unsigned int level)
 	//create objects manually
 	uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 	m_area = std::make_shared<select_area>(id);
+
+	m_pause = false;
 }
 
 Game::~Game()
@@ -35,59 +37,68 @@ void Game::loop()
 
 	while (!RenderEngine::windowShouldClose())
 	{
-		LOG_DURATION("--- main loop");
+		//LOG_DURATION("--- main loop");
 
 		{
-			LOG_DURATION("calculate deltaTime");
-			float currTime = RenderEngine::getCurrTime();
-			RenderEngine::deltaTime = currTime - lastTime;
-			lastTime = currTime;
+			//LOG_DURATION("calculate deltaTime");
+
+			if (!m_pause)
+			{
+				float currTime = RenderEngine::getCurrTime();
+				RenderEngine::deltaTime = currTime - lastTime;
+				lastTime = currTime;
+			}
+			else
+			{
+				lastTime = RenderEngine::getCurrTime();
+				RenderEngine::deltaTime = 0.0f;
+			}
 		}
 
 
 		{
-			LOG_DURATION("process input");
+			//LOG_DURATION("process input");
 			processInput(RenderEngine::keys, RenderEngine::buttons, RenderEngine::cursorCoords, RenderEngine::scroll);
 		}
 
 		{
-			LOG_DURATION("clearScreen");
+			//LOG_DURATION("clearScreen");
 			RenderEngine::clearScreen();
 		}
 
 		{
-			LOG_DURATION("updateCameraView");
+			//LOG_DURATION("updateCameraView");
 			RenderEngine::updateCameraView();
 		}
 
 		{
-			LOG_DURATION("updateGameState");
+			//LOG_DURATION("updateGameState");
 			updateGameState(RenderEngine::deltaTime);
 		}
 
 		{
-			LOG_DURATION("genModelMatrices");
-			RenderEngine::genModelMatrices(Game::objects);
+			//LOG_DURATION("genModelMatrices");
+			RenderEngine::genModelMatrices(Game::objects, Game::red_units, Game::blue_units);
 		}
 
 		{
-			LOG_DURATION("drawObjects");
-			RenderEngine::drawObjects(Game::objects);
+			//LOG_DURATION("drawObjects");
+			RenderEngine::drawObjects();
 		}
 
 		{
-			LOG_DURATION("updateScreen");
+			//LOG_DURATION("updateScreen");
 			RenderEngine::updateScreen();
 		}
 
 		{
-			LOG_DURATION("pollEvents");
+			//LOG_DURATION("pollEvents");
 			RenderEngine::pollEvents();
 		}
 
 
-		std::cerr << "objects " << objects.size() << std::endl;
-
+		//std::cerr << "objects " << objects.size() << std::endl;
+		/*
 		{
 			LOG_DURATION("Profile");
 			if (RenderEngine::deltaTime > 1.0f / 59.0f)
@@ -113,6 +124,7 @@ void Game::loop()
 				system("pause");
 			}
 		}
+		*/
 	}
 }
 
@@ -186,6 +198,17 @@ void Game::createObject(const ObjectAttributes& attributes)
 			std::shared_ptr<Object> sh_planet(ptr_planet);
 			objects.push_back(sh_planet);
 		}
+		else if (attributes.object_type == "BUTTON")
+		{
+			Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+										    glm::vec3{ stof(attributes.posx),
+												       stof(attributes.posy),
+												       stof(attributes.posz) },
+										    stof(attributes.scale),
+										    "");
+			std::shared_ptr<Button> sh_button(ptr_button);
+			objects.push_back(sh_button);
+		}
 		else
 		{
 			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
@@ -201,7 +224,7 @@ void Game::createObject(const ObjectAttributes& attributes)
 }
 
 static int collDtct_counter = 0;
-static int collDtctParts = 20;
+static int collDtctParts = 10;
 
 void Game::collisionsDetected()
 {
@@ -262,7 +285,7 @@ void Game::collisionsDetected()
 
 								planet->m_healthPoints += 1.0f;
 
-								if (planet->m_healthPoints == 101.0f)
+								if (planet->m_healthPoints == 200.0f)
 								{
 									planet->m_healthPoints = 100.0f;
 									planet->m_level += 1;
@@ -327,7 +350,7 @@ void Game::collisionsDetected()
 }
 
 static int phys_counter = 0;
-static int parts = 20;
+static int parts = 10;
 
 void Game::updatePhysics()
 {
@@ -335,7 +358,7 @@ void Game::updatePhysics()
 	uint32_t partSize = objects.size() / parts;
 	uint32_t start = partSize * phys_counter;
 	uint32_t end = start + partSize;
-
+	
 	//for (uint32_t i = 0; i < objects.size(); i++)
 	for (uint32_t i = start; i < end; i++)
 	{
@@ -345,45 +368,39 @@ void Game::updatePhysics()
 
 			glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
 
-			//if (unit_i->m_physics_counter > 1)
+			for (uint32_t j = 0; j < objects.size(); j++)
 			{
-				//unit_i->m_physics_counter = 0;
-
-				for (uint32_t j = 0; j < objects.size(); j++)
+				if (j != i &&
+					objects[j]->m_type == Object::ObjectType::UNIT)
 				{
-					if (j != i &&
-						objects[j]->m_type == Object::ObjectType::UNIT)
+					Unit* unit_j = (Unit*)objects[j].get();
+
+					float force = (1.0f / sqrt(glm::distance(unit_i->m_position, unit_j->m_position))) * 0.2f;
+
+					if (unit_i->m_fraction != unit_j->m_fraction)
 					{
-						Unit* unit_j = (Unit*)objects[j].get();
-
-						float force = (1.0f / sqrt(glm::distance(unit_i->m_position, unit_j->m_position))) * 0.2f;
-
-						if (unit_i->m_fraction != unit_j->m_fraction)
-						{
-							//std::cout << "force " << force << std::endl;
-							if (force < 0.08)
-								force = 0.0f;
-							else
-								force = -(force * 10.0f);
-						}
+						//std::cout << "force " << force << std::endl;
+						if (force < 0.08)
+							force = 0.0f;
 						else
-						{
-							if (force < 0.15)
-								force = 0.0f;
-						}
-
-						glm::vec3 temp = glm::normalize(unit_i->m_position - unit_j->m_position) * force;
-
-						totoalGravityVector += temp;
+							force = -(force * 10.0f);
 					}
-				}
+					else
+					{
+						if (force < 0.15)
+							force = 0.0f;
+					}
 
-				unit_i->m_gravityOffset = totoalGravityVector;
+					glm::vec3 temp = glm::normalize(unit_i->m_position - unit_j->m_position) * force;
+
+					totoalGravityVector += temp;
+				}
 			}
-			//else
-			{
-				//unit_i->m_physics_counter++;
-			}
+			
+			unit_i->m_gravityOffset = totoalGravityVector;
+
+			if (unit_i->m_gravityOffset.y != 0.0f)
+				unit_i->m_gravityOffset.y = 0.0f;
 		}
 	}
 }
@@ -414,18 +431,17 @@ void Game::updateGameState(float deltaTime)
 
 void Game::selectUnits()
 {
-	for (auto&& obj : objects)
+	if (m_player_fraction == "RED")
 	{
-		if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
+		for (auto&& obj : objects)
 		{
-			Unit* unit = (Unit*)obj.get();
-			if (glm::distance(m_area->m_position, obj->m_position) <= m_area->radius)
+			if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
 			{
-				unit->select();
-			}
-			else
-			{
-				unit->deselect();
+				Unit* unit = (Unit*)obj.get();
+				if (glm::distance(m_area->m_position, unit->m_position) <= m_area->radius)
+					unit->select();
+				else
+					unit->deselect();
 			}
 		}
 	}
@@ -456,15 +472,15 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	//process mouse scroll
 	//--------------------
 	if (scroll == 1)
-		RenderEngine::camera->Position.y -= 5.0f;
+		RenderEngine::camera->finalCameraPoint -= 20.0f;
 	if (scroll == -1)
-		RenderEngine::camera->Position.y += 5.0f;
+		RenderEngine::camera->finalCameraPoint += 20.0f;
 
-	if (RenderEngine::camera->Position.y < 10)
-		RenderEngine::camera->Position.y = 10;
-	if (RenderEngine::camera->Position.y > 1000)
-		RenderEngine::camera->Position.y = 1000;
-
+	if (RenderEngine::camera->finalCameraPoint < 10)
+		RenderEngine::camera->finalCameraPoint = 10;
+	if (RenderEngine::camera->finalCameraPoint > 1000)
+		RenderEngine::camera->finalCameraPoint = 1000;
+	
 	RenderEngine::scroll = 0;
 
 	
@@ -510,11 +526,43 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	}
 
 
+
 	static glm::vec2 lastCursorCoords;
+	static bool leftButtonLastTime = false;
 
 	//selected area
 	if (buttons[0])
 	{
+		//interface check hit (buttons)
+		//-----------------------------
+		{
+			float x = (1.0f / RenderEngine::SCREEN.x) * cursorCoords.x;
+			float y = (1.0f / RenderEngine::SCREEN.y) * cursorCoords.y;
+
+			//std::cerr << x << " " << y << std::endl;
+			{
+				for (auto&& obj : objects)
+				{
+					if (obj->m_type == Object::ObjectType::BUTTON)
+					{
+						Button* button = (Button*)obj.get();
+						if (button->checkButtonPress(glm::vec2(x, y)) && !leftButtonLastTime)
+						{
+							button->m_isPressed = !button->m_isPressed;
+
+							if (button->m_isPressed)
+								button->setButtonDown();
+							else
+								button->setButtonUp();
+
+							m_pause = !m_pause;
+						}
+					}
+				}
+			}
+		}
+		//-----------------------------
+
 		if (cursorCoords != lastCursorCoords)
 		{
 			if (m_area->firstTime)
@@ -540,10 +588,12 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 			RenderEngine::resourceManager.updateVBO(m_area->ID, m_area->vertices);
 		}
 
-		m_area->previusTime = true;
+		m_area->previusTime = true; 
+		leftButtonLastTime = true;
 	}
 	else
 	{
+
 		//set target
 		if (m_area->previusTime && m_area->firstTime)
 		{
@@ -576,7 +626,7 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 					}
 				}
 			}
-			
+
 			//collapse select area
 			m_area->radius = 0.0f;
 			m_area->updateVertices();
@@ -585,6 +635,8 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 
 		m_area->firstTime = true;
 		m_area->previusTime = false;
+
+		leftButtonLastTime = false;
 	}
 
 	lastCursorCoords = cursorCoords;
@@ -603,16 +655,17 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 
 //TODO
 /*
+	- лоад скрин
+	- сделать api для удобста использования ai
 	- добавить границы карты
 	- добавить бокс (фон)
+	- интерфейс (кнопки)
 
-
-	- m_selected находится в Object, а дожен быть только у Unit, это кривое проэктирование.
-		RenderEngine при отрисовке смотрит на поле m_selected, чтобы определить, 
-		нужно ли отрисовывать белое выделение вокруг юнита, и это определяется прям в функции drawObjects.
-		Нужно сделать так, чтоб если юнит выделен, то он сам определяет как он должен быть отрисован, и тогда, 
-		drawObjects будет отрисовывать все объёкты одинаковым способом (просто выводить все модели на которые 
-		у объекта есть индесы).
+		- баг с неправильным таргетом у юнита
+		(если юнита отправить В планету и его путь будет
+		пролегать через другую планет, то юнит войдёт не в ту
+		планету на которую был отправлен, а в ту которая
+		лежит у него на пути)
 
 	- при передвижении толпа юнитов не стремится в одну точку, а двигаются как бы строем
 	- при расчёте физики можно пользоваться многопоточкой
@@ -625,11 +678,7 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 
 
 	Решено:
-		- баг с неправильным таргетом у юнита
-		(если юнита отправить В планету и его путь будет
-		пролегать через другую планет, то юнит войдёт не в ту
-		планету на которую был отправлен, а в ту которая
-		лежит у него на пути)
+		- баг с физикой (разлетаются по координате y)
 
 		- сделать нормальное ООП
 		
@@ -640,4 +689,11 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 		- улучшить графику и добавить опенгл фитчи (например, отправлять в шейдер модельки не по одной а все сразу)
 
 		- общая оптимизация (сократить количество вложенных циклов, сделать свою функцию distance без извлечения корня, и.т.д.)
+
+		- m_selected находится в Object, а дожен быть только у Unit, это кривое проэктирование.
+		  RenderEngine при отрисовке смотрит на поле m_selected, чтобы определить,
+		  нужно ли отрисовывать белое выделение вокруг юнита, и это определяется прям в функции drawObjects.
+		  Нужно сделать так, чтоб если юнит выделен, то он сам определяет как он должен быть отрисован, и тогда,
+		  drawObjects будет отрисовывать все объёкты одинаковым способом (просто выводить все модели на которые
+		  у объекта есть индесы).
 */

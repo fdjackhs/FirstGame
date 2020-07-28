@@ -61,6 +61,10 @@ void Unit::action(float deltaTime)
 {
 	if (m_state == "rest")
 	{
+
+		//if (m_gravityOffset != glm::vec3(0.0f, 0.0f, 0.0f))
+		//	while (false);
+
 		m_position += m_gravityOffset * deltaTime;
 	}
 	else if (m_state == "move" || m_state == "update" || m_state == "attack")
@@ -75,6 +79,13 @@ void Unit::action(float deltaTime)
 
 		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
 		m_position += move_vector * speed * deltaTime;
+
+		float x = m_position.x - m_targetPos.x;
+		float y = m_position.y - m_targetPos.y;
+		float z = m_position.z - m_targetPos.z;
+
+		if (abs(x) < 0.1f && abs(y) < 0.1f && abs(z) < 0.1f)
+			m_state = "rest";
 	}
 	else
 	{

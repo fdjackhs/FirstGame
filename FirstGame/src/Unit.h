@@ -7,6 +7,7 @@ class Unit : public Object
 {
 public:
 	bool m_annihilated;
+	bool m_selected;
 	int m_physics_counter;
 	float m_speed;
 

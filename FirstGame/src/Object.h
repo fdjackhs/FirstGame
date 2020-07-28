@@ -8,13 +8,11 @@
 class Object
 {
 public:
-	enum ObjectType { OBJECT, UNIT, PLANET };
+	enum ObjectType { OBJECT, UNIT, PLANET, BUTTON };
 
 	Object();
 	Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, const std::string fraction);
 	~Object();
-
-	bool m_selected; //Only Unit's can be selected, just a render engine shouldn't know what exactly it draws
 	
 	float m_radius;
 	float m_scale;

@@ -14,6 +14,7 @@
 #include "Shader.h"
 #include "ResourceManager.h"
 #include "SelectArea.h"
+#include "Unit.h"
 
 extern class select_area;
 
@@ -71,8 +72,9 @@ namespace RenderEngine
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
 
-	void drawObjects(std::vector<std::shared_ptr<Object>>& objects);
-	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
+	void drawObjects();
+	//void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
+	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Unit>>& red_unit, std::vector<std::shared_ptr<Unit>>& blue_unit);
 	void drawGroupOfObjects(RenderEngine::modelGroupAttribs& group);
 	void drawSingleObject(RenderEngine::modelGroupAttribs& group);
 };
