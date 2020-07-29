@@ -76,7 +76,7 @@ public:
 	void loadListPathLevels();
 	void loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs);
 	void loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs);
-	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
+	void loadModels(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
 
 	//return index - need for update
 	uint32_t createObject(std::vector<GLfloat> vertices, const std::string& vertexPath, const std::string& fragmentPath);

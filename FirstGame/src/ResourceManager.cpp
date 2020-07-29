@@ -101,11 +101,8 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 	}
 }
 
-void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
+void ResourceManager::loadModels(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
 {
-	//why it's here?
-	//m_stencilShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.stencil_shader.vs", "../FirstGame/Resources/shaders/1.stencil_shader.fs");
-
 	std::string levelData = readFile(listPathLevels[number]);
 
 	rapidjson::Document d;
@@ -131,7 +128,7 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 		rapidjson::Value& posz = d[i]["posz"];
 		rapidjson::Value& scale = d[i]["scale"];
 		rapidjson::Value& exsist = d[i]["exsist"];
-		//rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
+		rapidjson::Value& optionalProperties = d[i]["optionalProperties"];
 
 		rapidjson::Value& object_type = d[i]["object_type"];
 		std::string str = object_type.GetString();
@@ -143,7 +140,7 @@ void ResourceManager::loadLevel(unsigned int number, std::vector<ObjectAttribute
 								posz.GetString(), 
 								scale.GetString(), 
 								exsist.GetString(),
-								"" };
+								optionalProperties.GetString() };
 
 		objectsAttrib.push_back(temp);
 	}

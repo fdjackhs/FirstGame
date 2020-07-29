@@ -21,8 +21,11 @@ public:
 	std::string directory;
 	bool gammaCorrection;
 
+	bool verticesUpdated;
+
 	Model(const char *path, bool gamma = false) : gammaCorrection(gamma)
 	{
+		verticesUpdated = false;
 		loadModel(path);
 	}
 	void Draw(Shader shader);

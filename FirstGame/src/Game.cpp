@@ -7,12 +7,7 @@ Game::Game(unsigned int level)
 	m_ai_fraction = "BLUE";
 
 	std::vector<ObjectAttributes> objectsAttribs;
-	RenderEngine::resourceManager.loadLevel(0, objectsAttribs);
-
-	// temporary here
-	// create models groups
-	for (auto&& x : RenderEngine::resourceManager.modelIndex_shadersIndices)
-		RenderEngine::modelsGroups.push_back({ std::get<2>(RenderEngine::resourceManager.models[x.first]).depth_test, false, 0, x.first, x.second, std::vector<glm::mat4>() });
+	RenderEngine::loadLevel(0, objectsAttribs);
 	
 	for (auto&& x : objectsAttribs)
 		createObject(x);
@@ -22,6 +17,7 @@ Game::Game(unsigned int level)
 	m_area = std::make_shared<select_area>(id);
 
 	m_pause = false;
+	m_timeKoef = 1.0f;
 }
 
 Game::~Game()
@@ -47,6 +43,8 @@ void Game::loop()
 				float currTime = RenderEngine::getCurrTime();
 				RenderEngine::deltaTime = currTime - lastTime;
 				lastTime = currTime;
+
+				RenderEngine::deltaTime *= m_timeKoef;
 			}
 			else
 			{
@@ -134,22 +132,14 @@ void Game::createObject(const ObjectAttributes& attributes)
 	{
 		if (attributes.object_type == "RED_UNIT")
 		{
-			float x = 0;
-			float z = 0;
-			//for (x = 0; x < 500; x++)
-			{
-			//	for (z = 0; z < 50; z++)
-				{
-					Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-											  glm::vec3{ stof(attributes.posx) + x,
-											  		     stof(attributes.posy),
-											  		     stof(attributes.posz) + z},
-											  stof(attributes.scale),
-											  "", "RED");
-					std::shared_ptr<Object> sp_unit(ptr_unit);
-					objects.push_back(sp_unit);
-				}
-			}
+			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+									  glm::vec3{ stof(attributes.posx),
+									  		     stof(attributes.posy),
+									  		     stof(attributes.posz) },
+									  stof(attributes.scale),
+									  "", "RED");
+			std::shared_ptr<Object> sp_unit(ptr_unit);
+			objects.push_back(sp_unit);
 		}
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
@@ -205,8 +195,18 @@ void Game::createObject(const ObjectAttributes& attributes)
 												       stof(attributes.posy),
 												       stof(attributes.posz) },
 										    stof(attributes.scale),
+											this,
 										    "");
 			std::shared_ptr<Button> sh_button(ptr_button);
+
+			if (attributes.optionalProperties == "PAUSE")
+				sh_button->setCallbackFunc(switchPause);
+			if (attributes.optionalProperties == "SPEED_UP")
+				sh_button->setCallbackFunc(speedGameUp);
+			if (attributes.optionalProperties == "SPEED_DOWN")
+				sh_button->setCallbackFunc(speedGameDown);
+
+
 			objects.push_back(sh_button);
 		}
 		else
@@ -528,71 +528,55 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 
 
 	static glm::vec2 lastCursorCoords;
+	static glm::vec2 clickCoords;
 	static bool leftButtonLastTime = false;
 
-	//selected area
+
+	//selected area and buttons hit
 	if (buttons[0])
 	{
-		//interface check hit (buttons)
-		//-----------------------------
-		{
-			float x = (1.0f / RenderEngine::SCREEN.x) * cursorCoords.x;
-			float y = (1.0f / RenderEngine::SCREEN.y) * cursorCoords.y;
+		bool clickOnButton = false;
 
-			//std::cerr << x << " " << y << std::endl;
+		if (!leftButtonLastTime)
+		{
+			clickCoords = cursorCoords;
+			clickOnButton = checkButtonHits(clickCoords, true);
+		}
+
+		if (!clickOnButton)
+		{
+			if (cursorCoords != lastCursorCoords)
 			{
-				for (auto&& obj : objects)
+				if (m_area->firstTime)
 				{
-					if (obj->m_type == Object::ObjectType::BUTTON)
-					{
-						Button* button = (Button*)obj.get();
-						if (button->checkButtonPress(glm::vec2(x, y)) && !leftButtonLastTime)
-						{
-							button->m_isPressed = !button->m_isPressed;
-
-							if (button->m_isPressed)
-								button->setButtonDown();
-							else
-								button->setButtonUp();
-
-							m_pause = !m_pause;
-						}
-					}
+					m_area->areaStartPosition = clickCoords;
+					m_area->firstTime = false;
 				}
+
+				float radius = glm::distance(m_area->areaStartPosition, cursorCoords);
+				glm::vec2 diff = glm::vec2(cursorCoords.x - m_area->areaStartPosition.x, cursorCoords.y - m_area->areaStartPosition.y);
+				glm::vec2 center = m_area->areaStartPosition + glm::vec2(diff.x / 2, diff.y / 2);
+
+				glm::vec3 centerInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ center.x, center.y });
+				glm::vec3 borderInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
+
+				uint32_t indexOfarea = RenderEngine::resourceManager.m_manCrObj_indexs[m_area->ID].first;
+
+				RenderEngine::resourceManager.m_manuallyCreaatedObjects[indexOfarea].m_position = centerInWorldCoords;
+				m_area->m_position = centerInWorldCoords;
+				m_area->radius = glm::distance(centerInWorldCoords, borderInWorldCoords);
+
+				m_area->updateVertices();
+				RenderEngine::resourceManager.updateVBO(m_area->ID, m_area->vertices);
 			}
 		}
-		//-----------------------------
 
-		if (cursorCoords != lastCursorCoords)
-		{
-			if (m_area->firstTime)
-			{
-				m_area->areaStartPosition = cursorCoords;
-				m_area->firstTime = false;
-			}
-
-			float radius = glm::distance(m_area->areaStartPosition, cursorCoords);
-			glm::vec2 diff = glm::vec2(cursorCoords.x - m_area->areaStartPosition.x, cursorCoords.y - m_area->areaStartPosition.y);
-			glm::vec2 center = m_area->areaStartPosition + glm::vec2(diff.x / 2, diff.y / 2);
-
-			glm::vec3 centerInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ center.x, center.y });
-			glm::vec3 borderInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
-
-			uint32_t indexOfarea = RenderEngine::resourceManager.m_manCrObj_indexs[m_area->ID].first;
-
-			RenderEngine::resourceManager.m_manuallyCreaatedObjects[indexOfarea].m_position = centerInWorldCoords;
-			m_area->m_position = centerInWorldCoords;
-			m_area->radius = glm::distance(centerInWorldCoords, borderInWorldCoords);
-
-			m_area->updateVertices();
-			RenderEngine::resourceManager.updateVBO(m_area->ID, m_area->vertices);
-		}
-
-		m_area->previusTime = true; 
+		m_area->previusTime = true;
 		leftButtonLastTime = true;
 	}
 	else
 	{
+		checkButtonHits(cursorCoords, false);
 
 		//set target
 		if (m_area->previusTime && m_area->firstTime)
@@ -643,6 +627,35 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 }
 
 
+bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
+{
+	bool result = false;
+
+	float x = cursorCoords.x / RenderEngine::SCREEN.x;
+	float y = cursorCoords.y / RenderEngine::SCREEN.y;
+
+	for (auto&& obj : objects)
+	{
+		if (obj->m_type == Object::ObjectType::BUTTON)
+		{
+			Button* button = (Button*)obj.get();
+			if (button->cursorIsOnButton(glm::vec2(x, y)) && isPressed)
+			{
+				result = true;
+				button->setButtonDown();
+
+				button->callCallbackFunction();
+
+			}
+			else
+				button->setButtonUp();
+		}
+	}
+	
+	return result;
+}
+
+
 inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance)
 {
 	float x = firstPosition.x - secondPosition.x;
@@ -653,13 +666,32 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 	return (x * x + z * z) < distance * distance;
 }
 
+
+void switchPause(Game& game)
+{
+	game.m_pause = !game.m_pause;
+}
+
+void speedGameUp(Game& game)
+{
+	game.m_timeKoef += 0.25f;
+	if (game.m_timeKoef > 2.0f)
+		game.m_timeKoef = 2.0f;
+}
+
+void speedGameDown(Game& game)
+{
+	game.m_timeKoef -= 0.25f;
+	if (game.m_timeKoef < 0.25f)
+		game.m_timeKoef = 0.25f;
+}
+
 //TODO
 /*
 	- лоад скрин
 	- сделать api для удобста использования ai
 	- добавить границы карты
 	- добавить бокс (фон)
-	- интерфейс (кнопки)
 
 		- баг с неправильным таргетом у юнита
 		(если юнита отправить В планету и его путь будет
@@ -678,6 +710,8 @@ inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& se
 
 
 	Решено:
+		- интерфейс (кнопки)
+
 		- баг с физикой (разлетаются по координате y)
 
 		- сделать нормальное ООП

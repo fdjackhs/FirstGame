@@ -27,14 +27,18 @@ public:
 	void selectUnits();
 	void updatePhysics();
 	void collisionsDetected();
+	bool checkButtonHits(const glm::vec2& cursorCoords, bool isPressed);
 
 	inline bool closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance); //custom distance
 
-	//for fast creating units during the game
-	//std::vector<unsigned int> m_common_unit_index;
+	//callback functions (for buttons)
+	friend void switchPause(Game& game);
+	friend void speedGameUp(Game& game);
+	friend void speedGameDown(Game& game);
 
 private:
 	bool m_pause;
+	float m_timeKoef;
 
 	std::vector<std::shared_ptr<Object>> objects;
 	
@@ -45,7 +49,4 @@ private:
 
 	std::string m_player_fraction;
 	std::string m_ai_fraction;
-
-	//game state (game, pause)
-	//game speed
 };

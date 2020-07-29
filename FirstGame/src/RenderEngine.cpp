@@ -70,8 +70,6 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwSetCursorEnterCallback(window, cursor_enter_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	glfwSwapInterval(0);
-
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGL())
@@ -82,15 +80,6 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	}
 
 	glViewport(0, 0, (int)SCREEN.x, (int)SCREEN.y);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	//glEnable(GL_STENCIL_TEST);
-
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glfwSwapInterval(1);
 
@@ -121,7 +110,6 @@ void RenderEngine::clearScreen()
 {
 	glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//glDisable(GL_DEPTH_TEST);
 }
 
 void RenderEngine::updateCameraView()
@@ -130,7 +118,6 @@ void RenderEngine::updateCameraView()
 	camera->Position.y += offset;
 
 	//camera->Position.y = camera->finalCameraPoint;
-
 
 	view = camera->GetViewMatrix();
 	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 1000.0f);
@@ -149,9 +136,6 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 
 	for (auto&& obj : objects)
 	{
-		if (obj->m_fraction == "RED" && obj->m_type == Object::ObjectType::UNIT)
-			while (false);
-
 		for (auto&& index : obj->m_indexes_of_displayd_models)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -261,7 +245,6 @@ void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
 
 void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
 {
-	//draw planets
 	for (auto&& matrix : group.matrices)
 	{
 		//it's draw single object function
@@ -274,6 +257,15 @@ void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
 
 		std::get<1>(resourceManager.models[group.model_index]).Draw(resourceManager.shaders[group.shaders_indices[0]].second);
 	}
+}
+
+void RenderEngine::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
+{
+	resourceManager.loadModels(number, objectsAttrib);
+
+	// create models groups
+	for (auto&& x : resourceManager.modelIndex_shadersIndices)
+		modelsGroups.push_back({ std::get<2>(resourceManager.models[x.first]).depth_test, false, 0, x.first, x.second, std::vector<glm::mat4>() });
 }
 
 glm::vec3 RenderEngine::cursorCoordToWorldCoords(const glm::vec2& cursorPos)
@@ -302,6 +294,11 @@ glm::vec2 RenderEngine::WorldCoordsToScreenCoords(const glm::vec3& objPos)
 void RenderEngine::pollEvents()
 {
 	glfwPollEvents();
+}
+
+float RenderEngine::getScreenAspectRatio()
+{
+	return SCREEN.y / SCREEN.x;
 }
 
 //callback functions

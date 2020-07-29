@@ -62,6 +62,7 @@ namespace RenderEngine
 	void free();
 
 	float getCurrTime();
+	float getScreenAspectRatio();
 
 	bool windowShouldClose();
 	void clearScreen();
@@ -71,6 +72,8 @@ namespace RenderEngine
 
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
+
+	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
 
 	void drawObjects();
 	//void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
