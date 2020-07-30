@@ -55,6 +55,12 @@
 		"depth_test" : "false"
 	},
 	{
+		"type" : "BUTTON_START",
+		"path" : "../FirstGame/resources/models/StartButton/StartButton.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false"
+	},
+	{
 		"type" : "default",
 		"path" : "default",
 		"shaders_types" : ["default"],

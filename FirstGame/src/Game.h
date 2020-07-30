@@ -28,6 +28,7 @@ public:
 	void updatePhysics();
 	void collisionsDetected();
 	bool checkButtonHits(const glm::vec2& cursorCoords, bool isPressed);
+	void setTargetForSelectedUnits(const glm::vec2& cursorCoords);
 
 	inline bool closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance); //custom distance
 

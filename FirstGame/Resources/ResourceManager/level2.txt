@@ -1,1 +1,145 @@
-json level1
+[{
+		"object_type": "RED_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "-100.0",
+		"posy": "0.0",
+		"posz": "-100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "RED_PLANET"
+	},
+	{
+		"object_type": "BLUE_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "100.0",
+		"posy": "0.0",
+		"posz": "100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "BLUE_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "-100.0",
+		"posy": "0.0",
+		"posz": "100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"posx": "100.0",
+		"posy": "0.0",
+		"posz": "-100.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
+	},
+	{
+		"object_type": "RED_UNIT",
+		"models_type": ["STENCIL", "RED_UNIT"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "RED_UNIT"
+	},
+	{
+		"object_type": "BLUE_UNIT",
+		"models_type": ["STENCIL", "BLUE_UNIT"],
+		"posx": "5.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "BLUE_UNIT"
+	},
+	
+	{
+		"object_type": "TEST",
+		"models_type": ["TEST"],
+		"posx": "0.0",
+		"posy": "100.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "TEST"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON", "BUTTON_DOWN"],
+		"posx": "0.925",
+		"posy": "-0.85",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "PAUSE"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON", "BUTTON_DOWN"],
+		"posx": "0.925",
+		"posy": "0.85",
+		"posz": "0.0",
+		
+		"scale": "0.05",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "SPEED_UP"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON", "BUTTON_DOWN"],
+		"posx": "0.8",
+		"posy": "0.85",
+		"posz": "0.0",
+		
+		"scale": "0.05",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "SPEED_DOWN"
+	}
+]

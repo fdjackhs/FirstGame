@@ -16,6 +16,8 @@ Game::Game(unsigned int level)
 	uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 	m_area = std::make_shared<select_area>(id);
 
+
+
 	m_pause = false;
 	m_timeKoef = 1.0f;
 }
@@ -208,6 +210,10 @@ void Game::createObject(const ObjectAttributes& attributes)
 
 
 			objects.push_back(sh_button);
+		}
+		else if (attributes.object_type == "CAMERA")
+		{
+			RenderEngine::camera = std::make_shared<Camera>(glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)));
 		}
 		else
 		{
@@ -438,7 +444,7 @@ void Game::selectUnits()
 			if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
 			{
 				Unit* unit = (Unit*)obj.get();
-				if (glm::distance(m_area->m_position, unit->m_position) <= m_area->radius)
+				if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
 					unit->select();
 				else
 					unit->deselect();
@@ -478,8 +484,8 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 
 	if (RenderEngine::camera->finalCameraPoint < 10)
 		RenderEngine::camera->finalCameraPoint = 10;
-	if (RenderEngine::camera->finalCameraPoint > 1000)
-		RenderEngine::camera->finalCameraPoint = 1000;
+	if (RenderEngine::camera->finalCameraPoint > 900)
+		RenderEngine::camera->finalCameraPoint = 900;
 	
 	RenderEngine::scroll = 0;
 
@@ -526,101 +532,53 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	}
 
 
-
 	static glm::vec2 lastCursorCoords;
-	static glm::vec2 clickCoords;
 	static bool leftButtonLastTime = false;
+	static bool clickOnButton = false;
+	//static bool lastClickWasSetTarget = false;
 
 
 	//selected area and buttons hit
 	if (buttons[0])
 	{
-		bool clickOnButton = false;
-
 		if (!leftButtonLastTime)
-		{
-			clickCoords = cursorCoords;
-			clickOnButton = checkButtonHits(clickCoords, true);
-		}
+			clickOnButton = checkButtonHits(cursorCoords, true);
 
 		if (!clickOnButton)
 		{
-			if (cursorCoords != lastCursorCoords)
+			if (cursorCoords != lastCursorCoords /*&& !lastClickWasSetTarget*/)
 			{
-				if (m_area->firstTime)
-				{
-					m_area->areaStartPosition = clickCoords;
-					m_area->firstTime = false;
-				}
-
-				float radius = glm::distance(m_area->areaStartPosition, cursorCoords);
-				glm::vec2 diff = glm::vec2(cursorCoords.x - m_area->areaStartPosition.x, cursorCoords.y - m_area->areaStartPosition.y);
-				glm::vec2 center = m_area->areaStartPosition + glm::vec2(diff.x / 2, diff.y / 2);
-
-				glm::vec3 centerInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ center.x, center.y });
-				glm::vec3 borderInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
-
-				uint32_t indexOfarea = RenderEngine::resourceManager.m_manCrObj_indexs[m_area->ID].first;
-
-				RenderEngine::resourceManager.m_manuallyCreaatedObjects[indexOfarea].m_position = centerInWorldCoords;
-				m_area->m_position = centerInWorldCoords;
-				m_area->radius = glm::distance(centerInWorldCoords, borderInWorldCoords);
-
-				m_area->updateVertices();
-				RenderEngine::resourceManager.updateVBO(m_area->ID, m_area->vertices);
+				m_area->updateArea(cursorCoords);
 			}
+			//else // click made after releasing
 		}
 
-		m_area->previusTime = true;
 		leftButtonLastTime = true;
 	}
 	else
 	{
-		checkButtonHits(cursorCoords, false);
+		;
 
-		//set target
-		if (m_area->previusTime && m_area->firstTime)
+		if (!checkButtonHits(cursorCoords, false) && leftButtonLastTime)
 		{
-			glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
-
-			std::string state = "move";
-
-			for (auto&& obj : objects)
+			if (m_area->m_exsist && m_area->m_fixed)
 			{
-				if (obj->m_type == Object::ObjectType::PLANET && glm::distance(obj->m_position, targetPos) < obj->m_radius)
-				{
-					if (obj->m_fraction == m_player_fraction)
-						state = "update";
-					else
-						state = "attack";
+				//set target
+				setTargetForSelectedUnits(cursorCoords);
 
-					targetPos = obj->m_position;
-				}
+				//collapse select area
+				m_area->m_exsist = false;
+				m_area->m_radius = 0.0f;
+				m_area->updateVertices();
+				RenderEngine::resourceManager.updateVBO(m_area->m_ID, m_area->m_vertices);
+
+				//lastClickWasSetTarget = true;
 			}
-
-			for (auto&& obj : objects)
-			{
-				if (obj->m_type == Object::ObjectType::UNIT)
-				{
-					Unit* unit = (Unit*)obj.get();
-					if (unit->m_selected)
-					{
-						unit->setTargetPosition(targetPos);
-						unit->m_state = state;
-					}
-				}
-			}
-
-			//collapse select area
-			m_area->radius = 0.0f;
-			m_area->updateVertices();
-			RenderEngine::resourceManager.updateVBO(m_area->ID, m_area->vertices);
 		}
 
-		m_area->firstTime = true;
-		m_area->previusTime = false;
-
+		m_area->m_fixed = true;
 		leftButtonLastTime = false;
+		//lastClickWasSetTarget = false;
 	}
 
 	lastCursorCoords = cursorCoords;
@@ -639,15 +597,25 @@ bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
 		if (obj->m_type == Object::ObjectType::BUTTON)
 		{
 			Button* button = (Button*)obj.get();
-			if (button->cursorIsOnButton(glm::vec2(x, y)) && isPressed)
+			if (button->cursorIsOnButton(glm::vec2(x, y)))
 			{
 				result = true;
-				button->setButtonDown();
 
-				button->callCallbackFunction();
-
+				if (isPressed)
+				{
+					button->setButtonDown();
+					button->m_isPressed = true;
+				}
+				else if (button->m_isPressed)
+				{
+					button->callCallbackFunction();
+					button->m_isPressed = false;
+				}
 			}
 			else
+				button->m_isPressed = false;
+
+			if (!isPressed)
 				button->setButtonUp();
 		}
 	}
@@ -655,6 +623,38 @@ bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
 	return result;
 }
 
+void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
+{
+	glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
+
+	std::string state = "move";
+
+	for (auto&& obj : objects)
+	{
+		if (obj->m_type == Object::ObjectType::PLANET && glm::distance(obj->m_position, targetPos) < obj->m_radius)
+		{
+			if (obj->m_fraction == m_player_fraction)
+				state = "update";
+			else
+				state = "attack";
+
+			targetPos = obj->m_position;
+		}
+	}
+
+	for (auto&& obj : objects)
+	{
+		if (obj->m_type == Object::ObjectType::UNIT)
+		{
+			Unit* unit = (Unit*)obj.get();
+			if (unit->m_selected)
+			{
+				unit->setTargetPosition(targetPos);
+				unit->m_state = state;
+			}
+		}
+	}
+}
 
 inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance)
 {
@@ -688,6 +688,8 @@ void speedGameDown(Game& game)
 
 //TODO
 /*
+	- сделать меню
+	- сделать редактор карт
 	- лоад скрин
 	- сделать api для удобста использования ai
 	- добавить границы карты
@@ -699,9 +701,7 @@ void speedGameDown(Game& game)
 		планету на которую был отправлен, а в ту которая
 		лежит у него на пути)
 
-	- при передвижении толпа юнитов не стремится в одну точку, а двигаются как бы строем
 	- при расчёте физики можно пользоваться многопоточкой
-	- редактор карт?
 
 
 	- разобраться с анимациями (пульсирование планет, увеличение и т.д.)

@@ -1,4 +1,18 @@
-[{
+[
+	{
+		"object_type": "CAMERA",
+		"models_type": [],
+		"posx": "0.0",
+		"posy": "300.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "CAMERA"
+	},
+	{
 		"object_type": "RED_PLANET",
 		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
 		"posx": "-100.0",

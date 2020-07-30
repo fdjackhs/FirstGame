@@ -84,7 +84,6 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwSwapInterval(1);
 
 	//
-	camera = std::make_shared<Camera>(glm::vec3(0.0f, 300.0f, 0.0f));
 	RenderEngine::firstMouse = true;
 	srand(unsigned int(time(NULL)));
 
