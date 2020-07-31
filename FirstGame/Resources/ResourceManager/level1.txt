@@ -93,7 +93,7 @@
 	{
 		"object_type": "BLUE_UNIT",
 		"models_type": ["STENCIL", "BLUE_UNIT"],
-		"posx": "5.0",
+		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
 		

@@ -22,28 +22,33 @@ void select_area::updateVertices()
 
 void select_area::updateArea(const glm::vec2& cursorCoords)
 {
-	if (!m_exsist)
+	if (!m_exsist || (m_exsist && m_fixed))
 	{
 		m_areaStartPosition = cursorCoords;
 		m_exsist = true;
 		m_fixed = false;
 	}
 
-	if (!m_fixed)
-	{
-		glm::vec2 diff = glm::vec2(cursorCoords.x - m_areaStartPosition.x, cursorCoords.y - m_areaStartPosition.y);
-		glm::vec2 center = m_areaStartPosition + glm::vec2(diff.x / 2, diff.y / 2);
+	glm::vec2 diff = glm::vec2(cursorCoords.x - m_areaStartPosition.x, cursorCoords.y - m_areaStartPosition.y);
+	glm::vec2 center = m_areaStartPosition + glm::vec2(diff.x / 2, diff.y / 2);
 
-		glm::vec3 centerInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ center.x, center.y });
-		glm::vec3 borderInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
+	glm::vec3 centerInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ center.x, center.y });
+	glm::vec3 borderInWorldCoords = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
 
-		uint32_t indexOfarea = RenderEngine::resourceManager.m_manCrObj_indexs[m_ID].first;
+	uint32_t indexOfarea = RenderEngine::resourceManager.m_manCrObj_indexs[m_ID].first;
 
-		RenderEngine::resourceManager.m_manuallyCreaatedObjects[indexOfarea].m_position = centerInWorldCoords;
-		m_position = centerInWorldCoords;
-		m_radius = glm::distance(centerInWorldCoords, borderInWorldCoords);
+	RenderEngine::resourceManager.m_manuallyCreaatedObjects[indexOfarea].m_position = centerInWorldCoords;
+	m_position = centerInWorldCoords;
+	m_radius = glm::distance(centerInWorldCoords, borderInWorldCoords);
 
-		updateVertices();
-		RenderEngine::resourceManager.updateVBO(m_ID, m_vertices);
-	}
+	updateVertices();
+	RenderEngine::resourceManager.updateVBO(m_ID, m_vertices);
+}
+
+void select_area::collapseArea()
+{
+	m_exsist = false;
+	m_radius = 0.0f;
+	updateVertices();
+	RenderEngine::resourceManager.updateVBO(m_ID, m_vertices);
 }

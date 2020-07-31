@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 
 #include "Object.h"
+#include "CustomDistance.h"
 
 class Unit : public Object
 {

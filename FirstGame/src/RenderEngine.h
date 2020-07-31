@@ -29,7 +29,7 @@ namespace RenderEngine
 	extern bool enteredWindow;
 	extern bool buttons[12];
 	extern glm::vec2 cursorCoords;
-	extern glm::vec3 startCursorPos;
+	extern glm::vec2 startCursorPos;
 	extern bool firstMouse;
 	extern int scroll;
 	
@@ -76,8 +76,7 @@ namespace RenderEngine
 	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
 
 	void drawObjects();
-	//void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
-	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Unit>>& red_unit, std::vector<std::shared_ptr<Unit>>& blue_unit);
+	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
 	void drawGroupOfObjects(RenderEngine::modelGroupAttribs& group);
 	void drawSingleObject(RenderEngine::modelGroupAttribs& group);
 };

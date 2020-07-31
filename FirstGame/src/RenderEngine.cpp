@@ -25,7 +25,7 @@ namespace RenderEngine
 	bool enteredWindow;
 	bool buttons[12];
 	glm::vec2 cursorCoords;
-	glm::vec3 startCursorPos;
+	glm::vec2 startCursorPos;
 	bool firstMouse;
 	int scroll;
 
@@ -128,7 +128,7 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Unit>>& red_unit, std::vector<std::shared_ptr<Unit>>& blue_unit)
+void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects)
 {
 	for (auto&& group : modelsGroups)
 		group.matrices.clear();

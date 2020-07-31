@@ -16,8 +16,6 @@ Game::Game(unsigned int level)
 	uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 	m_area = std::make_shared<select_area>(id);
 
-
-
 	m_pause = false;
 	m_timeKoef = 1.0f;
 }
@@ -78,7 +76,7 @@ void Game::loop()
 
 		{
 			//LOG_DURATION("genModelMatrices");
-			RenderEngine::genModelMatrices(Game::objects, Game::red_units, Game::blue_units);
+			RenderEngine::genModelMatrices(Game::objects);
 		}
 
 		{
@@ -134,25 +132,31 @@ void Game::createObject(const ObjectAttributes& attributes)
 	{
 		if (attributes.object_type == "RED_UNIT")
 		{
-			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-									  glm::vec3{ stof(attributes.posx),
-									  		     stof(attributes.posy),
-									  		     stof(attributes.posz) },
-									  stof(attributes.scale),
-									  "", "RED");
-			std::shared_ptr<Object> sp_unit(ptr_unit);
-			objects.push_back(sp_unit);
+			//for (int i = 0; i < 1000; i++)
+			{
+				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+					glm::vec3{ stof(attributes.posx) /*- 50.0f*/,
+							   stof(attributes.posy),
+							   stof(attributes.posz) /*+ float(i)*/ },
+					stof(attributes.scale),
+					"", "RED");
+				std::shared_ptr<Object> sp_unit(ptr_unit);
+				objects.push_back(sp_unit);
+			}
 		}
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
-			Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-									  glm::vec3{ stof(attributes.posx),
-											     stof(attributes.posy),
-											     stof(attributes.posz) },
-									  stof(attributes.scale),
-									  "", "BLUE");
-			std::shared_ptr<Object> sp_unit(ptr_unit);
-			objects.push_back(sp_unit);
+			//for (int i = 0; i < 1000; i++)
+			{
+				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+					glm::vec3{ stof(attributes.posx) /*+ 50.0f*/,
+							   stof(attributes.posy),
+							   stof(attributes.posz) /*+ float(i)*/ },
+					stof(attributes.scale),
+					"", "BLUE");
+				std::shared_ptr<Object> sp_unit(ptr_unit);
+				objects.push_back(sp_unit);
+			}
 		}
 		else if (attributes.object_type == "RED_PLANET")
 		{
@@ -241,8 +245,8 @@ void Game::collisionsDetected()
 	uint32_t start = partSize * collDtct_counter;
 	uint32_t end = start + partSize;
 
-	for (uint32_t i = start; i < end; i++)
-	//for (uint32_t i = 0; i < objects.size(); i++)
+	//for (uint32_t i = start; i < end; i++)
+	for (uint32_t i = 0; i < objects.size(); i++)
 	{
 		if (objects[i]->m_type == Object::ObjectType::UNIT)
 		{
@@ -254,18 +258,13 @@ void Game::collisionsDetected()
 				{
 					if (i != j)
 					{
-						//if (objects[i]->m_type == Object::ObjectType::UNIT && objects[j]->m_type == Object::ObjectType::UNIT)
 						if (objects[j]->m_type == Object::ObjectType::UNIT)
 						{
 							Unit* unit_j = (Unit*)objects[j].get();
 
-							//if (!unit_i->m_annihilated && !unit_j->m_annihilated &&
-							//	unit_i->m_fraction != unit_j->m_fraction)
-
 							if (!unit_j->m_annihilated && 
 								 unit_i->m_fraction != unit_j->m_fraction)
 							{
-								//if (glm::distance(objects[i]->m_position, objects[j]->m_position) < objects[i]->m_radius + objects[j]->m_radius)
 								if (closerThan(unit_i->m_position, unit_j->m_position, unit_i->m_radius + unit_j->m_radius))
 								{
 									flag = true;
@@ -275,59 +274,27 @@ void Game::collisionsDetected()
 								}
 							}
 						}
-						else
+						else if (objects[j]->m_type == Object::ObjectType::PLANET)
 						{
-							Planet* planet = (Planet*)(objects[i]->m_type == Object::ObjectType::PLANET ? objects[i].get() : objects[j].get());
-							Unit*	unit = (Unit*)(objects[i]->m_type == Object::ObjectType::UNIT ? objects[i].get() : objects[j].get());
+							Planet* planet = (Planet*)objects[j].get();
 
-							if (unit->m_state == "update" &&
-								unit->m_fraction == planet->m_fraction &&
-								unit->m_targetPos == planet->m_position &&
-								//glm::distance(unit->m_position, planet->m_position) < unit->m_radius + planet->m_radius) // Unit and Planet same color
-								closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius))
+							if (unit_i->m_targetPos == planet->m_position &&
+								closerThan(unit_i->m_position, planet->m_position, unit_i->m_radius + planet->m_radius))
 							{
-								flag = true;
-								unit->m_annihilated = true;
-
-								planet->m_healthPoints += 1.0f;
-
-								if (planet->m_healthPoints == 200.0f)
+								if (unit_i->m_state == "update" && unit_i->m_fraction == planet->m_fraction)
 								{
-									planet->m_healthPoints = 100.0f;
-									planet->m_level += 1;
+									flag = true;
+									unit_i->m_annihilated = true;
+
+									planet->plusOne();
 								}
-							}
 
-							if (unit->m_state == "attack" &&
-								unit->m_fraction != planet->m_fraction &&
-								//glm::distance(unit->m_position, planet->m_position) < unit->m_radius + planet->m_radius) // Unit and Planet different color
-								closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius))
-							{
-								flag = true;
-								unit->m_annihilated = true;
-
-								planet->m_healthPoints -= 1.0f;
-
-								if (planet->m_fraction != "NEUTRAL")
+								if (unit_i->m_state == "attack" && unit_i->m_fraction != planet->m_fraction)
 								{
-									if (planet->m_healthPoints == 0.0f)
-									{
-										planet->m_fraction = "NEUTRAL";
+									flag = true;
+									unit_i->m_annihilated = true;
 
-										planet->m_indexes_of_displayd_models.clear();
-										planet->m_indexes_of_displayd_models.push_back(2);
-									}
-								}
-								else // planet neutral
-								{
-									if (planet->m_healthPoints == -1.0f)
-									{
-										planet->m_fraction = m_player_fraction;
-										planet->m_healthPoints = 1.0f;
-
-										planet->m_indexes_of_displayd_models.clear();
-										planet->m_indexes_of_displayd_models.push_back(0);
-									}
+									planet->minusOne(unit_i->m_fraction);
 								}
 							}
 						}
@@ -431,7 +398,6 @@ void Game::updateGameState(float deltaTime)
 		}
 	}
 
-
 	selectUnits();
 }
 
@@ -517,16 +483,14 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	{
 		if (RenderEngine::firstMouse)
 		{
-			RenderEngine::startCursorPos.x = cursorCoords.x;
-			RenderEngine::startCursorPos.z = cursorCoords.y;
+			RenderEngine::startCursorPos = cursorCoords;
 			RenderEngine::firstMouse = false;
 		}
 
-		glm::vec3 startP = RenderEngine::cursorCoordToWorldCoords({ RenderEngine::startCursorPos.x, RenderEngine::startCursorPos.z });
-		glm::vec3 crurrP = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x , cursorCoords.y });
+		glm::vec3 startP = RenderEngine::cursorCoordToWorldCoords(RenderEngine::startCursorPos);
+		glm::vec3 crurrP = RenderEngine::cursorCoordToWorldCoords(cursorCoords);
 
-		RenderEngine::startCursorPos.x = cursorCoords.x;
-		RenderEngine::startCursorPos.z = cursorCoords.y;
+		RenderEngine::startCursorPos = cursorCoords;
 
 		RenderEngine::camera->Position += startP - crurrP;
 	}
@@ -535,8 +499,6 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	static glm::vec2 lastCursorCoords;
 	static bool leftButtonLastTime = false;
 	static bool clickOnButton = false;
-	//static bool lastClickWasSetTarget = false;
-
 
 	//selected area and buttons hit
 	if (buttons[0])
@@ -544,41 +506,25 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 		if (!leftButtonLastTime)
 			clickOnButton = checkButtonHits(cursorCoords, true);
 
-		if (!clickOnButton)
-		{
-			if (cursorCoords != lastCursorCoords /*&& !lastClickWasSetTarget*/)
-			{
-				m_area->updateArea(cursorCoords);
-			}
-			//else // click made after releasing
-		}
+		//if last click was not on button and cursor moved while holding down the button - update area
+		if (!clickOnButton && cursorCoords != lastCursorCoords) 
+			m_area->updateArea(cursorCoords);
 
 		leftButtonLastTime = true;
 	}
 	else
 	{
-		;
-
 		if (!checkButtonHits(cursorCoords, false) && leftButtonLastTime)
 		{
 			if (m_area->m_exsist && m_area->m_fixed)
 			{
-				//set target
 				setTargetForSelectedUnits(cursorCoords);
-
-				//collapse select area
-				m_area->m_exsist = false;
-				m_area->m_radius = 0.0f;
-				m_area->updateVertices();
-				RenderEngine::resourceManager.updateVBO(m_area->m_ID, m_area->m_vertices);
-
-				//lastClickWasSetTarget = true;
+				m_area->collapseArea();
 			}
 		}
 
 		m_area->m_fixed = true;
 		leftButtonLastTime = false;
-		//lastClickWasSetTarget = false;
 	}
 
 	lastCursorCoords = cursorCoords;
@@ -631,14 +577,20 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 
 	for (auto&& obj : objects)
 	{
-		if (obj->m_type == Object::ObjectType::PLANET && glm::distance(obj->m_position, targetPos) < obj->m_radius)
+		if (obj->m_type == Object::ObjectType::PLANET)
 		{
-			if (obj->m_fraction == m_player_fraction)
-				state = "update";
-			else
-				state = "attack";
+			Planet* planet = (Planet*)obj.get();
 
-			targetPos = obj->m_position;
+			if (closerThan(planet->m_position, targetPos, obj->m_radius)) // click was on planet
+			{
+				if (planet->m_fraction != m_player_fraction)
+					state = "attack";
+				else 
+				if (planet->m_level < planet->s_max_level)
+					state = "update";
+
+				targetPos = obj->m_position;
+			}
 		}
 	}
 
@@ -655,17 +607,6 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 		}
 	}
 }
-
-inline bool Game::closerThan(const glm::vec3& firstPosition, const glm::vec3& secondPosition, const float& distance)
-{
-	float x = firstPosition.x - secondPosition.x;
-	//float y = firstPosition.y - secondPosition.y;
-	float z = firstPosition.z - secondPosition.z;
-
-	//return (x * x + y * y + z * z) < distance * distance;
-	return (x * x + z * z) < distance * distance;
-}
-
 
 void switchPause(Game& game)
 {
@@ -695,11 +636,7 @@ void speedGameDown(Game& game)
 	- добавить границы карты
 	- добавить бокс (фон)
 
-		- баг с неправильным таргетом у юнита
-		(если юнита отправить В планету и его путь будет
-		пролегать через другую планет, то юнит войдёт не в ту
-		планету на которую был отправлен, а в ту которая
-		лежит у него на пути)
+	- исправить баг с дёрганьем юнитов когда они стоят на месте (это из за того что время * скорость и получается большое значение и юнит перепрыгивает таргет)
 
 	- при расчёте физики можно пользоваться многопоточкой
 
@@ -710,6 +647,15 @@ void speedGameDown(Game& game)
 
 
 	Решено:
+		- баг, если направить юнитов не на апдейт своей планеты, а атаковать вражескую или нейтральную, то юниты просто исчезают
+
+		- баг с неправильным таргетом у юнита
+		(если юнита отправить В планету и его путь будет
+		пролегать через другую планет, то юнит войдёт не в ту
+		планету на которую был отправлен, а в ту которая
+		лежит у него на пути)
+
+
 		- интерфейс (кнопки)
 
 		- баг с физикой (разлетаются по координате y)

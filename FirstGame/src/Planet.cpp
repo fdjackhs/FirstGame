@@ -15,14 +15,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	if (m_fraction == "BLUE")
 		m_indexes_of_displayd_models.push_back(1);
 
-	m_healthPoints = 1.0f;
-
 	if (m_fraction == "NEUTRAL")
-	{
 		m_indexes_of_displayd_models.push_back(2);
-		m_healthPoints = 0.0f;
-	}
-
 
 	m_position = pos;
 	m_scale = scale;
@@ -77,4 +71,47 @@ void Planet::action(float deltaTime)
 glm::vec3 Planet::GetPosition() const
 {
 	return m_position;
+}
+
+void Planet::plusOne()
+{
+	if (m_level < s_max_level)
+	{
+		m_healthPoints += 1.0f;
+
+		if (m_healthPoints == 200.0f)
+		{
+			m_healthPoints = 100.0f;
+			m_level += 1;
+		}
+	}
+}
+
+void Planet::minusOne(const std::string& unitFraction)
+{
+	m_healthPoints -= 1.0f;
+
+	if (m_healthPoints == 0.0f)
+	{
+		m_healthPoints = 100.0f;
+
+		if (m_fraction == "NEUTRAL")
+		{
+			m_fraction = unitFraction;
+			m_level = 1;
+
+			// Then fraction will be more than 2, 
+			// need find right index of model
+			m_indexes_of_displayd_models.clear();
+			m_indexes_of_displayd_models.push_back(0);
+		}
+		else
+		{
+			m_fraction = "NEUTRAL";
+			m_level = 1;
+
+			m_indexes_of_displayd_models.clear();
+			m_indexes_of_displayd_models.push_back(2);
+		}
+	}
 }

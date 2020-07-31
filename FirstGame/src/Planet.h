@@ -16,7 +16,13 @@ public:
 	float m_reloading;
 	Game* m_gameState;
 
+	const static int s_max_level = 3;
+
 	Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, Game* game, const std::string fraction);
-	void action(float deltaTime);
+
 	glm::vec3 GetPosition() const;
+
+	void action(float deltaTime);
+	void plusOne();
+	void minusOne(const std::string& unitFraction);
 };

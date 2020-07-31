@@ -69,23 +69,22 @@ void Unit::action(float deltaTime)
 	}
 	else if (m_state == "move" || m_state == "update" || m_state == "attack")
 	{
-		//float distance = glm::distance(m_position, m_targetPos);
 		float speed = m_speed;
-		//if (distance < 5.0f)
-		{
-			m_position += m_gravityOffset * deltaTime;
-			//speed = distance;
-		}
 
 		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
-		m_position += move_vector * speed * deltaTime;
 
-		float x = m_position.x - m_targetPos.x;
-		float y = m_position.y - m_targetPos.y;
-		float z = m_position.z - m_targetPos.z;
+		glm::vec3 nextPosition = m_position + move_vector * speed * deltaTime;
 
-		if (abs(x) < 0.1f && abs(y) < 0.1f && abs(z) < 0.1f)
-			m_state = "rest";
+		m_position = nextPosition;
+
+		/*
+		bool passesTargetPoint = glm::distance(m_position, m_targetPos) < glm::distance(m_position, nextPosition);
+
+		if (passesTargetPoint)
+			m_position = m_targetPos;
+		else
+			m_position = nextPosition;
+			*/
 	}
 	else
 	{

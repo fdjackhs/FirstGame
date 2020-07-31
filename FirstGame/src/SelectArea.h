@@ -21,10 +21,11 @@ public:
 	glm::vec2 m_areaStartPosition;
 	glm::vec3 m_position;
 
-	/**/std::vector<GLfloat> m_vertices;
+	std::vector<GLfloat> m_vertices;
 
 	select_area(uint32_t id);
 
 	void updateVertices();
 	void updateArea(const glm::vec2& cursorCoords);
+	void collapseArea();
 };
