@@ -3,9 +3,11 @@
 ResourceManager::ResourceManager()
 {
 	ResourceManager::loadListPathLevels();
-	loadShaderPairs("../FirstGame/Resources/ResourceManager/shaders_type_path.txt", shaders_type_path);
-	loadModelPairs("../FirstGame/Resources/ResourceManager/models_type_path.txt", models_type_path);
+	loadShaderPairs("../FirstGame/Resources/ResourceManager/shaders_type_path.txt", m_shaders_type_path);
+	loadModelPairs("../FirstGame/Resources/ResourceManager/models_type_path.txt", m_models_type_path);
+
 	while (false);
+
 }
 
 void ResourceManager::loadListPathLevels()
@@ -18,7 +20,7 @@ void ResourceManager::loadListPathLevels()
 	{
 		std::string path;
 		while (std::getline(levelPathsFile, path))
-			listPathLevels.push_back(path);
+			m_listPathLevels.push_back(path);
 
 		levelPathsFile.close();
 	}
@@ -55,9 +57,12 @@ void ResourceManager::loadModelPairs(const char* path, std::map<std::string, mod
 			rapidjson::Value& type = d[i]["type"];
 			rapidjson::Value& path = d[i]["path"];
 			rapidjson::Value& depth_test = d[i]["depth_test"];
-			std::string s_dt = depth_test.GetString();
+			rapidjson::Value& unique = d[i]["unique"];
 
-			vector_pairs[type.GetString()] = { path.GetString(), shadersTypes, { (s_dt == "true" ? true : false) } };
+			std::string s_dt = depth_test.GetString();
+			bool s_uniq = unique.GetBool();
+
+			vector_pairs[type.GetString()] = { path.GetString(), shadersTypes, s_uniq, { (s_dt == "true" ? true : false) } };
 		}
 
 		pair_File.close();
@@ -101,12 +106,14 @@ void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, sh
 	}
 }
 
-void ResourceManager::loadModels(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
+void ResourceManager::loadModels(uint32_t number, std::vector<ObjectAttributes>& objectsAttrib, uint32_t& progress)
 {
-	std::string levelData = readFile(listPathLevels[number]);
+	std::string levelData = readFile(m_listPathLevels[number]);
 
 	rapidjson::Document d;
 	d.Parse(levelData.c_str());
+
+	uint32_t progress_step = (100 / d.Size()) + 1;
 
 	for (unsigned int i = 0; i < d.Size(); i++)
 	{
@@ -119,8 +126,8 @@ void ResourceManager::loadModels(unsigned int number, std::vector<ObjectAttribut
 			uint32_t model_index = getModelIndex(type.GetString());
 			std::vector<uint32_t> shaders_indices = getShadersIndices(type.GetString());
 
-			modelIndex_shadersIndices.push_back({ model_index, shaders_indices });
-			indexes.push_back((modelIndex_shadersIndices.size() - 1));
+			m_modelIndex_shadersIndices.push_back({ model_index, shaders_indices });
+			indexes.push_back((m_modelIndex_shadersIndices.size() - 1));
 		}
 
 		rapidjson::Value& posx = d[i]["posx"];
@@ -132,9 +139,12 @@ void ResourceManager::loadModels(unsigned int number, std::vector<ObjectAttribut
 
 		rapidjson::Value& object_type = d[i]["object_type"];
 		std::string str = object_type.GetString();
-		m_complete_models[str] = indexes;
+		//m_complete_models[str] = indexes;
+		m_map_complete_models[str] = indexes;
+		m_complete_models.push_back(indexes);
 
-		ObjectAttributes temp{  object_type.GetString(),
+		ObjectAttributes temp{  (m_complete_models.size() - 1),
+								object_type.GetString(),
 								posx.GetString(), 
 								posy.GetString(), 
 								posz.GetString(), 
@@ -143,24 +153,29 @@ void ResourceManager::loadModels(unsigned int number, std::vector<ObjectAttribut
 								optionalProperties.GetString() };
 
 		objectsAttrib.push_back(temp);
+
+		progress += progress_step;
 	}
 }
 
 uint32_t ResourceManager::getModelIndex(const std::string& type_of_model)
 {
-	auto findedModel = std::find_if(models.begin(), models.end(),
+	auto findedModel = std::find_if(m_models.begin(), m_models.end(),
 									[&type_of_model](const std::tuple<std::string, Model, rendering_parameters>& x) { return std::get<0>(x) == type_of_model; });
 
+	if (m_models_type_path[type_of_model].unique)
+		findedModel = m_models.end();
+
 	unsigned int model_index = -1;
-	if (findedModel == models.end()) // if model not loaded
+	if (findedModel == m_models.end()) // if model not loaded
 	{
-		Model model(models_type_path[type_of_model].path.c_str());
-		models.push_back({ type_of_model, model, models_type_path[type_of_model].rend_params });
-		model_index = models.size() - 1;
+		Model model(m_models_type_path[type_of_model].path.c_str());
+		m_models.push_back({ type_of_model, model, m_models_type_path[type_of_model].rend_params });
+		model_index = m_models.size() - 1;
 	}
 	else
 	{
-		model_index = findedModel - models.begin();
+		model_index = findedModel - m_models.begin();
 	}
 
 	return model_index;
@@ -170,23 +185,23 @@ std::vector<uint32_t> ResourceManager::getShadersIndices(const std::string& type
 {
 	std::vector<uint32_t> shaders_indices;
 
-	for (auto&& type_of_shader : models_type_path[type_of_model].shaders_types)
+	for (auto&& type_of_shader : m_models_type_path[type_of_model].shaders_types)
 	{
-		auto findedShader = std::find_if(shaders.begin(), shaders.end(),
+		auto findedShader = std::find_if(m_shaders.begin(), m_shaders.end(),
 										 [&type_of_shader](const std::pair<std::string, Shader>& x) { return x.first == type_of_shader; });
 
 		unsigned int shader_index = -1;
-		if (findedShader == shaders.end()) // if shader not loaded
+		if (findedShader == m_shaders.end()) // if shader not loaded
 		{
-			Shader shader((shaders_type_path[type_of_shader].vertex).c_str(),
-				(shaders_type_path[type_of_shader].fragment).c_str());
+			Shader shader((m_shaders_type_path[type_of_shader].vertex).c_str(),
+				(m_shaders_type_path[type_of_shader].fragment).c_str());
 
-			shaders.push_back({ type_of_shader, shader });
-			shader_index = shaders.size() - 1;
+			m_shaders.push_back({ type_of_shader, shader });
+			shader_index = m_shaders.size() - 1;
 		}
 		else
 		{
-			shader_index = findedShader - shaders.begin();
+			shader_index = findedShader - m_shaders.begin();
 		}
 
 		shaders_indices.push_back(shader_index);
@@ -219,8 +234,8 @@ std::string ResourceManager::readFile(const std::string& path)
 GLuint ResourceManager::createObject(std::vector<GLfloat> vertices, const std::string& vertexPath, const std::string& fragmentPath)
 {
 	Shader shader(vertexPath.c_str(), fragmentPath.c_str());
-	shaders.push_back({ "AREA", shader });
-	uint32_t shaderIndex = shaders.size() - 1;
+	m_shaders.push_back({ "AREA", shader });
+	uint32_t shaderIndex = m_shaders.size() - 1;
 
 	std::vector<GLuint> indices(vertices.size() / 3);
 	for (uint32_t i = 0; i < indices.size(); i++) indices[i] = i;
@@ -255,4 +270,14 @@ void ResourceManager::updateVBO(uint32_t id, std::vector<GLfloat>& vertices)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+}
+
+void ResourceManager::clear()
+{
+	m_shaders.clear();
+	m_models.clear();
+	m_manuallyCreaatedObjects.clear();
+	m_modelIndex_shadersIndices.clear();
+	m_complete_models.clear();
+	m_manCrObj_indexs.clear();
 }

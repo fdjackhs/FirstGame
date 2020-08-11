@@ -13,8 +13,21 @@
 		"optionalProperties": "CAMERA"
 	},
 	{
+		"object_type": "AREA",
+		"models_type": [],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "AREA"
+	},
+	{
 		"object_type": "RED_PLANET",
-		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "HP_SCALE"],
 		"posx": "-100.0",
 		"posy": "0.0",
 		"posz": "-100.0",
@@ -27,7 +40,7 @@
 	},
 	{
 		"object_type": "BLUE_PLANET",
-		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "HP_SCALE"],
 		"posx": "100.0",
 		"posy": "0.0",
 		"posz": "100.0",
@@ -40,7 +53,7 @@
 	},
 	{
 		"object_type": "NEUTRAL_PLANET",
-		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "HP_SCALE"],
 		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
@@ -53,7 +66,7 @@
 	},
 	{
 		"object_type": "NEUTRAL_PLANET",
-		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "HP_SCALE"],
 		"posx": "-100.0",
 		"posy": "0.0",
 		"posz": "100.0",
@@ -66,7 +79,7 @@
 	},
 	{
 		"object_type": "NEUTRAL_PLANET",
-		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET"],
+		"models_type": ["RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "HP_SCALE"],
 		"posx": "100.0",
 		"posy": "0.0",
 		"posz": "-100.0",
@@ -103,20 +116,6 @@
 		
 		"optionalProperties": "BLUE_UNIT"
 	},
-	
-	{
-		"object_type": "TEST",
-		"models_type": ["TEST"],
-		"posx": "0.0",
-		"posy": "100.0",
-		"posz": "0.0",
-		
-		"scale": "1.0",
-		
-		"exsist": "false",
-		
-		"optionalProperties": "TEST"
-	},
 	{
 		"object_type": "BUTTON",
 		"models_type": ["BUTTON", "BUTTON_DOWN"],
@@ -133,7 +132,7 @@
 	{
 		"object_type": "BUTTON",
 		"models_type": ["BUTTON", "BUTTON_DOWN"],
-		"posx": "0.925",
+		"posx": "0.93",
 		"posy": "0.85",
 		"posz": "0.0",
 		
@@ -146,7 +145,7 @@
 	{
 		"object_type": "BUTTON",
 		"models_type": ["BUTTON", "BUTTON_DOWN"],
-		"posx": "0.8",
+		"posx": "0.77",
 		"posy": "0.85",
 		"posz": "0.0",
 		
@@ -155,5 +154,18 @@
 		"exsist": "true",
 		
 		"optionalProperties": "SPEED_DOWN"
+	},
+	{
+		"object_type": "LABEL",
+		"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+		"posx": "0.8125",
+		"posy": "0.85",
+		"posz": "0.0",
+		
+		"scale": "0.05",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "LABEL_ONE"
 	}
 ]

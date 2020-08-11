@@ -8,7 +8,7 @@
 class Object
 {
 public:
-	enum ObjectType { OBJECT, UNIT, PLANET, BUTTON };
+	enum ObjectType { OBJECT, UNIT, PLANET, BUTTON, LABEL };
 
 	Object();
 	Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, const std::string fraction);

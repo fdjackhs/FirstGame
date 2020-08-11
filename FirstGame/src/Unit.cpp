@@ -71,11 +71,27 @@ void Unit::action(float deltaTime)
 	{
 		float speed = m_speed;
 
+		float sqrt_distToTargetPos = sqrt_distance(m_position, m_targetPos);
+
+		/*
+		if (sqrt_distToTargetPos < 100.0f)
+		{
+			speed = sqrt_distToTargetPos / m_speed + 1.5f;
+		}
+		if (sqrt_distToTargetPos < 2.0f)
+			m_state = "rest";
+		*/
+
 		glm::vec3 move_vector = glm::normalize(m_targetPos - m_position);
 
 		glm::vec3 nextPosition = m_position + move_vector * speed * deltaTime;
 
-		m_position = nextPosition;
+		float sqrt_distToNextPos = sqrt_distance(m_position, nextPosition);
+
+		if (sqrt_distToNextPos > sqrt_distToTargetPos)
+			m_position = m_targetPos;
+		else
+			m_position = nextPosition;
 
 		/*
 		bool passesTargetPoint = glm::distance(m_position, m_targetPos) < glm::distance(m_position, nextPosition);

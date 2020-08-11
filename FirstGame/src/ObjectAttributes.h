@@ -3,6 +3,8 @@
 
 struct ObjectAttributes
 {
+	uint32_t id;
+
 	std::string object_type;
 
 	std::string posx;

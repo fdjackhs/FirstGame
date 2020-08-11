@@ -1,35 +1,121 @@
 #include "Game.h"
 #include "Profile.h"
 
-Game::Game(unsigned int level)
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glad/glad.h>
+
+#include <GLFW/glfw3native.h>
+
+/*
+struct func
+{
+	uint32_t& progress;
+	uint32_t& level;
+	Game& game;
+	GLFWwindow* context;
+	void(*function)(GLFWwindow* context, Game& game, uint32_t& level, uint32_t& progress);
+
+	func(GLFWwindow* c, Game& g, uint32_t& l, uint32_t& p, void(*funct)(GLFWwindow*, Game&, uint32_t&, uint32_t&)) : context(c), game(g), level(l), progress(p), function(funct)
+	{}
+
+	void operator() ()
+	{
+		function(context, game, level, progress);
+	}
+};*/
+
+
+static bool flag = false;
+static uint32_t level = 1;
+
+void Game::loadResources()
+{
+	/*
+	auto func = [this]() 
+	{
+		uint32_t progress = 0;
+		GLFWwindow* context = RenderEngine::loadScreenWin;
+		//GLFWwindow* context = RenderEngine::window;
+
+		glfwMakeContextCurrent(context);
+		if (!glfwInit()) std::cout << "wrong!" << std::endl;
+
+		createGame(level, progress);
+
+		flag = true;
+	};
+	std::thread t(func);
+	t.detach();
+	*/
+
+	Model loadScreen("../FirstGame/resources/models/Loading/LoadScreen.obj");
+	Shader interfaceShader("../FirstGame/Resources/shaders/1.button_shader.vs", "../FirstGame/Resources/shaders/1.button_shader.fs");
+
+	loadScreen.Draw(interfaceShader);
+	RenderEngine::updateScreen();
+
+	uint32_t progress = 0;
+	createGame(level, progress);
+}
+
+Game::Game(uint32_t level)
+{
+	
+	level = 1;
+	loadResources();
+
+	/*
+	uint32_t progress = 0;
+	createGame(level, progress);*/
+
+}
+Game::~Game() {}
+
+void startButton(Game& game)
+{
+	game.m_objects.clear();
+	RenderEngine::resourceManager.clear();
+	RenderEngine::modelsGroups.clear();
+
+	/*
+	uint32_t progress = 0;
+	level = 0;
+	game.createGame(level, progress);
+	*/
+
+	level = 0;
+	game.loadResources();
+}
+
+void Game::createGame(uint32_t& level, uint32_t& progress)
 {
 	m_player_fraction = "RED";
 	m_ai_fraction = "BLUE";
+	m_area = nullptr;
 
 	std::vector<ObjectAttributes> objectsAttribs;
-	RenderEngine::loadLevel(0, objectsAttribs);
-	
+	RenderEngine::loadLevel(level, objectsAttribs, progress);
+
 	for (auto&& x : objectsAttribs)
 		createObject(x);
 
-	//create objects manually
-	uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
-	m_area = std::make_shared<select_area>(id);
+
 
 	m_pause = false;
-	m_timeKoef = 1.0f;
+	//m_timeKoef = 1.0f;
+
+	lastTime = RenderEngine::getCurrTime();
+	RenderEngine::deltaTime = 0.0f;
 }
 
-Game::~Game()
-{
-
-}
 
 static int counter = 0;
 
 void Game::loop()
 {
-	float lastTime = RenderEngine::getCurrTime();
+	lastTime = RenderEngine::getCurrTime();
 
 	while (!RenderEngine::windowShouldClose())
 	{
@@ -44,7 +130,7 @@ void Game::loop()
 				RenderEngine::deltaTime = currTime - lastTime;
 				lastTime = currTime;
 
-				RenderEngine::deltaTime *= m_timeKoef;
+				RenderEngine::deltaTime *= RenderEngine::m_timeKoef;
 			}
 			else
 			{
@@ -76,12 +162,12 @@ void Game::loop()
 
 		{
 			//LOG_DURATION("genModelMatrices");
-			RenderEngine::genModelMatrices(Game::objects);
+			RenderEngine::genModelMatrices(Game::m_objects);
 		}
 
 		{
 			//LOG_DURATION("drawObjects");
-			RenderEngine::drawObjects();
+			RenderEngine::drawObjects(m_labels);
 		}
 
 		{
@@ -95,7 +181,7 @@ void Game::loop()
 		}
 
 
-		//std::cerr << "objects " << objects.size() << std::endl;
+		//std::cerr << "objects " << m_objects.size() << std::endl;
 		/*
 		{
 			LOG_DURATION("Profile");
@@ -111,14 +197,14 @@ void Game::loop()
 			if (counter > 100)
 			{
 				std::cerr << std::endl;
-				std::cerr << "total objects " << objects.size() << std::endl;
+				std::cerr << "total objects " << m_objects.size() << std::endl;
 				for (auto&& group : RenderEngine::modelsGroups)
 				{
 					std::cerr << "buffer " << group.buffer << " model_index " << group.model_index << " matrices.size " << group.matrices.size() << std::endl;
 				}
 
 				std::cerr << std::endl;
-				std::cout << objects.size() << std::endl;
+				std::cout << m_objects.size() << std::endl;
 				system("pause");
 			}
 		}
@@ -132,35 +218,38 @@ void Game::createObject(const ObjectAttributes& attributes)
 	{
 		if (attributes.object_type == "RED_UNIT")
 		{
-			//for (int i = 0; i < 1000; i++)
+			for (int i = 0; i < 2; i++)
 			{
-				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-					glm::vec3{ stof(attributes.posx) /*- 50.0f*/,
+				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
+					glm::vec3{ stof(attributes.posx) - 50.0f,
 							   stof(attributes.posy),
 							   stof(attributes.posz) /*+ float(i)*/ },
 					stof(attributes.scale),
 					"", "RED");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				objects.push_back(sp_unit);
+				m_objects.push_back(sp_unit);
 			}
 		}
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
-			//for (int i = 0; i < 1000; i++)
+			for (int i = 0; i < 2; i++)
 			{
-				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-					glm::vec3{ stof(attributes.posx) /*+ 50.0f*/,
+				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
+					glm::vec3{ stof(attributes.posx) + 50.0f,
 							   stof(attributes.posy),
 							   stof(attributes.posz) /*+ float(i)*/ },
 					stof(attributes.scale),
 					"", "BLUE");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				objects.push_back(sp_unit);
+				m_objects.push_back(sp_unit);
 			}
 		}
 		else if (attributes.object_type == "RED_PLANET")
 		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
 													   stof(attributes.posz) },
@@ -168,11 +257,12 @@ void Game::createObject(const ObjectAttributes& attributes)
 											"",
 											this, "RED");
 			std::shared_ptr<Object> sh_planet(ptr_planet);
-			objects.push_back(sh_planet);
+			m_objects.push_back(sh_planet);
 		}
 		else if (attributes.object_type == "BLUE_PLANET")
 		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
 													   stof(attributes.posz) },
@@ -180,11 +270,12 @@ void Game::createObject(const ObjectAttributes& attributes)
 											"",
 											this, "BLUE");
 			std::shared_ptr<Object> sh_planet(ptr_planet);
-			objects.push_back(sh_planet);
+			m_objects.push_back(sh_planet);
 		}
 		else if (attributes.object_type == "NEUTRAL_PLANET")
 		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
 													   stof(attributes.posz) },
@@ -192,11 +283,12 @@ void Game::createObject(const ObjectAttributes& attributes)
 											"",
 											this, "NEUTRAL");
 			std::shared_ptr<Object> sh_planet(ptr_planet);
-			objects.push_back(sh_planet);
+			m_objects.push_back(sh_planet);
 		}
 		else if (attributes.object_type == "BUTTON")
 		{
-			Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			//Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.id],
 										    glm::vec3{ stof(attributes.posx),
 												       stof(attributes.posy),
 												       stof(attributes.posz) },
@@ -211,24 +303,42 @@ void Game::createObject(const ObjectAttributes& attributes)
 				sh_button->setCallbackFunc(speedGameUp);
 			if (attributes.optionalProperties == "SPEED_DOWN")
 				sh_button->setCallbackFunc(speedGameDown);
+			if (attributes.optionalProperties == "BUTTON_START")
+				sh_button->setCallbackFunc(startButton);
 
-
-			objects.push_back(sh_button);
+			m_objects.push_back(sh_button);
 		}
 		else if (attributes.object_type == "CAMERA")
 		{
 			RenderEngine::camera = std::make_shared<Camera>(glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)));
 		}
+		else if (attributes.object_type == "AREA")
+		{
+			//create objects manually
+			uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
+			m_area = std::make_shared<select_area>(id);
+		}
+		else if (attributes.object_type == "LABEL")
+		{
+			//Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.id],
+									 Var("float", &RenderEngine::m_timeKoef), 
+									 glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)), 
+									 stof(attributes.scale));
+			std::shared_ptr<Label> sh_obj(label);
+			m_labels.push_back(sh_obj);
+		}
 		else
 		{
-			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			//Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
+			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.id],
 										 glm::vec3{ stof(attributes.posx),
 										 		    stof(attributes.posy),
 										 		    stof(attributes.posz) },
 										 stof(attributes.scale),
 										 "", "");
 			std::shared_ptr<Object> sh_obj(ptr_obj);
-			objects.push_back(sh_obj);
+			m_objects.push_back(sh_obj);
 		}
 	}
 }
@@ -241,26 +351,26 @@ void Game::collisionsDetected()
 	bool flag = false;
 
 	collDtct_counter = (collDtct_counter + 1) % collDtctParts;
-	uint32_t partSize = objects.size() / collDtctParts;
+	uint32_t partSize = m_objects.size() / collDtctParts;
 	uint32_t start = partSize * collDtct_counter;
 	uint32_t end = start + partSize;
 
 	//for (uint32_t i = start; i < end; i++)
-	for (uint32_t i = 0; i < objects.size(); i++)
+	for (uint32_t i = 0; i < m_objects.size(); i++)
 	{
-		if (objects[i]->m_type == Object::ObjectType::UNIT)
+		if (m_objects[i]->m_type == Object::ObjectType::UNIT)
 		{
-			Unit* unit_i = (Unit*)objects[i].get();
+			Unit* unit_i = (Unit*)m_objects[i].get();
 
 			if (!unit_i->m_annihilated)
 			{
-				for (uint32_t j = 0; j < objects.size(); j++)
+				for (uint32_t j = 0; j < m_objects.size(); j++)
 				{
 					if (i != j)
 					{
-						if (objects[j]->m_type == Object::ObjectType::UNIT)
+						if (m_objects[j]->m_type == Object::ObjectType::UNIT)
 						{
-							Unit* unit_j = (Unit*)objects[j].get();
+							Unit* unit_j = (Unit*)m_objects[j].get();
 
 							if (!unit_j->m_annihilated && 
 								 unit_i->m_fraction != unit_j->m_fraction)
@@ -274,9 +384,9 @@ void Game::collisionsDetected()
 								}
 							}
 						}
-						else if (objects[j]->m_type == Object::ObjectType::PLANET)
+						else if (m_objects[j]->m_type == Object::ObjectType::PLANET)
 						{
-							Planet* planet = (Planet*)objects[j].get();
+							Planet* planet = (Planet*)m_objects[j].get();
 
 							if (unit_i->m_targetPos == planet->m_position &&
 								closerThan(unit_i->m_position, planet->m_position, unit_i->m_radius + planet->m_radius))
@@ -306,15 +416,15 @@ void Game::collisionsDetected()
 
 	if (flag)
 	{
-		for (uint32_t iter = 0; iter < objects.size(); iter++)
+		for (uint32_t iter = 0; iter < m_objects.size(); iter++)
 		{
-			if (objects[iter]->m_type == Object::ObjectType::UNIT)
+			if (m_objects[iter]->m_type == Object::ObjectType::UNIT)
 			{
-				Unit* unit = (Unit*)objects[iter].get();
+				Unit* unit = (Unit*)m_objects[iter].get();
 
 				if (unit->m_annihilated)
 				{
-					objects.erase(objects.begin() + iter);
+					m_objects.erase(m_objects.begin() + iter);
 					iter--;
 				}
 			}
@@ -324,57 +434,79 @@ void Game::collisionsDetected()
 
 static int phys_counter = 0;
 static int parts = 10;
+static uint32_t lastEnd;
 
 void Game::updatePhysics()
 {
-	phys_counter = (phys_counter + 1) % parts;
-	uint32_t partSize = objects.size() / parts;
-	uint32_t start = partSize * phys_counter;
-	uint32_t end = start + partSize;
-	
-	//for (uint32_t i = 0; i < objects.size(); i++)
-	for (uint32_t i = start; i < end; i++)
+	try
 	{
-		if (objects[i]->m_type == Object::ObjectType::UNIT)
+		phys_counter = (phys_counter + 1) % parts;
+		uint32_t partSize = m_objects.size() / parts;
+
+		if (phys_counter == 0)
+			lastEnd = 0;
+
+		uint32_t start = lastEnd;
+		uint32_t end = start + partSize;
+		lastEnd = end;
+	
+		//for (uint32_t i = 0; i < m_objects.size(); i++)
+		for (uint32_t i = start; i < end; i++)
 		{
-			Unit* unit_i = (Unit*)objects[i].get();
-
-			glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
-
-			for (uint32_t j = 0; j < objects.size(); j++)
+			if (m_objects[i]->m_type == Object::ObjectType::UNIT)
 			{
-				if (j != i &&
-					objects[j]->m_type == Object::ObjectType::UNIT)
+				Unit* unit_i = (Unit*)m_objects[i].get();
+
+				glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
+
+				for (uint32_t j = 0; j < m_objects.size(); j++)
 				{
-					Unit* unit_j = (Unit*)objects[j].get();
-
-					float force = (1.0f / sqrt(glm::distance(unit_i->m_position, unit_j->m_position))) * 0.2f;
-
-					if (unit_i->m_fraction != unit_j->m_fraction)
+					if (j != i &&
+						m_objects[j]->m_type == Object::ObjectType::UNIT)
 					{
-						//std::cout << "force " << force << std::endl;
-						if (force < 0.08)
-							force = 0.0f;
+						Unit* unit_j = (Unit*)m_objects[j].get();
+
+						float dist = glm::distance(unit_i->m_position, unit_j->m_position);
+
+						if (dist == 0.0f)
+						{
+							while (false);
+						}
 						else
-							force = -(force * 10.0f);
-					}
-					else
-					{
-						if (force < 0.15)
-							force = 0.0f;
-					}
+						{
+							float force = (1.0f / sqrt(dist)) * 0.207f;
 
-					glm::vec3 temp = glm::normalize(unit_i->m_position - unit_j->m_position) * force;
+							if (unit_i->m_fraction != unit_j->m_fraction)
+							{
+								//std::cout << "force " << force << std::endl;
+								if (force < 0.08)
+									force = 0.0f;
+								else
+									force = -(force * 10.0f);
+							}
+							else
+							{
+								if (force < 0.15)
+									force = 0.0f;
+							}
 
-					totoalGravityVector += temp;
+							glm::vec3 temp = glm::normalize(unit_i->m_position - unit_j->m_position) * force;
+
+							totoalGravityVector += temp;
+						}
+					}
 				}
-			}
-			
-			unit_i->m_gravityOffset = totoalGravityVector;
 
-			if (unit_i->m_gravityOffset.y != 0.0f)
-				unit_i->m_gravityOffset.y = 0.0f;
+				unit_i->m_gravityOffset = totoalGravityVector;
+
+				if (unit_i->m_gravityOffset.y != 0.0f)
+					unit_i->m_gravityOffset.y = 0.0f;
+			}
 		}
+	}
+	catch (...)
+	{
+		while (false);
 	}
 }
 
@@ -392,9 +524,9 @@ void Game::updateGameState(float deltaTime)
 
 	{
 		//LOG_DURATION("action");
-		for (uint32_t i = 0; i < objects.size(); i++)
+		for (uint32_t i = 0; i < m_objects.size(); i++)
 		{
-			objects[i]->action(deltaTime);
+			m_objects[i]->action(deltaTime);
 		}
 	}
 
@@ -403,17 +535,20 @@ void Game::updateGameState(float deltaTime)
 
 void Game::selectUnits()
 {
-	if (m_player_fraction == "RED")
+	if (m_area != nullptr)
 	{
-		for (auto&& obj : objects)
+		if (m_player_fraction == "RED")
 		{
-			if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
+			for (auto&& obj : m_objects)
 			{
-				Unit* unit = (Unit*)obj.get();
-				if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
-					unit->select();
-				else
-					unit->deselect();
+				if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
+				{
+					Unit* unit = (Unit*)obj.get();
+					if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
+						unit->select();
+					else
+						unit->deselect();
+				}
 			}
 		}
 	}
@@ -421,8 +556,8 @@ void Game::selectUnits()
 
 void Game::createUnit(const std::string& unitType, const glm::vec3& position, const glm::vec3& targetPosition, const std::string& fraction)
 {
-	Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[unitType], position, targetPosition, fraction);
-	objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
+	Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_map_complete_models[unitType], position, targetPosition, fraction);
+	m_objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
 }
 
 void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll)
@@ -495,20 +630,27 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 		RenderEngine::camera->Position += startP - crurrP;
 	}
 
+	processArea(buttons[0], cursorCoords);
+}
 
+void Game::processArea(const bool& leftButton, const glm::vec2& cursorCoords)
+{
 	static glm::vec2 lastCursorCoords;
 	static bool leftButtonLastTime = false;
 	static bool clickOnButton = false;
 
 	//selected area and buttons hit
-	if (buttons[0])
+	if (leftButton)
 	{
 		if (!leftButtonLastTime)
 			clickOnButton = checkButtonHits(cursorCoords, true);
 
 		//if last click was not on button and cursor moved while holding down the button - update area
-		if (!clickOnButton && cursorCoords != lastCursorCoords) 
-			m_area->updateArea(cursorCoords);
+		if (m_area != nullptr)
+		{
+			if (!clickOnButton && cursorCoords != lastCursorCoords)
+				m_area->updateArea(cursorCoords);
+		}
 
 		leftButtonLastTime = true;
 	}
@@ -516,14 +658,18 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 	{
 		if (!checkButtonHits(cursorCoords, false) && leftButtonLastTime)
 		{
-			if (m_area->m_exsist && m_area->m_fixed)
+			if (m_area != nullptr)
 			{
-				setTargetForSelectedUnits(cursorCoords);
-				m_area->collapseArea();
+				if (m_area->m_exsist && m_area->m_fixed)
+				{
+					setTargetForSelectedUnits(cursorCoords);
+					m_area->collapseArea();
+				}
 			}
 		}
 
-		m_area->m_fixed = true;
+		if (m_area != nullptr)
+			m_area->m_fixed = true;
 		leftButtonLastTime = false;
 	}
 
@@ -538,7 +684,7 @@ bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
 	float x = cursorCoords.x / RenderEngine::SCREEN.x;
 	float y = cursorCoords.y / RenderEngine::SCREEN.y;
 
-	for (auto&& obj : objects)
+	for (auto&& obj : m_objects)
 	{
 		if (obj->m_type == Object::ObjectType::BUTTON)
 		{
@@ -554,15 +700,20 @@ bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
 				}
 				else if (button->m_isPressed)
 				{
+					button->setButtonUp();
 					button->callCallbackFunction();
-					button->m_isPressed = false;
+					/*If this button was a button in the menu, then after pressing it it may no longer exist*/
+					if (button != nullptr)
+						button->m_isPressed = false;
+					else
+						return false;
 				}
 			}
 			else
+			{
 				button->m_isPressed = false;
-
-			if (!isPressed)
 				button->setButtonUp();
+			}
 		}
 	}
 	
@@ -575,7 +726,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 
 	std::string state = "move";
 
-	for (auto&& obj : objects)
+	for (auto&& obj : m_objects)
 	{
 		if (obj->m_type == Object::ObjectType::PLANET)
 		{
@@ -594,7 +745,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 		}
 	}
 
-	for (auto&& obj : objects)
+	for (auto&& obj : m_objects)
 	{
 		if (obj->m_type == Object::ObjectType::UNIT)
 		{
@@ -615,38 +766,58 @@ void switchPause(Game& game)
 
 void speedGameUp(Game& game)
 {
-	game.m_timeKoef += 0.25f;
-	if (game.m_timeKoef > 2.0f)
-		game.m_timeKoef = 2.0f;
+	RenderEngine::m_timeKoef += 0.25f;
+	if (RenderEngine::m_timeKoef > 2.0f)
+		RenderEngine::m_timeKoef = 2.0f;
 }
 
 void speedGameDown(Game& game)
 {
-	game.m_timeKoef -= 0.25f;
-	if (game.m_timeKoef < 0.25f)
-		game.m_timeKoef = 0.25f;
+	RenderEngine::m_timeKoef -= 0.25f;
+	if (RenderEngine::m_timeKoef < 0.25f)
+		RenderEngine::m_timeKoef = 0.25f;
 }
+
+
 
 //TODO
 /*
-	- сделать меню
+	- сделать шкалу хп для планеты
 	- сделать редактор карт
-	- лоад скрин
 	- сделать api для удобста использования ai
-	- добавить границы карты
-	- добавить бокс (фон)
 
-	- исправить баг с дёрганьем юнитов когда они стоят на месте (это из за того что время * скорость и получается большое значение и юнит перепрыгивает таргет)
+	- какой то баг с выходом за пределы вектора во время столкновения юнитов
+
+	- новая оптимизация физики - брать только первую половину всех юнитов и при проходе по каждому записывать смещение в ОБА юнита а не только в текущий
+
+	- сделать псевдо-физику
 
 	- при расчёте физики можно пользоваться многопоточкой
 
+	- проверку на конец матча и вывод графика
 
+	- добавить границы карты
+	- добавить бокс (фон)
 	- разобраться с анимациями (пульсирование планет, увеличение и т.д.)
-	- баг с исчезновением юнитов когда их становится много (вроде бы его уже нет)
-	- интерфейс (хп планет, и ускоритель времени как в тотал вар)
-
 
 	Решено:
+
+		- сделать шрифты (пока только цифры но пока что больше и не надо)
+
+		- лоад скрин (совсем не то что я хотел, но по другому не получается)
+
+		- сделать меню (кое как сделано)
+
+		- баг при расчёте физики - некоторые юниты пропускались (возможно не решено)
+
+		- интерфейс (хп планет, и ускоритель времени как в тотал вар)
+
+		- баг с исчезновением юнитов когда их становится много
+		  костыльно решено, проблема была при расчёте физики, когда два юнита оказывались в одной точке то расстояние между ними = 0.0f и 1.0f / 0.0f давало нанд
+		  а так же если пытаться нормализовать вектор длиной 0.0f то результат - вектор с нанд
+
+		- исправить баг с дёрганьем юнитов когда они стоят на месте (это из за того что время * скорость и получается большое значение и юнит перепрыгивает таргет)
+
 		- баг, если направить юнитов не на апдейт своей планеты, а атаковать вражескую или нейтральную, то юниты просто исчезают
 
 		- баг с неправильным таргетом у юнита
@@ -654,7 +825,6 @@ void speedGameDown(Game& game)
 		пролегать через другую планет, то юнит войдёт не в ту
 		планету на которую был отправлен, а в ту которая
 		лежит у него на пути)
-
 
 		- интерфейс (кнопки)
 

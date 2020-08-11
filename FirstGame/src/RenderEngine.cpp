@@ -17,7 +17,8 @@ void cursor_enter_callback(GLFWwindow* window, int entered);
 namespace RenderEngine
 {
 	glm::vec2 SCREEN;
-	GLFWwindow* window;
+	GLFWwindow* window; 
+	GLFWwindow* loadScreenWin;
 
 	//keyboard
 	bool keys[349];
@@ -35,6 +36,7 @@ namespace RenderEngine
 	std::shared_ptr<Camera> camera;
 
 	float deltaTime;
+	float m_timeKoef;
 
 	ResourceManager resourceManager;
 
@@ -55,13 +57,18 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow((int)SCREEN.x, (int)SCREEN.y, windowName, nullptr, nullptr);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	loadScreenWin = glfwCreateWindow(1, 1, "", NULL, NULL);
+
+	glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
+	window = glfwCreateWindow((int)SCREEN.x, (int)SCREEN.y, windowName, NULL, loadScreenWin);
 	if (!window)
 	{
 		std::cout << "glfwCreateWindow failed" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
+
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -72,6 +79,7 @@ int RenderEngine::init(float x, float y, const char* windowName)
 
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	//if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	if (!gladLoadGL())
 	{
 		std::cout << "gladLoadGL() failed" << std::endl;
@@ -86,6 +94,8 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	//
 	RenderEngine::firstMouse = true;
 	srand(unsigned int(time(NULL)));
+
+	m_timeKoef = 1.0f;
 
 	return 0;
 }
@@ -113,7 +123,7 @@ void RenderEngine::clearScreen()
 
 void RenderEngine::updateCameraView()
 {
-	float offset = (camera->finalCameraPoint - camera->Position.y) * 0.07f;
+	float offset = (camera->finalCameraPoint - camera->Position.y) * camera->speedUp * deltaTime;
 	camera->Position.y += offset;
 
 	//camera->Position.y = camera->finalCameraPoint;
@@ -146,7 +156,7 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 	}
 }
 
-void RenderEngine::drawObjects()
+void RenderEngine::drawObjects(const std::vector<std::shared_ptr<Label>>& labels)
 {
 	for (auto&& group : modelsGroups)
 	{
@@ -163,7 +173,7 @@ void RenderEngine::drawObjects()
 
 	//draw area
 	//-----------------------------
-	for (unsigned int modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)
+	for (uint32_t modelID = 0; modelID < RenderEngine::resourceManager.m_manCrObj_indexs.size(); modelID++)
 	{
 		uint32_t modelIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].first;
 		uint32_t shaderIndex = RenderEngine::resourceManager.m_manCrObj_indexs[modelID].second;
@@ -171,10 +181,10 @@ void RenderEngine::drawObjects()
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_position);
 
-		resourceManager.shaders[shaderIndex].second.use();
-		resourceManager.shaders[shaderIndex].second.setMat4("view", view);
-		resourceManager.shaders[shaderIndex].second.setMat4("projection", projection);
-		resourceManager.shaders[shaderIndex].second.setMat4("model", model);
+		resourceManager.m_shaders[shaderIndex].second.use();
+		resourceManager.m_shaders[shaderIndex].second.setMat4("view", view);
+		resourceManager.m_shaders[shaderIndex].second.setMat4("projection", projection);
+		resourceManager.m_shaders[shaderIndex].second.setMat4("model", model);
 
 		glDisable(GL_DEPTH_TEST);
 		glBindVertexArray(RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_VAO);
@@ -182,6 +192,37 @@ void RenderEngine::drawObjects()
 		glDrawElements(GL_LINE_LOOP, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_vertices.size() / 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glEnable(GL_DEPTH_TEST);
+	}
+	//draw labels
+	for (uint32_t labelIndex = 0; labelIndex < labels.size(); labelIndex++)
+	{
+		labels[labelIndex]->updateLabel();
+
+		// 0.5f - it's widht of one char
+		float stride = 0.5f * labels[labelIndex]->m_scale;
+
+		for (int charIndex = 0; charIndex < labels[labelIndex]->m_value.size(); charIndex++)
+		{
+			uint32_t modelIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[labels[labelIndex]->m_alphabet[labels[labelIndex]->m_value[charIndex]]].first;
+			uint32_t shaderIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[labels[labelIndex]->m_alphabet[charIndex]].second[0]; // 0 - this models has only one shader (INTERFACE)
+
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, { labels[labelIndex]->m_position.x + (charIndex * stride),
+											labels[labelIndex]->m_position.y,
+											labels[labelIndex]->m_position.z });
+
+			model = glm::scale(model, glm::vec3(labels[labelIndex]->m_scale, labels[labelIndex]->m_scale, labels[labelIndex]->m_scale));
+
+
+			resourceManager.m_shaders[shaderIndex].second.use();
+
+			resourceManager.m_shaders[shaderIndex].second.setMat4("projection", projection);
+			resourceManager.m_shaders[shaderIndex].second.setMat4("view", view);
+			resourceManager.m_shaders[shaderIndex].second.setMat4("model", model);
+
+			std::get<1>(resourceManager.m_models[modelIndex]).Draw(resourceManager.m_shaders[shaderIndex].second);
+
+		}
 	}
 }
 
@@ -197,9 +238,9 @@ void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
 	glBufferData(GL_ARRAY_BUFFER, group.matrices.size() * sizeof(glm::mat4), &group.matrices[0], GL_STATIC_DRAW);
 
 
-	for (unsigned int i = 0; i < std::get<1>(resourceManager.models[group.model_index]).meshes.size(); i++)
+	for (unsigned int i = 0; i < std::get<1>(resourceManager.m_models[group.model_index]).meshes.size(); i++)
 	{
-		unsigned int VAO = std::get<1>(resourceManager.models[group.model_index]).meshes[i].VAO;
+		unsigned int VAO = std::get<1>(resourceManager.m_models[group.model_index]).meshes[i].VAO;
 		glBindVertexArray(VAO);
 		// set attribute pointers for matrix (4 times vec4)
 		glEnableVertexAttribArray(3);
@@ -222,22 +263,22 @@ void RenderEngine::drawGroupOfObjects(RenderEngine::modelGroupAttribs& group)
 
 	//it's draw groups function
 	//by default INSTANSING shader has index - 1
-	resourceManager.shaders[group.shaders_indices[1]].second.use();
-	resourceManager.shaders[group.shaders_indices[1]].second.setMat4("projection", projection);
-	resourceManager.shaders[group.shaders_indices[1]].second.setMat4("view", view);
+	resourceManager.m_shaders[group.shaders_indices[1]].second.use();
+	resourceManager.m_shaders[group.shaders_indices[1]].second.setMat4("projection", projection);
+	resourceManager.m_shaders[group.shaders_indices[1]].second.setMat4("view", view);
 
 
-	if (!std::get<1>(resourceManager.models[group.model_index]).textures_loaded.empty())
+	if (!std::get<1>(resourceManager.m_models[group.model_index]).textures_loaded.empty())
 	{
-		resourceManager.shaders[group.shaders_indices[1]].second.setInt("texture_diffuse1", 0);
+		resourceManager.m_shaders[group.shaders_indices[1]].second.setInt("texture_diffuse1", 0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, std::get<1>(resourceManager.models[group.model_index]).textures_loaded[0].id);
+		glBindTexture(GL_TEXTURE_2D, std::get<1>(resourceManager.m_models[group.model_index]).textures_loaded[0].id);
 	}
 
-	for (unsigned int i = 0; i < std::get<1>(resourceManager.models[group.model_index]).meshes.size(); i++)
+	for (unsigned int i = 0; i < std::get<1>(resourceManager.m_models[group.model_index]).meshes.size(); i++)
 	{
-		glBindVertexArray(std::get<1>(resourceManager.models[group.model_index]).meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, std::get<1>(resourceManager.models[group.model_index]).meshes[i].indices.size(), GL_UNSIGNED_INT, 0, group.matrices.size());
+		glBindVertexArray(std::get<1>(resourceManager.m_models[group.model_index]).meshes[i].VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, std::get<1>(resourceManager.m_models[group.model_index]).meshes[i].indices.size(), GL_UNSIGNED_INT, 0, group.matrices.size());
 		glBindVertexArray(0);
 	}
 }
@@ -248,23 +289,23 @@ void RenderEngine::drawSingleObject(RenderEngine::modelGroupAttribs& group)
 	{
 		//it's draw single object function
 		//by default BASIC shader has index - 0
-		resourceManager.shaders[group.shaders_indices[0]].second.use();
+		resourceManager.m_shaders[group.shaders_indices[0]].second.use();
 
-		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("projection", projection);
-		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("view", view);
-		resourceManager.shaders[group.shaders_indices[0]].second.setMat4("model", matrix);
+		resourceManager.m_shaders[group.shaders_indices[0]].second.setMat4("projection", projection);
+		resourceManager.m_shaders[group.shaders_indices[0]].second.setMat4("view", view);
+		resourceManager.m_shaders[group.shaders_indices[0]].second.setMat4("model", matrix);
 
-		std::get<1>(resourceManager.models[group.model_index]).Draw(resourceManager.shaders[group.shaders_indices[0]].second);
+		std::get<1>(resourceManager.m_models[group.model_index]).Draw(resourceManager.m_shaders[group.shaders_indices[0]].second);
 	}
 }
 
-void RenderEngine::loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib)
+void RenderEngine::loadLevel(uint32_t number, std::vector<ObjectAttributes>& objectsAttrib, uint32_t& progress)
 {
-	resourceManager.loadModels(number, objectsAttrib);
+	resourceManager.loadModels(number, objectsAttrib, progress);
 
 	// create models groups
-	for (auto&& x : resourceManager.modelIndex_shadersIndices)
-		modelsGroups.push_back({ std::get<2>(resourceManager.models[x.first]).depth_test, false, 0, x.first, x.second, std::vector<glm::mat4>() });
+	for (auto&& x : resourceManager.m_modelIndex_shadersIndices)
+		modelsGroups.push_back({ std::get<2>(resourceManager.m_models[x.first]).depth_test, false, 0, x.first, x.second, std::vector<glm::mat4>() });
 }
 
 glm::vec3 RenderEngine::cursorCoordToWorldCoords(const glm::vec2& cursorPos)

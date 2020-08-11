@@ -15,13 +15,15 @@
 #include "ResourceManager.h"
 #include "SelectArea.h"
 #include "Unit.h"
+#include "Label.h"
 
 extern class select_area;
 
 namespace RenderEngine
 {
 	extern glm::vec2 SCREEN;
-	extern GLFWwindow* window;
+	extern GLFWwindow* window; 
+	extern GLFWwindow* loadScreenWin;
 
 	//keyboard
 	extern bool keys[349];
@@ -39,6 +41,7 @@ namespace RenderEngine
 	extern std::shared_ptr<Camera> camera;
 	
 	extern float deltaTime;
+	extern float m_timeKoef;
 	
 	extern ResourceManager resourceManager;
 
@@ -73,9 +76,9 @@ namespace RenderEngine
 	glm::vec3 cursorCoordToWorldCoords(const glm::vec2& cursorPos);
 	glm::vec2 WorldCoordsToScreenCoords(const glm::vec3& objPos);
 
-	void loadLevel(unsigned int number, std::vector<ObjectAttributes>& objectsAttrib);
+	void loadLevel(uint32_t number, std::vector<ObjectAttributes>& objectsAttrib, uint32_t& progress);
 
-	void drawObjects();
+	void drawObjects(const std::vector<std::shared_ptr<Label>>& labels);
 	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
 	void drawGroupOfObjects(RenderEngine::modelGroupAttribs& group);
 	void drawSingleObject(RenderEngine::modelGroupAttribs& group);

@@ -2,22 +2,25 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <thread>
+#include <future>
 
 #include "RenderEngine.h"
 #include "Unit.h"
 #include "Planet.h"
 #include "SelectArea.h"
 #include "Button.h"
-#include "CustomDistance.h"
+#include "Utilities.h"
+#include "Label.h"
 
 class Game
 {
 public:
-	Game(unsigned int level);
+	Game(uint32_t level);
 	~Game();
 
-	Game(Game&) = delete;				//??
-	Game(Game&&) = delete;				//??
+	//Game(Game&) = delete;				//??
+	//Game(Game&&) = delete;			//??
 	Game& operator==(Game&) = delete;	//??
 
 	void loop();
@@ -29,22 +32,26 @@ public:
 	void updatePhysics();
 	void collisionsDetected();
 	bool checkButtonHits(const glm::vec2& cursorCoords, bool isPressed);
-	void setTargetForSelectedUnits(const glm::vec2& cursorCoords);
+	void setTargetForSelectedUnits(const glm::vec2& cursorCoords); 
+	void processArea(const bool& leftButton, const glm::vec2& cursorCoords);
 
 
 	//callback functions (for buttons)
 	friend void switchPause(Game& game);
 	friend void speedGameUp(Game& game);
 	friend void speedGameDown(Game& game);
+	friend void startButton(Game& game);
+
+	void createGame(uint32_t& level, uint32_t& progress); 
+	void loadResources();
 
 private:
 	bool m_pause;
-	float m_timeKoef;
+	float lastTime;
 
-	std::vector<std::shared_ptr<Object>> objects;
+	std::vector<std::shared_ptr<Object>> m_objects;
 
-	std::vector<std::shared_ptr<Unit>> red_units;
-	std::vector<std::shared_ptr<Unit>> blue_units;
+	std::vector<std::shared_ptr<Label>> m_labels;
 
 	std::shared_ptr<select_area> m_area;
 

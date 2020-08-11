@@ -54,8 +54,8 @@ void Button::updateButtonVertices()
 {
 	for(auto&& modelId : m_modelIDs)
 	{
-		int modelIndex = RenderEngine::resourceManager.modelIndex_shadersIndices[modelId].first;
-		Model tempModel = std::get<1>(RenderEngine::resourceManager.models[modelIndex]);
+		int modelIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[modelId].first;
+		Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[modelIndex]);
 
 		if (!tempModel.verticesUpdated)
 		{
@@ -65,7 +65,7 @@ void Button::updateButtonVertices()
 			tempModel.meshes[0].updateMesh();
 			
 			tempModel.verticesUpdated = true;
-			std::get<1>(RenderEngine::resourceManager.models[modelIndex]) = tempModel;
+			std::get<1>(RenderEngine::resourceManager.m_models[modelIndex]) = tempModel;
 		}
 	}
 }
@@ -74,8 +74,8 @@ void Button::calculateSizeOfButton()
 {
 	//calculate only for first model of button (someday needs to be redone for all models)
 
-	int modelIndex = RenderEngine::resourceManager.modelIndex_shadersIndices[m_modelIDs[m_indexes_of_displayd_models[0]]].first;
-	Model tempModel = std::get<1>(RenderEngine::resourceManager.models[modelIndex]);
+	int modelIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_indexes_of_displayd_models[0]]].first;
+	Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[modelIndex]);
 
 	std::vector<std::pair<float, float>> vertices;
 	for (auto&& vertex : tempModel.meshes[0].vertices)

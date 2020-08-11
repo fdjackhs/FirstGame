@@ -18,6 +18,10 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	if (m_fraction == "NEUTRAL")
 		m_indexes_of_displayd_models.push_back(2);
 
+	//HP scale always last
+	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 1);
+	m_indexOfHPscaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 1]].first;
+
 	m_position = pos;
 	m_scale = scale;
 	m_optionalProperties = opt_prop;
@@ -83,8 +87,13 @@ void Planet::plusOne()
 		{
 			m_healthPoints = 100.0f;
 			m_level += 1;
+
+			m_scale *= 1.25f;
+			m_radius *= 1.25f;
 		}
 	}
+
+	updateHPscaleVertices();
 }
 
 void Planet::minusOne(const std::string& unitFraction)
@@ -113,5 +122,59 @@ void Planet::minusOne(const std::string& unitFraction)
 			m_indexes_of_displayd_models.clear();
 			m_indexes_of_displayd_models.push_back(2);
 		}
+
+		m_scale = 1.0f;
+		m_radius = 9.0f;
+	}
+
+	updateHPscaleVertices();
+}
+
+
+void Planet::updateHPscaleVertices()
+{
+	//for (auto&& index : m_indexes_of_displayd_models)
+	{
+		Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfHPscaleRM]);
+
+		std::vector<glm::vec3> new_vertices;
+		std::vector<glm::vec3> new_texcoords;
+
+		new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
+		new_texcoords.push_back({ 0.0f, 0.0f, 0.0f });
+
+		float step = 360.0f / 100.0f;
+		float top = (m_healthPoints - 100.0f) * step;
+
+		for (float angle = 0.0f; angle <= top; angle += step)
+		{
+			float x = cos(glm::radians(angle)) * (m_radius * 1.15); 
+			float z = sin(glm::radians(angle)) * (m_radius * 1.15);
+			new_vertices.push_back({ x, 0.0f, z });
+
+
+			x = sin(glm::radians(angle)) * 0.5f;
+			z = cos(glm::radians(angle)) * 0.5f;
+			new_texcoords.push_back({ x, 0.0f, z });
+		}
+
+		tempModel.meshes[0].vertices.clear();
+		tempModel.meshes[0].indices.clear();
+
+		unsigned int ind = 2;
+		for (unsigned int i = 0; i < new_vertices.size(); i++, ind++)
+		{
+			Vertex vertex;
+			vertex.Position = new_vertices[i];
+			vertex.TexCoords = new_texcoords[i];
+			tempModel.meshes[0].vertices.push_back(vertex);
+
+			tempModel.meshes[0].indices.push_back(0);
+			tempModel.meshes[0].indices.push_back(ind - 1);
+			tempModel.meshes[0].indices.push_back(ind);
+		}
+
+		tempModel.meshes[0].updateMesh();
+		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfHPscaleRM]) = tempModel;
 	}
 }
