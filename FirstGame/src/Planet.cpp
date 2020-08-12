@@ -10,17 +10,15 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_fraction = fraction; //color
 
 	m_modelIDs = ID;
-	if (m_fraction == "RED")
-		m_indexes_of_displayd_models.push_back(0);
-	if (m_fraction == "BLUE")
-		m_indexes_of_displayd_models.push_back(1);
+	determineColor();
 
-	if (m_fraction == "NEUTRAL")
-		m_indexes_of_displayd_models.push_back(2);
-
-	//HP scale always last
+	//capture scale always pre last
+	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 2);
+	//upgrade scale always pre last
 	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 1);
-	m_indexOfHPscaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 1]].first;
+
+	m_indexOfCaputreScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 2]].first;
+	m_indexOfUpgradeScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 1]].first;
 
 	m_position = pos;
 	m_scale = scale;
@@ -30,14 +28,19 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 
 	m_reloading = 0.0f;
 	m_reloadingTime = 1.0f;
-	
-	m_healthPoints = 100.0f;
 
-	m_level = 1;
+	m_upgradePoints = 0.0f;
+	m_capturePoints = 0.0f;
+
+	m_level = 1.0f;
 
 	m_gameState = game;
+	
+	//m_levelOneRadius = 10.0f;
+	//m_levelTwoRadius = 12.0f;
+	//m_levelThreeRadius = 14.0f;
 
-	m_radius = 9.0f;
+	m_radius = 10.0f;
 }
 
 void Planet::action(float deltaTime)
@@ -77,104 +80,173 @@ glm::vec3 Planet::GetPosition() const
 	return m_position;
 }
 
+void Planet::determineColor()
+{
+	m_indexes_of_displayd_models.clear();
+
+	if (m_fraction == "RED")
+		m_indexes_of_displayd_models.push_back(0);
+	if (m_fraction == "BLUE")
+		m_indexes_of_displayd_models.push_back(1);
+	if (m_fraction == "NEUTRAL")
+		m_indexes_of_displayd_models.push_back(2);
+
+	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 1);
+	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 2);
+}
+
 void Planet::plusOne()
 {
 	if (m_level < s_max_level)
 	{
-		m_healthPoints += 1.0f;
-
-		if (m_healthPoints == 200.0f)
+		if (m_capturePoints == 0.0f)
 		{
-			m_healthPoints = 100.0f;
-			m_level += 1;
+			m_upgradePoints += 1.0f;
 
-			m_scale *= 1.25f;
-			m_radius *= 1.25f;
-		}
-	}
-
-	updateHPscaleVertices();
-}
-
-void Planet::minusOne(const std::string& unitFraction)
-{
-	m_healthPoints -= 1.0f;
-
-	if (m_healthPoints == 0.0f)
-	{
-		m_healthPoints = 100.0f;
-
-		if (m_fraction == "NEUTRAL")
-		{
-			m_fraction = unitFraction;
-			m_level = 1;
-
-			// Then fraction will be more than 2, 
-			// need find right index of model
-			m_indexes_of_displayd_models.clear();
-			m_indexes_of_displayd_models.push_back(0);
+			if (m_upgradePoints == 100.0f)
+			{
+				m_upgradePoints = 0.0f;
+				m_level += 1;
+			}
 		}
 		else
 		{
-			m_fraction = "NEUTRAL";
-			m_level = 1;
-
-			m_indexes_of_displayd_models.clear();
-			m_indexes_of_displayd_models.push_back(2);
+			m_capturePoints -= 1.0f;
 		}
-
-		m_scale = 1.0f;
-		m_radius = 9.0f;
 	}
 
-	updateHPscaleVertices();
+	std::cout << "-----------------------------" << std::endl;
+	std::cout << "planet " << m_fraction << std::endl;
+	std::cout << "upgradePoints " << m_upgradePoints << std::endl;
+	std::cout << "capturePoints " << m_capturePoints << std::endl;
+
+	updateScaleVertices();
 }
 
 
-void Planet::updateHPscaleVertices()
+void Planet::minusOne(const std::string& unitFraction)
 {
-	//for (auto&& index : m_indexes_of_displayd_models)
+	if (m_upgradePoints == 0.0f)
 	{
-		Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfHPscaleRM]);
+		m_capturePoints += 1.0f;
 
-		std::vector<glm::vec3> new_vertices;
-		std::vector<glm::vec3> new_texcoords;
-
-		new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
-		new_texcoords.push_back({ 0.0f, 0.0f, 0.0f });
-
-		float step = 360.0f / 100.0f;
-		float top = (m_healthPoints - 100.0f) * step;
-
-		for (float angle = 0.0f; angle <= top; angle += step)
+		if (m_capturePoints == 100.0f)
 		{
-			float x = cos(glm::radians(angle)) * (m_radius * 1.15); 
-			float z = sin(glm::radians(angle)) * (m_radius * 1.15);
-			new_vertices.push_back({ x, 0.0f, z });
+			if (m_fraction == "NEUTRAL")
+				m_fraction = unitFraction;
+			else if (m_fraction != "NEUTRAL")
+				m_fraction = "NEUTRAL";
+
+			determineColor();
+
+			m_level = 1;
+			m_radius = 10.0f;
+			m_capturePoints = 0.0f;
+		}
+	}
+	else
+	{
+		m_upgradePoints -= 1.0f;
+	}
+
+	std::cout << "-----------------------------" << std::endl;
+	std::cout << "planet " << m_fraction << std::endl;
+	std::cout << "upgradePoints " << m_upgradePoints << std::endl;
+	std::cout << "capturePoints " << m_capturePoints << std::endl;
+
+	updateScaleVertices();
+}
 
 
-			x = sin(glm::radians(angle)) * 0.5f;
-			z = cos(glm::radians(angle)) * 0.5f;
-			new_texcoords.push_back({ x, 0.0f, z });
+void Planet::updateScaleVertices()
+{
+	try
+	{
+		int32_t indexOfScale = -1;
+		float topBorder;
+
+		bool flag = false;
+		if (m_capturePoints > 0.0f)
+		{
+			indexOfScale = m_indexOfCaputreScaleRM;
+			topBorder = m_capturePoints;
+			flag = true;
+		}
+		else if (m_upgradePoints > 0.0f)
+		{
+			if (flag)
+				while (false);
+			indexOfScale = m_indexOfUpgradeScaleRM;
+			topBorder = m_upgradePoints;
 		}
 
-		tempModel.meshes[0].vertices.clear();
-		tempModel.meshes[0].indices.clear();
-
-		unsigned int ind = 2;
-		for (unsigned int i = 0; i < new_vertices.size(); i++, ind++)
+		if (indexOfScale != -1)
 		{
+			Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]);
+
+			std::vector<glm::vec3> new_vertices;
+			new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
+
+			float step = 360.0f / 100.0f;
+			float top = (topBorder) * step;
+
+			for (float angle = 0.0f; angle <= top; angle += step)
+			{
+				float x = -sin(glm::radians(angle) + pi) * (m_radius + 2.0f);
+				float z = cos(glm::radians(angle) + pi) * (m_radius + 2.0f);
+				new_vertices.push_back({ x, 0.0f, z });
+			}
+
+			tempModel.meshes[0].vertices.clear();
+			tempModel.meshes[0].indices.clear();
+
+			unsigned int ind = 2;
+			for (unsigned int i = 0; i < new_vertices.size(); i++, ind++)
+			{
+				Vertex vertex;
+				vertex.Position = new_vertices[i];
+				tempModel.meshes[0].vertices.push_back(vertex);
+
+				tempModel.meshes[0].indices.push_back(0);
+				tempModel.meshes[0].indices.push_back(ind - 1);
+				tempModel.meshes[0].indices.push_back(ind);
+			}
+
+			tempModel.meshes[0].updateMesh();
+			std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]) = tempModel;
+		}
+		else
+		{
+			Model captureScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]);
+			Model upgradeScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]);
+
+			std::vector<glm::vec3> new_vertices;
+			new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
+
+			captureScale.meshes[0].vertices.clear();
+			upgradeScale.meshes[0].vertices.clear();
+
+			captureScale.meshes[0].indices.clear();
+			upgradeScale.meshes[0].indices.clear();
+
 			Vertex vertex;
-			vertex.Position = new_vertices[i];
-			vertex.TexCoords = new_texcoords[i];
-			tempModel.meshes[0].vertices.push_back(vertex);
+			vertex.Position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-			tempModel.meshes[0].indices.push_back(0);
-			tempModel.meshes[0].indices.push_back(ind - 1);
-			tempModel.meshes[0].indices.push_back(ind);
+			captureScale.meshes[0].vertices.push_back(vertex);
+			upgradeScale.meshes[0].vertices.push_back(vertex); 
+			
+			captureScale.meshes[0].indices.push_back(0);
+			upgradeScale.meshes[0].indices.push_back(0);
+
+			captureScale.meshes[0].updateMesh();
+			upgradeScale.meshes[0].updateMesh();
+
+			std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]) = captureScale;
+			std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]) = upgradeScale;
 		}
-
-		tempModel.meshes[0].updateMesh();
-		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfHPscaleRM]) = tempModel;
+	}
+	catch (std::bad_exception a)
+	{
+		while (false);
 	}
 }

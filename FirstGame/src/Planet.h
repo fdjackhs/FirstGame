@@ -9,15 +9,18 @@ extern class Game;
 class Planet : public Object
 {
 public:
-	float m_healthPoints;
+	float m_capturePoints;
+	float m_upgradePoints;
+
 	float m_reloadingTime;
 	float m_level;
 
 	float m_reloading;
 	Game* m_gameState;
 
-	// index of hp scale in resource manager in rm->m_models
-	uint32_t m_indexOfHPscaleRM;
+	// index of capture and upgrade scales in resource manager in rm->m_models
+	uint32_t m_indexOfCaputreScaleRM;
+	uint32_t m_indexOfUpgradeScaleRM;
 
 	const static int s_max_level = 3;
 
@@ -28,6 +31,7 @@ public:
 	void action(float deltaTime);
 	void plusOne();
 	void minusOne(const std::string& unitFraction);
+	void determineColor();
 
-	void updateHPscaleVertices();
+	void updateScaleVertices();
 };

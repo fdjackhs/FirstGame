@@ -514,7 +514,7 @@ void Game::updateGameState(float deltaTime)
 {
 	{
 		//LOG_DURATION("updatePhysics");
-		updatePhysics();
+		//updatePhysics();
 	}
 
 	{
@@ -537,11 +537,11 @@ void Game::selectUnits()
 {
 	if (m_area != nullptr)
 	{
-		if (m_player_fraction == "RED")
+		//if (m_player_fraction == "RED")
 		{
 			for (auto&& obj : m_objects)
 			{
-				if (obj->m_type == Object::ObjectType::UNIT && obj->m_fraction == m_player_fraction)
+				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
 				{
 					Unit* unit = (Unit*)obj.get();
 					if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
@@ -724,6 +724,68 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 {
 	glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
 
+	std::string planetFraction = "";
+	glm::vec3 planetPos;
+	float planetLevel = 0;
+	float planetLevelMAX = 0;
+
+	for (auto&& obj : m_objects)
+	{
+		if (obj->m_type == Object::ObjectType::PLANET)
+		{
+			Planet* planet = (Planet*)obj.get(); 
+			
+			if (closerThan(planet->m_position, targetPos, obj->m_radius)) // click was on planet
+			{
+				planetFraction = planet->m_fraction;
+				planetLevel = planet->m_level;
+				planetLevelMAX = planet->s_max_level;
+				planetPos = planet->m_position;
+			}
+		}
+	}
+
+	for (auto&& obj : m_objects)
+	{
+		if (obj->m_type == Object::ObjectType::UNIT)
+		{
+			Unit* unit = (Unit*)obj.get();
+
+			if (unit->m_selected)
+			{
+				if (planetFraction == "")
+				{
+					unit->m_state = "move";
+					unit->setTargetPosition(targetPos);
+				}
+				else
+				{
+					if (planetFraction == unit->m_fraction)
+					{
+						if (planetLevel < planetLevelMAX)
+						{
+							unit->m_state = "update"; 
+							unit->setTargetPosition(planetPos);
+						}
+						else
+						{
+							unit->m_state = "move";
+							unit->setTargetPosition(targetPos);
+						}
+					}
+					else
+					{
+						unit->m_state = "attack";
+						unit->setTargetPosition(planetPos);
+					}
+				}
+			}
+		}
+	}
+
+	/*
+	glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
+
 	std::string state = "move";
 
 	for (auto&& obj : m_objects)
@@ -757,6 +819,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 			}
 		}
 	}
+	*/
 }
 
 void switchPause(Game& game)

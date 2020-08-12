@@ -85,8 +85,15 @@
 		"unique" : false
 	},
 	{
-		"type" : "HP_SCALE",
-		"path" : "../FirstGame/Resources/models/HP_scale/HPscale.obj",
+		"type" : "CAPTURE_SCALE",
+		"path" : "../FirstGame/Resources/models/Capture_scale/Capture_scale.obj",
+		"shaders_types" : ["BASIC"],
+		"depth_test" : "true",
+		"unique" : true
+	},
+	{
+		"type" : "UPGRADE_SCALE",
+		"path" : "../FirstGame/Resources/models/Upgrade_scale/Upgrade_scale.obj",
 		"shaders_types" : ["BASIC"],
 		"depth_test" : "true",
 		"unique" : true
