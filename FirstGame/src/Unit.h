@@ -3,17 +3,25 @@
 
 #include "Object.h"
 #include "Utilities.h"
+#include "RenderEngine.h"
 
 class Unit : public Object
 {
 public:
 	bool m_annihilated;
 	bool m_selected;
-	int m_physics_counter;
+	float m_physCounter;
+	float m_globCounter;
 	float m_speed;
+
+	float m_lastAngle;
+
+	glm::vec3 m_centerPosition;
+	glm::vec3 m_currVector;
 
 	glm::vec3 m_targetPos;
 	glm::vec3 m_gravityOffset;
+	glm::vec3 m_lastPos;
 
 	std::string m_state;
 

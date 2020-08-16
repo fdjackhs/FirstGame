@@ -115,11 +115,6 @@ void Planet::plusOne()
 		}
 	}
 
-	std::cout << "-----------------------------" << std::endl;
-	std::cout << "planet " << m_fraction << std::endl;
-	std::cout << "upgradePoints " << m_upgradePoints << std::endl;
-	std::cout << "capturePoints " << m_capturePoints << std::endl;
-
 	updateScaleVertices();
 }
 
@@ -149,104 +144,89 @@ void Planet::minusOne(const std::string& unitFraction)
 		m_upgradePoints -= 1.0f;
 	}
 
-	std::cout << "-----------------------------" << std::endl;
-	std::cout << "planet " << m_fraction << std::endl;
-	std::cout << "upgradePoints " << m_upgradePoints << std::endl;
-	std::cout << "capturePoints " << m_capturePoints << std::endl;
-
 	updateScaleVertices();
 }
 
 
 void Planet::updateScaleVertices()
 {
-	try
+	int32_t indexOfScale = -1;
+	float topBorder;
+
+	bool flag = false;
+	if (m_capturePoints > 0.0f)
 	{
-		int32_t indexOfScale = -1;
-		float topBorder;
-
-		bool flag = false;
-		if (m_capturePoints > 0.0f)
-		{
-			indexOfScale = m_indexOfCaputreScaleRM;
-			topBorder = m_capturePoints;
-			flag = true;
-		}
-		else if (m_upgradePoints > 0.0f)
-		{
-			if (flag)
-				while (false);
-			indexOfScale = m_indexOfUpgradeScaleRM;
-			topBorder = m_upgradePoints;
-		}
-
-		if (indexOfScale != -1)
-		{
-			Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]);
-
-			std::vector<glm::vec3> new_vertices;
-			new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
-
-			float step = 360.0f / 100.0f;
-			float top = (topBorder) * step;
-
-			for (float angle = 0.0f; angle <= top; angle += step)
-			{
-				float x = -sin(glm::radians(angle) + pi) * (m_radius + 2.0f);
-				float z = cos(glm::radians(angle) + pi) * (m_radius + 2.0f);
-				new_vertices.push_back({ x, 0.0f, z });
-			}
-
-			tempModel.meshes[0].vertices.clear();
-			tempModel.meshes[0].indices.clear();
-
-			unsigned int ind = 2;
-			for (unsigned int i = 0; i < new_vertices.size(); i++, ind++)
-			{
-				Vertex vertex;
-				vertex.Position = new_vertices[i];
-				tempModel.meshes[0].vertices.push_back(vertex);
-
-				tempModel.meshes[0].indices.push_back(0);
-				tempModel.meshes[0].indices.push_back(ind - 1);
-				tempModel.meshes[0].indices.push_back(ind);
-			}
-
-			tempModel.meshes[0].updateMesh();
-			std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]) = tempModel;
-		}
-		else
-		{
-			Model captureScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]);
-			Model upgradeScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]);
-
-			std::vector<glm::vec3> new_vertices;
-			new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
-
-			captureScale.meshes[0].vertices.clear();
-			upgradeScale.meshes[0].vertices.clear();
-
-			captureScale.meshes[0].indices.clear();
-			upgradeScale.meshes[0].indices.clear();
-
-			Vertex vertex;
-			vertex.Position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-			captureScale.meshes[0].vertices.push_back(vertex);
-			upgradeScale.meshes[0].vertices.push_back(vertex); 
-			
-			captureScale.meshes[0].indices.push_back(0);
-			upgradeScale.meshes[0].indices.push_back(0);
-
-			captureScale.meshes[0].updateMesh();
-			upgradeScale.meshes[0].updateMesh();
-
-			std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]) = captureScale;
-			std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]) = upgradeScale;
-		}
+		indexOfScale = m_indexOfCaputreScaleRM;
+		topBorder = m_capturePoints;
+		flag = true;
 	}
-	catch (std::bad_exception a)
+	else if (m_upgradePoints > 0.0f)
 	{
-		while (false);
+		if (flag)
+			while (false);
+		indexOfScale = m_indexOfUpgradeScaleRM;
+		topBorder = m_upgradePoints;
+	}
+
+	if (indexOfScale != -1)
+	{
+		Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]);
+
+		std::vector<glm::vec3> new_vertices;
+		new_vertices.push_back({ 0.0f, 0.0f, 0.0f }); //center
+
+		float step = 360.0f / 100.0f;
+		float top = (topBorder) * step;
+
+		for (float angle = 0.0f; angle <= top; angle += step)
+		{
+			float x = -sin(glm::radians(angle) + pi) * (m_radius + 2.0f);
+			float z = cos(glm::radians(angle) + pi) * (m_radius + 2.0f);
+			new_vertices.push_back({ x, 0.0f, z });
+		}
+
+		tempModel.meshes[0].vertices.clear();
+		tempModel.meshes[0].indices.clear();
+
+		unsigned int ind = 2;
+		for (unsigned int i = 0; i < new_vertices.size(); i++, ind++)
+		{
+			Vertex vertex;
+			vertex.Position = new_vertices[i];
+			tempModel.meshes[0].vertices.push_back(vertex);
+
+			tempModel.meshes[0].indices.push_back(0);
+			tempModel.meshes[0].indices.push_back(ind - 1);
+			tempModel.meshes[0].indices.push_back(ind);
+		}
+
+		tempModel.meshes[0].updateMesh();
+		std::get<1>(RenderEngine::resourceManager.m_models[indexOfScale]) = tempModel;
+	}
+	else
+	{
+		Model captureScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]);
+		Model upgradeScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]);
+
+		captureScale.meshes[0].vertices.clear();
+		upgradeScale.meshes[0].vertices.clear();
+
+		captureScale.meshes[0].indices.clear();
+		upgradeScale.meshes[0].indices.clear();
+
+		Vertex vertex;
+		vertex.Position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+		captureScale.meshes[0].vertices.push_back(vertex);
+		upgradeScale.meshes[0].vertices.push_back(vertex); 
+			
+		captureScale.meshes[0].indices.push_back(0);
+		upgradeScale.meshes[0].indices.push_back(0);
+
+		captureScale.meshes[0].updateMesh();
+		upgradeScale.meshes[0].updateMesh();
+
+		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]) = captureScale;
+		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]) = upgradeScale;
 	}
 }

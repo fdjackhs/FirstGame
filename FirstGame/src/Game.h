@@ -51,6 +51,9 @@ private:
 
 	std::vector<std::shared_ptr<Object>> m_objects;
 
+	std::vector<std::shared_ptr<Object>> m_red_units;
+	std::vector<std::shared_ptr<Object>> m_blue_units;
+
 	std::vector<std::shared_ptr<Label>> m_labels;
 
 	std::shared_ptr<select_area> m_area;

@@ -79,7 +79,7 @@ namespace RenderEngine
 	void loadLevel(uint32_t number, std::vector<ObjectAttributes>& objectsAttrib, uint32_t& progress);
 
 	void drawObjects(const std::vector<std::shared_ptr<Label>>& labels);
-	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects);
+	void genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Object>>& redUnits, std::vector<std::shared_ptr<Object>>& blueUnits);
 	void drawGroupOfObjects(RenderEngine::modelGroupAttribs& group);
 	void drawSingleObject(RenderEngine::modelGroupAttribs& group);
 };

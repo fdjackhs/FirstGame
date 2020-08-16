@@ -8,48 +8,11 @@
 
 #include <GLFW/glfw3native.h>
 
-/*
-struct func
-{
-	uint32_t& progress;
-	uint32_t& level;
-	Game& game;
-	GLFWwindow* context;
-	void(*function)(GLFWwindow* context, Game& game, uint32_t& level, uint32_t& progress);
-
-	func(GLFWwindow* c, Game& g, uint32_t& l, uint32_t& p, void(*funct)(GLFWwindow*, Game&, uint32_t&, uint32_t&)) : context(c), game(g), level(l), progress(p), function(funct)
-	{}
-
-	void operator() ()
-	{
-		function(context, game, level, progress);
-	}
-};*/
-
-
 static bool flag = false;
 static uint32_t level = 1;
 
 void Game::loadResources()
 {
-	/*
-	auto func = [this]() 
-	{
-		uint32_t progress = 0;
-		GLFWwindow* context = RenderEngine::loadScreenWin;
-		//GLFWwindow* context = RenderEngine::window;
-
-		glfwMakeContextCurrent(context);
-		if (!glfwInit()) std::cout << "wrong!" << std::endl;
-
-		createGame(level, progress);
-
-		flag = true;
-	};
-	std::thread t(func);
-	t.detach();
-	*/
-
 	Model loadScreen("../FirstGame/resources/models/Loading/LoadScreen.obj");
 	Shader interfaceShader("../FirstGame/Resources/shaders/1.button_shader.vs", "../FirstGame/Resources/shaders/1.button_shader.fs");
 
@@ -62,14 +25,8 @@ void Game::loadResources()
 
 Game::Game(uint32_t level)
 {
-	
 	level = 1;
 	loadResources();
-
-	/*
-	uint32_t progress = 0;
-	createGame(level, progress);*/
-
 }
 Game::~Game() {}
 
@@ -78,12 +35,6 @@ void startButton(Game& game)
 	game.m_objects.clear();
 	RenderEngine::resourceManager.clear();
 	RenderEngine::modelsGroups.clear();
-
-	/*
-	uint32_t progress = 0;
-	level = 0;
-	game.createGame(level, progress);
-	*/
 
 	level = 0;
 	game.loadResources();
@@ -101,15 +52,11 @@ void Game::createGame(uint32_t& level, uint32_t& progress)
 	for (auto&& x : objectsAttribs)
 		createObject(x);
 
-
-
 	m_pause = false;
-	//m_timeKoef = 1.0f;
 
 	lastTime = RenderEngine::getCurrTime();
 	RenderEngine::deltaTime = 0.0f;
 }
-
 
 static int counter = 0;
 
@@ -156,22 +103,22 @@ void Game::loop()
 		}
 
 		{
-			//LOG_DURATION("updateGameState");
+			LOG_DURATION("updateGameState");
 			updateGameState(RenderEngine::deltaTime);
 		}
 
 		{
-			//LOG_DURATION("genModelMatrices");
-			RenderEngine::genModelMatrices(Game::m_objects);
+			LOG_DURATION("genModelMatrices");
+			RenderEngine::genModelMatrices(Game::m_objects, Game::m_red_units, Game::m_blue_units);
 		}
 
 		{
-			//LOG_DURATION("drawObjects");
+			LOG_DURATION("drawObjects");
 			RenderEngine::drawObjects(m_labels);
 		}
 
 		{
-			//LOG_DURATION("updateScreen");
+			LOG_DURATION("updateScreen");
 			RenderEngine::updateScreen();
 		}
 
@@ -181,11 +128,11 @@ void Game::loop()
 		}
 
 
-		//std::cerr << "objects " << m_objects.size() << std::endl;
-		/*
+		std::cerr << "objects " << m_objects.size() + m_red_units.size() + m_blue_units.size() << std::endl;
+		
 		{
-			LOG_DURATION("Profile");
-			if (RenderEngine::deltaTime > 1.0f / 59.0f)
+			//LOG_DURATION("Profile");
+			if (RenderEngine::deltaTime > (1.0f / 59.0f) * RenderEngine::m_timeKoef)
 			{
 				counter++;
 			}
@@ -194,10 +141,10 @@ void Game::loop()
 				counter = 0;
 			}
 
-			if (counter > 100)
+			if (counter > 50)
 			{
 				std::cerr << std::endl;
-				std::cerr << "total objects " << m_objects.size() << std::endl;
+				std::cerr << "total objects " << m_objects.size() + m_red_units.size() + m_blue_units.size() << std::endl;
 				for (auto&& group : RenderEngine::modelsGroups)
 				{
 					std::cerr << "buffer " << group.buffer << " model_index " << group.model_index << " matrices.size " << group.matrices.size() << std::endl;
@@ -208,7 +155,6 @@ void Game::loop()
 				system("pause");
 			}
 		}
-		*/
 	}
 }
 
@@ -218,32 +164,34 @@ void Game::createObject(const ObjectAttributes& attributes)
 	{
 		if (attributes.object_type == "RED_UNIT")
 		{
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 50; i++)
 			{
 				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
 					glm::vec3{ stof(attributes.posx) - 50.0f,
 							   stof(attributes.posy),
-							   stof(attributes.posz) /*+ float(i)*/ },
+							   stof(attributes.posz) + float(i) },
 					stof(attributes.scale),
 					"", "RED");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				m_objects.push_back(sp_unit);
+				//m_objects.push_back(sp_unit);
+				m_red_units.push_back(sp_unit);
 			}
 		}
 		else if (attributes.object_type == "BLUE_UNIT")
 		{
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
 					glm::vec3{ stof(attributes.posx) + 50.0f,
 							   stof(attributes.posy),
-							   stof(attributes.posz) /*+ float(i)*/ },
+							   stof(attributes.posz) + float(i) },
 					stof(attributes.scale),
 					"", "BLUE");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				m_objects.push_back(sp_unit);
+				//m_objects.push_back(sp_unit);
+				m_blue_units.push_back(sp_unit);
 			}
 		}
 		else if (attributes.object_type == "RED_PLANET")
@@ -343,171 +291,284 @@ void Game::createObject(const ObjectAttributes& attributes)
 	}
 }
 
-static int collDtct_counter = 0;
-static int collDtctParts = 10;
+struct collisionThread
+{
+	std::vector<std::shared_ptr<Object>>& red;
+	std::vector<std::shared_ptr<Object>>& blue;
+
+	uint32_t start;
+	uint32_t end;
+
+	std::mutex& mut;
+
+	void(*func)(std::vector<std::shared_ptr<Object>>& red_units, std::vector<std::shared_ptr<Object>>& blue_units, uint32_t start, uint32_t end, std::mutex& mutex);
+
+
+	collisionThread(std::vector<std::shared_ptr<Object>>& m_red_units, 
+					std::vector<std::shared_ptr<Object>>& m_blue_units, 
+					uint32_t _start, 
+					uint32_t _end,
+					void(*_func)(std::vector<std::shared_ptr<Object>>&, std::vector<std::shared_ptr<Object>>&, uint32_t, uint32_t, std::mutex&),
+					std::mutex& _mutex) 
+					: red(m_red_units), blue(m_blue_units), start(_start), end(_end), func(_func), mut(_mutex)
+	{}
+
+	void operator()()
+	{
+		func(red, blue, start, end, mut);
+	}
+};
 
 void Game::collisionsDetected()
 {
-	bool flag = false;
-
-	collDtct_counter = (collDtct_counter + 1) % collDtctParts;
-	uint32_t partSize = m_objects.size() / collDtctParts;
-	uint32_t start = partSize * collDtct_counter;
-	uint32_t end = start + partSize;
-
-	//for (uint32_t i = start; i < end; i++)
-	for (uint32_t i = 0; i < m_objects.size(); i++)
+	
+	// why here is no bag??
+	auto checkCollisionUnitToUnit = [](std::vector<std::shared_ptr<Object>>& m_red_units,
+									   std::vector<std::shared_ptr<Object>>& m_blue_units,
+									   uint32_t start, uint32_t end, 
+									   std::mutex& blocker)
 	{
-		if (m_objects[i]->m_type == Object::ObjectType::UNIT)
+		for (uint32_t i = start; i < end; i++)
 		{
-			Unit* unit_i = (Unit*)m_objects[i].get();
+			Unit* unit_i = (Unit*)m_red_units[i].get();
 
-			if (!unit_i->m_annihilated)
+			for (uint32_t j = 0; j < m_blue_units.size(); j++)
 			{
-				for (uint32_t j = 0; j < m_objects.size(); j++)
+				Unit* unit_j = (Unit*)m_blue_units[j].get();
+
+				if (!unit_i->m_annihilated && 
+					!unit_j->m_annihilated &&
+					closerThan(unit_i->m_position, unit_j->m_position, unit_i->m_radius + unit_j->m_radius))
 				{
-					if (i != j)
-					{
-						if (m_objects[j]->m_type == Object::ObjectType::UNIT)
-						{
-							Unit* unit_j = (Unit*)m_objects[j].get();
+					std::lock_guard<std::mutex> block(blocker);
 
-							if (!unit_j->m_annihilated && 
-								 unit_i->m_fraction != unit_j->m_fraction)
-							{
-								if (closerThan(unit_i->m_position, unit_j->m_position, unit_i->m_radius + unit_j->m_radius))
-								{
-									flag = true;
+					unit_i->m_annihilated = true;
+					unit_j->m_annihilated = true;
 
-									unit_i->m_annihilated = true;
-									unit_j->m_annihilated = true;
-								}
-							}
-						}
-						else if (m_objects[j]->m_type == Object::ObjectType::PLANET)
-						{
-							Planet* planet = (Planet*)m_objects[j].get();
-
-							if (unit_i->m_targetPos == planet->m_position &&
-								closerThan(unit_i->m_position, planet->m_position, unit_i->m_radius + planet->m_radius))
-							{
-								if (unit_i->m_state == "update" && unit_i->m_fraction == planet->m_fraction)
-								{
-									flag = true;
-									unit_i->m_annihilated = true;
-
-									planet->plusOne();
-								}
-
-								if (unit_i->m_state == "attack" && unit_i->m_fraction != planet->m_fraction)
-								{
-									flag = true;
-									unit_i->m_annihilated = true;
-
-									planet->minusOne(unit_i->m_fraction);
-								}
-							}
-						}
-					}
+					/*
+					m_red_units.erase(m_red_units.begin() + i);
+					m_blue_units.erase(m_blue_units.begin() + j);
+					i--;
+					j--;
+					*/
 				}
 			}
 		}
-	}
+	};
 
-	if (flag)
+	std::mutex mutex;
+
+	uint32_t part = m_red_units.size() / 4;
+
+	collisionThread colT1(m_red_units, m_blue_units, 0,			part,		  checkCollisionUnitToUnit, mutex);
+	collisionThread colT2(m_red_units, m_blue_units, part, part * 2,		  checkCollisionUnitToUnit, mutex);
+	collisionThread colT3(m_red_units, m_blue_units, part * 2, part * 3,		  checkCollisionUnitToUnit, mutex);
+	collisionThread colT4(m_red_units, m_blue_units, part * 3, part * 4,		  checkCollisionUnitToUnit, mutex);
+
+	std::thread t1(colT1);
+	std::thread t2(colT2);
+	std::thread t3(colT3);
+	std::thread t4(colT4);
+
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+
+	auto checkCollisionUnitsPlanet = [](std::vector<std::shared_ptr<Object>>& objects, Planet* planet)
 	{
-		for (uint32_t iter = 0; iter < m_objects.size(); iter++)
+		for (int j = 0; j < objects.size(); j++)
 		{
-			if (m_objects[iter]->m_type == Object::ObjectType::UNIT)
-			{
-				Unit* unit = (Unit*)m_objects[iter].get();
+			Unit* unit = (Unit*)objects[j].get();
 
-				if (unit->m_annihilated)
+			if (unit->m_targetPos == planet->m_position &&
+				closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius))
+			{
+				if (unit->m_state == "update" && unit->m_fraction == planet->m_fraction)
 				{
-					m_objects.erase(m_objects.begin() + iter);
-					iter--;
+					planet->plusOne();
+					objects.erase(objects.begin() + j);
+					j--;
+				}
+
+				if (unit->m_state == "attack" && unit->m_fraction != planet->m_fraction)
+				{
+					planet->minusOne(unit->m_fraction);
+					objects.erase(objects.begin() + j);
+					j--;
 				}
 			}
+		}
+	};
+
+	for (uint32_t i = 0; i < m_objects.size(); i++)
+	{
+		if (m_objects[i]->m_type == Object::ObjectType::PLANET)
+		{
+			Planet* planet = (Planet*)m_objects[i].get();
+
+			checkCollisionUnitsPlanet(m_red_units, planet);
+			checkCollisionUnitsPlanet(m_blue_units, planet);
+		}
+	}
+
+	for (uint32_t i = 0; i < m_red_units.size(); i++)
+	{
+		Unit* unit_i = (Unit*)m_red_units[i].get();
+
+		if (unit_i->m_annihilated)
+		{
+			m_red_units.erase(m_red_units.begin() + i);
+		}
+	}
+	for (uint32_t i = 0; i < m_blue_units.size(); i++)
+	{
+		Unit* unit_i = (Unit*)m_blue_units[i].get();
+
+		if (unit_i->m_annihilated)
+		{
+			m_blue_units.erase(m_blue_units.begin() + i);
 		}
 	}
 }
 
 static int phys_counter = 0;
-static int parts = 10;
+static int parts = 1;
 static uint32_t lastEnd;
+static bool lastEpochRed = true;
+static bool lastEpochBlue = true;
 
 void Game::updatePhysics()
 {
-	try
+
+	auto getForce = [](Unit* lhs, Unit* rhs)
 	{
-		phys_counter = (phys_counter + 1) % parts;
-		uint32_t partSize = m_objects.size() / parts;
-
-		if (phys_counter == 0)
-			lastEnd = 0;
-
-		uint32_t start = lastEnd;
-		uint32_t end = start + partSize;
-		lastEnd = end;
-	
-		//for (uint32_t i = 0; i < m_objects.size(); i++)
-		for (uint32_t i = start; i < end; i++)
+		if (lhs->m_position == rhs->m_position)
 		{
-			if (m_objects[i]->m_type == Object::ObjectType::UNIT)
-			{
-				Unit* unit_i = (Unit*)m_objects[i].get();
+			lhs->m_position = lhs->m_lastPos;
+			rhs->m_position = rhs->m_lastPos;
+		}
 
-				glm::vec3 totoalGravityVector = { 0.0f, 0.0f, 0.0f };
+		float dist = glm::distance(lhs->m_position, rhs->m_position);
+		float G = 0.8f;
+		return G * 1.0f / sqrt(dist); // dist * dist - not work ?????;
+	};
 
-				for (uint32_t j = 0; j < m_objects.size(); j++)
-				{
-					if (j != i &&
-						m_objects[j]->m_type == Object::ObjectType::UNIT)
-					{
-						Unit* unit_j = (Unit*)m_objects[j].get();
+	auto setOffset = [](Unit* lhs, Unit* rhs, float force)
+	{
+		glm::vec3 temp = glm::normalize(lhs->m_position - rhs->m_position) * force;
 
-						float dist = glm::distance(unit_i->m_position, unit_j->m_position);
+		temp.y = 0.0f;
 
-						if (dist == 0.0f)
-						{
-							while (false);
-						}
-						else
-						{
-							float force = (1.0f / sqrt(dist)) * 0.207f;
+		lhs->m_gravityOffset += temp;
+		rhs->m_gravityOffset -= temp;
+	};
 
-							if (unit_i->m_fraction != unit_j->m_fraction)
-							{
-								//std::cout << "force " << force << std::endl;
-								if (force < 0.08)
-									force = 0.0f;
-								else
-									force = -(force * 10.0f);
-							}
-							else
-							{
-								if (force < 0.15)
-									force = 0.0f;
-							}
+	auto updatePhysicUnitsSameFraction = [&getForce, &setOffset](Unit* lhs, Unit* rhs)
+	{
+		float force = getForce(lhs, rhs);
+		if (force < 0.55f)
+			force = 0.0f;
+		setOffset(lhs, rhs, force);
+	};
 
-							glm::vec3 temp = glm::normalize(unit_i->m_position - unit_j->m_position) * force;
+	auto updatePhysicUnitsDifferentFraction = [&getForce, &setOffset](Unit* lhs, Unit* rhs)
+	{
+		float force = getForce(lhs, rhs);
+		if (force > 0.27f)
+			force = -(force * 4.0f);
+		else
+			force = 0.0f;
+		setOffset(lhs, rhs, force);
+	};
 
-							totoalGravityVector += temp;
-						}
-					}
-				}
 
-				unit_i->m_gravityOffset = totoalGravityVector;
+	//uint32_t limit = m_red_units.size() / parts;
+	//uint32_t counter = 0;
+	uint32_t i = 0;
 
-				if (unit_i->m_gravityOffset.y != 0.0f)
-					unit_i->m_gravityOffset.y = 0.0f;
-			}
+	phys_counter = (phys_counter + 1) % parts;
+	uint32_t partSize = m_red_units.size() / parts;
+	uint32_t start = partSize * phys_counter;
+	uint32_t end = start + partSize;
+
+	//for (i = 0; i < m_red_units.size() && counter <= limit; i++)
+	for (i = start; i < end; i++)
+	{
+		Unit* unit_i = (Unit*)m_red_units[i].get();
+
+		//if (unit_i->m_physUpdated != lastEpochRed)
+		{
+		//	counter++;
+
+			for (uint32_t j = i + 1; j < m_red_units.size(); j++)
+				updatePhysicUnitsSameFraction((Unit*)m_red_units[i].get(), (Unit*)m_red_units[j].get());
+
+		//	unit_i->m_physUpdated = lastEpochRed;
 		}
 	}
-	catch (...)
+	//if (i == m_red_units.size())
+	//	lastEpochRed = !lastEpochRed;
+
+	//limit = m_blue_units.size() / parts;
+	//counter = 0;
+	i = 0;
+
+	phys_counter = (phys_counter + 1) % parts;
+	partSize = m_blue_units.size() / parts;
+	start = partSize * phys_counter;
+	end = start + partSize;
+
+	//for (i = 0; i < m_blue_units.size() && counter <= limit; i++)
+	for (i = start; i < end; i++)
 	{
-		while (false);
+		Unit* unit_i = (Unit*)m_blue_units[i].get();
+		for (uint32_t j = i + 1; j < m_blue_units.size(); j++)
+			updatePhysicUnitsSameFraction((Unit*)m_blue_units[i].get(), (Unit*)m_blue_units[j].get());
 	}
+
+
+	/*
+	limit = m_red_units.size() / parts;
+	counter = 0;
+
+	for (uint32_t i = 0; i < m_red_units.size() && counter < limit; i++)
+	{
+		Unit* unit_i = (Unit*)m_red_units[i].get();
+
+		if (!unit_i->m_physUpdated2)
+		{
+			counter++;
+
+			for (uint32_t j = 0; j < m_blue_units.size(); j++)
+				updatePhysicUnitsDifferentFraction((Unit*)m_red_units[i].get(), (Unit*)m_blue_units[j].get());
+
+			unit_i->m_physUpdated2 = true;
+		}
+	}
+	*/
+
+	/*
+	phys_counter++;
+	if (phys_counter >= parts)
+	{
+		phys_counter = 0;
+
+		for (uint32_t i = 0; i < m_red_units.size(); i++)
+		{
+			Unit* unit_i = (Unit*)m_red_units[i].get();
+			unit_i->m_physUpdated = false;
+			unit_i->m_physUpdated2 = false;
+		}
+		for (uint32_t i = 0; i < m_blue_units.size(); i++)
+		{
+			Unit* unit_i = (Unit*)m_blue_units[i].get();
+			unit_i->m_physUpdated = false;
+			unit_i->m_physUpdated2 = false;
+		}
+
+	}
+	*/
 }
 
 void Game::updateGameState(float deltaTime)
@@ -518,15 +579,24 @@ void Game::updateGameState(float deltaTime)
 	}
 
 	{
-		//LOG_DURATION("collisionsDetected");
+		LOG_DURATION("collisionsDetected");
 		collisionsDetected();
 	}
 
 	{
-		//LOG_DURATION("action");
+		LOG_DURATION("action");
 		for (uint32_t i = 0; i < m_objects.size(); i++)
 		{
 			m_objects[i]->action(deltaTime);
+		}
+		for (uint32_t i = 0; i < m_red_units.size(); i++)
+		{
+			m_red_units[i]->action(deltaTime);
+		}
+
+		for (uint32_t i = 0; i < m_blue_units.size(); i++)
+		{
+			m_blue_units[i]->action(deltaTime);
 		}
 	}
 
@@ -539,7 +609,32 @@ void Game::selectUnits()
 	{
 		//if (m_player_fraction == "RED")
 		{
+			/*
 			for (auto&& obj : m_objects)
+			{
+				if (obj->m_type == Object::ObjectType::UNIT)
+				{
+					Unit* unit = (Unit*)obj.get();
+					if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
+						unit->select();
+					else
+						unit->deselect();
+				}
+			}
+			*/
+
+			for (auto&& obj : m_red_units)
+			{
+				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
+				{
+					Unit* unit = (Unit*)obj.get();
+					if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
+						unit->select();
+					else
+						unit->deselect();
+				}
+			}
+			for (auto&& obj : m_blue_units)
 			{
 				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
 				{
@@ -557,7 +652,12 @@ void Game::selectUnits()
 void Game::createUnit(const std::string& unitType, const glm::vec3& position, const glm::vec3& targetPosition, const std::string& fraction)
 {
 	Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_map_complete_models[unitType], position, targetPosition, fraction);
-	m_objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
+
+	//m_objects.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
+	if(unitType == "RED_UNIT")
+		m_red_units.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
+	if(unitType == "BLUE_UNIT")
+		m_blue_units.push_back(std::move(std::shared_ptr<Unit>(ptr_unit)));
 }
 
 void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll)
@@ -745,6 +845,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 		}
 	}
 
+	/*
 	for (auto&& obj : m_objects)
 	{
 		if (obj->m_type == Object::ObjectType::UNIT)
@@ -782,44 +883,82 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 			}
 		}
 	}
-
-	/*
-	glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
-
-	std::string state = "move";
-
-	for (auto&& obj : m_objects)
-	{
-		if (obj->m_type == Object::ObjectType::PLANET)
-		{
-			Planet* planet = (Planet*)obj.get();
-
-			if (closerThan(planet->m_position, targetPos, obj->m_radius)) // click was on planet
-			{
-				if (planet->m_fraction != m_player_fraction)
-					state = "attack";
-				else 
-				if (planet->m_level < planet->s_max_level)
-					state = "update";
-
-				targetPos = obj->m_position;
-			}
-		}
-	}
-
-	for (auto&& obj : m_objects)
+	*/
+	for (auto&& obj : m_red_units)
 	{
 		if (obj->m_type == Object::ObjectType::UNIT)
 		{
 			Unit* unit = (Unit*)obj.get();
+
 			if (unit->m_selected)
 			{
-				unit->setTargetPosition(targetPos);
-				unit->m_state = state;
+				if (planetFraction == "")
+				{
+					unit->m_state = "move";
+					unit->setTargetPosition(targetPos);
+				}
+				else
+				{
+					if (planetFraction == unit->m_fraction)
+					{
+						if (planetLevel < planetLevelMAX)
+						{
+							unit->m_state = "update";
+							unit->setTargetPosition(planetPos);
+						}
+						else
+						{
+							unit->m_state = "move";
+							unit->setTargetPosition(targetPos);
+						}
+					}
+					else
+					{
+						unit->m_state = "attack";
+						unit->setTargetPosition(planetPos);
+					}
+				}
 			}
 		}
 	}
-	*/
+	for (auto&& obj : m_blue_units)
+	{
+		if (obj->m_type == Object::ObjectType::UNIT)
+		{
+			Unit* unit = (Unit*)obj.get();
+
+			if (unit->m_selected)
+			{
+				if (planetFraction == "")
+				{
+					unit->m_state = "move";
+					unit->setTargetPosition(targetPos);
+				}
+				else
+				{
+					if (planetFraction == unit->m_fraction)
+					{
+						if (planetLevel < planetLevelMAX)
+						{
+							unit->m_state = "update";
+							unit->setTargetPosition(planetPos);
+						}
+						else
+						{
+							unit->m_state = "move";
+							unit->setTargetPosition(targetPos);
+						}
+					}
+					else
+					{
+						unit->m_state = "attack";
+						unit->setTargetPosition(planetPos);
+					}
+				}
+			}
+		}
+	}
+	while (false);
 }
 
 void switchPause(Game& game)
@@ -845,25 +984,26 @@ void speedGameDown(Game& game)
 
 //TODO
 /*
-	- сделать шкалу хп для планеты
+	- при расчёте физики можно пользоваться многопоточкой
+	- проверку на конец матча и вывод графика
 	- сделать редактор карт
 	- сделать api для удобста использования ai
-
-	- какой то баг с выходом за пределы вектора во время столкновения юнитов
-
-	- новая оптимизация физики - брать только первую половину всех юнитов и при проходе по каждому записывать смещение в ОБА юнита а не только в текущий
-
-	- сделать псевдо-физику
-
-	- при расчёте физики можно пользоваться многопоточкой
-
-	- проверку на конец матча и вывод графика
-
 	- добавить границы карты
 	- добавить бокс (фон)
 	- разобраться с анимациями (пульсирование планет, увеличение и т.д.)
 
 	Решено:
+		- сделать псевдо-физику (бывало что вылетало исключение, но сейчас вроде нет)
+
+		- новая оптимизация физики - брать только первую половину всех юнитов и при проходе по каждому записывать смещение в ОБА юнита а не только в текущий
+	
+		- какой то баг с выходом за пределы вектора во время столкновения юнитов
+
+		- баг в коллизион детекшн (если кинуть толпа на толпу одинаковое количество с обоих сторон, то у одной стороны всё равно остаются юниты)
+
+		- сделать шкалу хп для планеты (механика шкал немного не как в оригинале, но пока что сойдёт) 
+		(в оригинале если две фракции одновременно атакуют планету, то они соревнуются друг с другом, 
+		а тут они топят планету вместе и чй юнит нанесёт последний удар, тому и достаётся планета)
 
 		- сделать шрифты (пока только цифры но пока что больше и не надо)
 

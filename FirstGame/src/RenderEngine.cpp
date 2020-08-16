@@ -138,12 +138,36 @@ void RenderEngine::updateScreen()
 }
 
 
-void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects)
+void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& objects, std::vector<std::shared_ptr<Object>>& redUnits, std::vector<std::shared_ptr<Object>>& blueUnits)
 {
 	for (auto&& group : modelsGroups)
 		group.matrices.clear();
 
 	for (auto&& obj : objects)
+	{
+		for (auto&& index : obj->m_indexes_of_displayd_models)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, obj->m_position);
+			model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+
+			modelsGroups[obj->m_modelIDs[index]].matrices.push_back(model);
+		}
+	}
+
+	for (auto&& obj : redUnits)
+	{
+		for (auto&& index : obj->m_indexes_of_displayd_models)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, obj->m_position);
+			model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+
+			modelsGroups[obj->m_modelIDs[index]].matrices.push_back(model);
+		}
+	}
+
+	for (auto&& obj : blueUnits)
 	{
 		for (auto&& index : obj->m_indexes_of_displayd_models)
 		{
@@ -182,6 +206,9 @@ void RenderEngine::drawObjects(const std::vector<std::shared_ptr<Label>>& labels
 		model = glm::translate(model, RenderEngine::resourceManager.m_manuallyCreaatedObjects[modelIndex].m_position);
 
 		resourceManager.m_shaders[shaderIndex].second.use();
+
+		resourceManager.m_shaders[shaderIndex].second.setVec3("color", glm::vec3(1.0f, 1.0f, 1.0f));
+
 		resourceManager.m_shaders[shaderIndex].second.setMat4("view", view);
 		resourceManager.m_shaders[shaderIndex].second.setMat4("projection", projection);
 		resourceManager.m_shaders[shaderIndex].second.setMat4("model", model);

@@ -8,7 +8,7 @@
 int main()
 {
 	RenderEngine::init(1600, 800, "FirstGame");
-
+	
 	Game game(1);
 	game.loop();
 
