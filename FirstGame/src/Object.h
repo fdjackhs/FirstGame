@@ -16,6 +16,8 @@ public:
 	
 	float m_radius;
 	float m_scale;
+	float m_visible;
+
 	ObjectType m_type;
 
 	glm::vec3 m_position;

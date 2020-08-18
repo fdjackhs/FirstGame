@@ -17,13 +17,12 @@
 #include "Unit.h"
 #include "Label.h"
 
-extern class select_area;
+//extern class select_area;
 
 namespace RenderEngine
 {
 	extern glm::vec2 SCREEN;
 	extern GLFWwindow* window; 
-	extern GLFWwindow* loadScreenWin;
 
 	//keyboard
 	extern bool keys[349];

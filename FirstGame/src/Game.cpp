@@ -8,36 +8,45 @@
 
 #include <GLFW/glfw3native.h>
 
-static bool flag = false;
-static uint32_t level = 1;
 
-void Game::loadResources()
+Game::Game(uint32_t level)
+{
+	loadResources(level);
+}
+
+Game::~Game() 
+{
+	freeResources();
+}
+
+void Game::loadResources(uint32_t level)
 {
 	Model loadScreen("../FirstGame/resources/models/Loading/LoadScreen.obj");
 	Shader interfaceShader("../FirstGame/Resources/shaders/1.button_shader.vs", "../FirstGame/Resources/shaders/1.button_shader.fs");
 
+	RenderEngine::clearScreen();
 	loadScreen.Draw(interfaceShader);
 	RenderEngine::updateScreen();
 
 	uint32_t progress = 0;
 	createGame(level, progress);
-}
 
-Game::Game(uint32_t level)
-{
-	level = 1;
-	loadResources();
-}
-Game::~Game() {}
 
-void startButton(Game& game)
-{
-	game.m_objects.clear();
-	RenderEngine::resourceManager.clear();
-	RenderEngine::modelsGroups.clear();
+	glDeleteShader(interfaceShader.ID);
 
-	level = 0;
-	game.loadResources();
+	for (auto&& texture : loadScreen.textures_loaded)
+		glDeleteTextures(1, &texture.id);
+
+	for (auto&& mesh : loadScreen.meshes)
+	{
+		for (auto&& texture : mesh.textures)
+		{
+			glDeleteTextures(1, &texture.id);
+		}
+		glDeleteBuffers(1, &mesh.VBO);
+		glDeleteBuffers(1, &mesh.EBO);
+		glDeleteVertexArrays(1, &mesh.VAO);
+	}
 }
 
 void Game::createGame(uint32_t& level, uint32_t& progress)
@@ -45,6 +54,11 @@ void Game::createGame(uint32_t& level, uint32_t& progress)
 	m_player_fraction = "RED";
 	m_ai_fraction = "BLUE";
 	m_area = nullptr;
+	m_pause = false;
+	m_run = false;
+
+	Statistic* stat = new Statistic();
+	m_statistic = std::shared_ptr<Statistic>(stat);
 
 	std::vector<ObjectAttributes> objectsAttribs;
 	RenderEngine::loadLevel(level, objectsAttribs, progress);
@@ -52,17 +66,31 @@ void Game::createGame(uint32_t& level, uint32_t& progress)
 	for (auto&& x : objectsAttribs)
 		createObject(x);
 
-	m_pause = false;
-
-	lastTime = RenderEngine::getCurrTime();
+	m_lastTime = RenderEngine::getCurrTime();
 	RenderEngine::deltaTime = 0.0f;
+	m_statistic->resetLastTime();
+}
+
+void Game::freeResources()
+{
+	m_objects.clear();
+	m_red_units.clear();
+	m_blue_units.clear();
+	m_labels.clear();
+	m_statistic->clear();
+
+	m_statistic.reset();
+	m_area.reset();
+
+	RenderEngine::resourceManager.clear();
+	RenderEngine::modelsGroups.clear();
 }
 
 static int counter = 0;
 
 void Game::loop()
 {
-	lastTime = RenderEngine::getCurrTime();
+	m_lastTime = RenderEngine::getCurrTime();
 
 	while (!RenderEngine::windowShouldClose())
 	{
@@ -70,20 +98,23 @@ void Game::loop()
 
 		{
 			//LOG_DURATION("calculate deltaTime");
-
+			/*
 			if (!m_pause)
 			{
 				float currTime = RenderEngine::getCurrTime();
-				RenderEngine::deltaTime = currTime - lastTime;
-				lastTime = currTime;
-
-				RenderEngine::deltaTime *= RenderEngine::m_timeKoef;
+				RenderEngine::deltaTime = currTime - m_lastTime;
+				m_lastTime = currTime;
 			}
 			else
 			{
-				lastTime = RenderEngine::getCurrTime();
+				m_lastTime = RenderEngine::getCurrTime();
 				RenderEngine::deltaTime = 0.0f;
 			}
+			*/
+
+			float currTime = RenderEngine::getCurrTime();
+			RenderEngine::deltaTime = currTime - m_lastTime;
+			m_lastTime = currTime;
 		}
 
 
@@ -103,22 +134,62 @@ void Game::loop()
 		}
 
 		{
-			LOG_DURATION("updateGameState");
-			updateGameState(RenderEngine::deltaTime);
+			//LOG_DURATION("updateGameState");
+			if (m_run && !m_pause)
+			{
+				updateGameState(RenderEngine::deltaTime * RenderEngine::m_timeKoef);
+			}
+			selectUnits();
 		}
 
 		{
-			LOG_DURATION("genModelMatrices");
+			//LOG_DURATION("genModelMatrices");
 			RenderEngine::genModelMatrices(Game::m_objects, Game::m_red_units, Game::m_blue_units);
 		}
 
 		{
-			LOG_DURATION("drawObjects");
+			//LOG_DURATION("drawObjects");
 			RenderEngine::drawObjects(m_labels);
 		}
 
 		{
-			LOG_DURATION("updateScreen");
+			if (checkEndGame())
+			{
+				m_run = false;
+				m_pause = true;
+				for (auto&& obj : m_objects)
+				{
+					if (obj->m_type == Object::ObjectType::BUTTON)
+					{
+						Button* button = (Button*)obj.get();
+
+						if (button->m_optionalProperties == "SPEED_DOWN" ||
+							button->m_optionalProperties == "SPEED_UP" ||
+							button->m_optionalProperties == "PAUSE")
+						{
+							button->m_visible = false;
+						}
+						if (button->m_optionalProperties == "MENU_BUTTON")
+							button->m_visible = true;
+					}
+				}
+				for (auto&& lab : m_labels)
+				{
+					Label* label = (Label*)lab.get();
+					if (label->m_optionalProperties == "LABEL_ONE")
+						label->m_visible = false;
+					if (label->m_optionalProperties == "LABEL_TWO")
+						label->m_visible = true;
+					if (label->m_optionalProperties == "LABEL_THREE")
+						label->m_visible = true;
+				}
+				drawStatisticScreen();
+				while (false);
+			}
+		}
+
+		{
+			//LOG_DURATION("updateScreen");
 			RenderEngine::updateScreen();
 		}
 
@@ -128,6 +199,12 @@ void Game::loop()
 		}
 
 
+		if (m_run && !m_pause)
+		{
+			m_statistic->saveStatisticTimePoint(RenderEngine::deltaTime * RenderEngine::m_timeKoef, m_red_units, m_blue_units);
+		}
+
+		/*
 		std::cerr << "objects " << m_objects.size() + m_red_units.size() + m_blue_units.size() << std::endl;
 		
 		{
@@ -155,6 +232,7 @@ void Game::loop()
 				system("pause");
 			}
 		}
+		*/
 	}
 }
 
@@ -166,7 +244,6 @@ void Game::createObject(const ObjectAttributes& attributes)
 		{
 			for (int i = 0; i < 50; i++)
 			{
-				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
 					glm::vec3{ stof(attributes.posx) - 50.0f,
 							   stof(attributes.posy),
@@ -174,7 +251,6 @@ void Game::createObject(const ObjectAttributes& attributes)
 					stof(attributes.scale),
 					"", "RED");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				//m_objects.push_back(sp_unit);
 				m_red_units.push_back(sp_unit);
 			}
 		}
@@ -182,7 +258,6 @@ void Game::createObject(const ObjectAttributes& attributes)
 		{
 			for (int i = 0; i < 0; i++)
 			{
-				//Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
 					glm::vec3{ stof(attributes.posx) + 50.0f,
 							   stof(attributes.posy),
@@ -190,13 +265,11 @@ void Game::createObject(const ObjectAttributes& attributes)
 					stof(attributes.scale),
 					"", "BLUE");
 				std::shared_ptr<Object> sp_unit(ptr_unit);
-				//m_objects.push_back(sp_unit);
 				m_blue_units.push_back(sp_unit);
 			}
 		}
 		else if (attributes.object_type == "RED_PLANET")
 		{
-			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
@@ -209,7 +282,6 @@ void Game::createObject(const ObjectAttributes& attributes)
 		}
 		else if (attributes.object_type == "BLUE_PLANET")
 		{
-			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
@@ -222,7 +294,6 @@ void Game::createObject(const ObjectAttributes& attributes)
 		}
 		else if (attributes.object_type == "NEUTRAL_PLANET")
 		{
-			//Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
 											glm::vec3{ stof(attributes.posx),
 													   stof(attributes.posy),
@@ -235,14 +306,13 @@ void Game::createObject(const ObjectAttributes& attributes)
 		}
 		else if (attributes.object_type == "BUTTON")
 		{
-			//Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 			Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.id],
 										    glm::vec3{ stof(attributes.posx),
 												       stof(attributes.posy),
 												       stof(attributes.posz) },
 										    stof(attributes.scale),
 											this,
-										    "");
+											attributes.optionalProperties);
 			std::shared_ptr<Button> sh_button(ptr_button);
 
 			if (attributes.optionalProperties == "PAUSE")
@@ -253,12 +323,45 @@ void Game::createObject(const ObjectAttributes& attributes)
 				sh_button->setCallbackFunc(speedGameDown);
 			if (attributes.optionalProperties == "BUTTON_START")
 				sh_button->setCallbackFunc(startButton);
+			if (attributes.optionalProperties == "MENU_BUTTON")
+			{
+				sh_button->setCallbackFunc(toMenuButton);
+				sh_button->m_visible = false;
+			}
 
 			m_objects.push_back(sh_button);
 		}
+		else if (attributes.object_type == "LABEL")
+		{
+			Var trackedValue;
+			if (attributes.optionalProperties == "LABEL_ONE")
+				trackedValue = Var("float", &RenderEngine::m_timeKoef);
+			if (attributes.optionalProperties == "LABEL_TWO")
+				trackedValue = Var("int32_t", &m_statistic->m_maxUnits);
+			if (attributes.optionalProperties == "LABEL_THREE")
+				trackedValue = Var("int32_t", &m_statistic->m_maxTime);
+
+			Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.id],
+									 trackedValue,
+									 glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)), 
+									 stof(attributes.scale),
+									 attributes.optionalProperties);
+
+			if (attributes.optionalProperties == "LABEL_ONE")
+				label->m_visible = true;
+			if (attributes.optionalProperties == "LABEL_TWO")
+				label->m_visible = false;
+			if (attributes.optionalProperties == "LABEL_THREE")
+				label->m_visible = false;
+
+			std::shared_ptr<Label> sh_obj(label);
+			m_labels.push_back(sh_obj);
+		}
 		else if (attributes.object_type == "CAMERA")
 		{
+			RenderEngine::camera.reset();
 			RenderEngine::camera = std::make_shared<Camera>(glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)));
+			//RenderEngine::camera->Position = glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz));
 		}
 		else if (attributes.object_type == "AREA")
 		{
@@ -266,19 +369,8 @@ void Game::createObject(const ObjectAttributes& attributes)
 			uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
 			m_area = std::make_shared<select_area>(id);
 		}
-		else if (attributes.object_type == "LABEL")
-		{
-			//Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
-			Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.id],
-									 Var("float", &RenderEngine::m_timeKoef), 
-									 glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)), 
-									 stof(attributes.scale));
-			std::shared_ptr<Label> sh_obj(label);
-			m_labels.push_back(sh_obj);
-		}
 		else
 		{
-			//Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.object_type],
 			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.id],
 										 glm::vec3{ stof(attributes.posx),
 										 		    stof(attributes.posy),
@@ -377,7 +469,7 @@ void Game::collisionsDetected()
 
 	auto checkCollisionUnitsPlanet = [](std::vector<std::shared_ptr<Object>>& objects, Planet* planet)
 	{
-		for (int j = 0; j < objects.size(); j++)
+		for (uint32_t j = 0; j < objects.size(); j++)
 		{
 			Unit* unit = (Unit*)objects[j].get();
 
@@ -579,12 +671,12 @@ void Game::updateGameState(float deltaTime)
 	}
 
 	{
-		LOG_DURATION("collisionsDetected");
+		//LOG_DURATION("collisionsDetected");
 		collisionsDetected();
 	}
 
 	{
-		LOG_DURATION("action");
+		//LOG_DURATION("action");
 		for (uint32_t i = 0; i < m_objects.size(); i++)
 		{
 			m_objects[i]->action(deltaTime);
@@ -593,14 +685,11 @@ void Game::updateGameState(float deltaTime)
 		{
 			m_red_units[i]->action(deltaTime);
 		}
-
 		for (uint32_t i = 0; i < m_blue_units.size(); i++)
 		{
 			m_blue_units[i]->action(deltaTime);
 		}
 	}
-
-	selectUnits();
 }
 
 void Game::selectUnits()
@@ -609,20 +698,6 @@ void Game::selectUnits()
 	{
 		//if (m_player_fraction == "RED")
 		{
-			/*
-			for (auto&& obj : m_objects)
-			{
-				if (obj->m_type == Object::ObjectType::UNIT)
-				{
-					Unit* unit = (Unit*)obj.get();
-					if (glm::distance(m_area->m_position, unit->m_position) <= m_area->m_radius)
-						unit->select();
-					else
-						unit->deselect();
-				}
-			}
-			*/
-
 			for (auto&& obj : m_red_units)
 			{
 				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
@@ -746,7 +821,7 @@ void Game::processArea(const bool& leftButton, const glm::vec2& cursorCoords)
 			clickOnButton = checkButtonHits(cursorCoords, true);
 
 		//if last click was not on button and cursor moved while holding down the button - update area
-		if (m_area != nullptr)
+		if (m_area != nullptr && m_run)
 		{
 			if (!clickOnButton && cursorCoords != lastCursorCoords)
 				m_area->updateArea(cursorCoords);
@@ -786,7 +861,7 @@ bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
 
 	for (auto&& obj : m_objects)
 	{
-		if (obj->m_type == Object::ObjectType::BUTTON)
+		if (obj->m_type == Object::ObjectType::BUTTON && obj->m_visible)
 		{
 			Button* button = (Button*)obj.get();
 			if (button->cursorIsOnButton(glm::vec2(x, y)))
@@ -845,45 +920,6 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 		}
 	}
 
-	/*
-	for (auto&& obj : m_objects)
-	{
-		if (obj->m_type == Object::ObjectType::UNIT)
-		{
-			Unit* unit = (Unit*)obj.get();
-
-			if (unit->m_selected)
-			{
-				if (planetFraction == "")
-				{
-					unit->m_state = "move";
-					unit->setTargetPosition(targetPos);
-				}
-				else
-				{
-					if (planetFraction == unit->m_fraction)
-					{
-						if (planetLevel < planetLevelMAX)
-						{
-							unit->m_state = "update"; 
-							unit->setTargetPosition(planetPos);
-						}
-						else
-						{
-							unit->m_state = "move";
-							unit->setTargetPosition(targetPos);
-						}
-					}
-					else
-					{
-						unit->m_state = "attack";
-						unit->setTargetPosition(planetPos);
-					}
-				}
-			}
-		}
-	}
-	*/
 	for (auto&& obj : m_red_units)
 	{
 		if (obj->m_type == Object::ObjectType::UNIT)
@@ -961,6 +997,86 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 	while (false);
 }
 
+bool Game::checkEndGame()
+{
+	std::string color = "";
+
+	for (auto&& obj : m_objects)
+	{
+		if (obj->m_type == Object::ObjectType::PLANET)
+		{
+			if (obj->m_fraction != "NEUTRAL")
+			{
+				if (color == "")
+				{
+					color = obj->m_fraction;
+				}
+				else
+				{
+					if (color != obj->m_fraction)
+						return false;
+				}
+			}
+		}
+	}
+
+	if (color != "")
+		return true;
+	else
+		return false;
+}
+
+void Game::drawStatisticScreen()
+{
+	float botWindow = -0.7f;
+	float topWindow =  0.7f;
+
+	float leftWindow = -0.8f;
+	float rightWindow = 0.8f;
+
+	float wind_width  = rightWindow - leftWindow;
+	float wind_height = topWindow   - botWindow;
+
+
+	float maxTime = m_statistic->getMaxTime();
+	float maxUnit = m_statistic->getMaxUnit();
+
+	std::vector<std::pair<float, float>> forDraw = m_statistic->compressStatistic(m_statistic->m_red_units);
+	//convert time and numbers of unit from -1.0f to 1.0f
+	auto convertPoints = [&](std::vector<std::pair<float, float>> stat_points)
+	{
+		std::vector<std::pair<float, float>> temp;
+
+		for (auto&& point : stat_points)
+		{
+			float x = (float(point.first) / (maxTime / wind_width)) - (wind_width / 2.0f);
+			float y = (float(point.second) / (maxUnit / wind_height)) - (wind_height / 2.0f);
+			temp.push_back({ x, y });
+		}
+
+		return temp;
+	};
+	forDraw = convertPoints(forDraw);
+
+	for (uint32_t i = 1; i < forDraw.size(); i++)
+	{
+		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(1.0f, 0.0f, 0.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+	}
+
+	//------------------------------------------------------
+
+	forDraw = m_statistic->compressStatistic(m_statistic->m_blue_units);
+	forDraw = convertPoints(forDraw);
+
+	for (uint32_t i = 1; i < forDraw.size(); i++)
+	{
+		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(0.0f, 0.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+	}
+
+	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(leftWindow, topWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(rightWindow, botWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+}
+
 void switchPause(Game& game)
 {
 	game.m_pause = !game.m_pause;
@@ -969,8 +1085,8 @@ void switchPause(Game& game)
 void speedGameUp(Game& game)
 {
 	RenderEngine::m_timeKoef += 0.25f;
-	if (RenderEngine::m_timeKoef > 2.0f)
-		RenderEngine::m_timeKoef = 2.0f;
+	if (RenderEngine::m_timeKoef > 4.0f)
+		RenderEngine::m_timeKoef = 4.0f;
 }
 
 void speedGameDown(Game& game)
@@ -980,19 +1096,45 @@ void speedGameDown(Game& game)
 		RenderEngine::m_timeKoef = 0.25f;
 }
 
+void toMenuButton(Game& game)
+{
+	game.freeResources();
 
+	RenderEngine::resourceManager.clear();
+	RenderEngine::modelsGroups.clear();
+
+	game.loadResources(0);
+}
+
+void startButton(Game& game)
+{
+	game.freeResources();
+
+	game.loadResources(1);
+
+	game.m_run = true;
+	game.m_pause = false;
+}
 
 //TODO
 /*
-	- при расчёте физики можно пользоваться многопоточкой
-	- проверку на конец матча и вывод графика
+	- добавить бокс (фон)
+
+	- баг в коллизион детекшен - если юниты направлены в планету, но пока они добрались до планеты та стала максимальным уровнем и больше не доступна для прокачки юниты всё равно убиваются об эту планету
+
 	- сделать редактор карт
 	- сделать api для удобста использования ai
 	- добавить границы карты
-	- добавить бокс (фон)
+
 	- разобраться с анимациями (пульсирование планет, увеличение и т.д.)
 
 	Решено:
+		- проверку на конец матча и вывод графика
+			доделать кнопки меню, подумать, нужно ли двигать камеру после финиша,
+			а, и циферки сделать
+
+		- при расчёте коллизий можно пользоваться многопоточкой
+
 		- сделать псевдо-физику (бывало что вылетало исключение, но сейчас вроде нет)
 
 		- новая оптимизация физики - брать только первую половину всех юнитов и при проходе по каждому записывать смещение в ОБА юнита а не только в текущий

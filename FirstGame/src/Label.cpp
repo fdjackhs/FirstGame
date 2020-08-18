@@ -5,18 +5,21 @@ Label::Label()
 {
 	m_visible = false;
 	m_label = "";
+	m_optionalProperties = "";
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	//m_left_top_corner = glm::vec3(0.0f, 0.0f, 0.0f);
 	updateLabelVertices();
 }
 
-Label::Label(const std::vector<uint32_t>& alphabet, const Var& value, glm::vec3& position, const float& scale) : m_visible(true), m_corresponding_value(value), m_position(position), m_scale(scale)
+Label::Label(const std::vector<uint32_t>& alphabet, const Var& value, glm::vec3& position, const float& scale, const std::string& optProp) 
+				: m_visible(true), m_corresponding_value(value), m_position(position), m_scale(scale), m_optionalProperties(optProp)
 {
 	m_alphabet = alphabet; 
 	updateLabelVertices();
 }
 
-Label::Label(const std::vector<uint32_t>& alphabet, const std::string& label, glm::vec3& position, const float& scale) : m_visible(true), m_label(label), m_position(position), m_scale(scale)
+Label::Label(const std::vector<uint32_t>& alphabet, const std::string& label, glm::vec3& position, const float& scale, const std::string& optProp) 
+				: m_visible(true), m_label(label), m_position(position), m_scale(scale), m_optionalProperties(optProp)
 {
 	m_alphabet = alphabet;
 	updateLabelVertices();

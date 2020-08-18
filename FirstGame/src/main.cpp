@@ -5,11 +5,12 @@
 
 #include <glfw/glfw3.h>
 
+
 int main()
 {
 	RenderEngine::init(1600, 800, "FirstGame");
 	
-	Game game(1);
+	Game game(0);
 	game.loop();
 
 	RenderEngine::free();

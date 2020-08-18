@@ -25,6 +25,11 @@
 		"path_fragment" : "../FirstGame/Resources/shaders/1.button_shader.fs"
 	},
 	{
+		"type" : "2D_LINE",
+		"path_vertex" : "../FirstGame/Resources/shaders/1.2D_LINE_shader.vs",
+		"path_fragment" : "../FirstGame/Resources/shaders/1.2D_LINE_shader.fs"
+	},
+	{
 		"type" : "default",
 		"path_vertex" : "path",
 		"path_fragment" : "path"

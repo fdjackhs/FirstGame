@@ -1,6 +1,10 @@
 #include "Object.h"
+#include <iostream>
 
-Object::Object() {}
+Object::Object() 
+{
+	m_visible = true;
+}
 
 Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scl, const std::string& opt_prop, const std::string fraction)
 {
@@ -14,6 +18,8 @@ Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_type = OBJECT;
 
 	m_fraction = fraction; //color
+
+	m_visible = true;
 }
 
 Object::~Object()

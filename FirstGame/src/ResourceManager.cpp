@@ -274,10 +274,33 @@ void ResourceManager::updateVBO(uint32_t id, std::vector<GLfloat>& vertices)
 
 void ResourceManager::clear()
 {
+	for (auto&& shader : m_shaders)
+		glDeleteShader(shader.second.ID);
 	m_shaders.clear();
+
+	for (auto&& model : m_models)
+	{
+		for (auto&& texture : std::get<1>(model).textures_loaded)
+		{
+			glDeleteTextures(1, &texture.id);
+		}
+		for (auto&& mesh : std::get<1>(model).meshes)
+		{
+			for (auto&& texture : mesh.textures)
+			{
+				glDeleteTextures(1, &texture.id);
+			}
+			glDeleteBuffers(1, &mesh.VBO);
+			glDeleteBuffers(1, &mesh.EBO);
+			glDeleteVertexArrays(1, &mesh.VAO);
+		}
+
+	}
 	m_models.clear();
+
 	m_manuallyCreaatedObjects.clear();
 	m_modelIndex_shadersIndices.clear();
 	m_complete_models.clear();
 	m_manCrObj_indexs.clear();
+	m_map_complete_models.clear();
 }

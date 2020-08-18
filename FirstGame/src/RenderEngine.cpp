@@ -147,13 +147,19 @@ void RenderEngine::genModelMatrices(std::vector<std::shared_ptr<Object>>& object
 	{
 		for (auto&& index : obj->m_indexes_of_displayd_models)
 		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, obj->m_position);
-			model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+			glm::mat4 model = glm::mat4(0.0f);
+			if (obj->m_visible)
+			{
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, obj->m_position);
+				model = glm::scale(model, glm::vec3(obj->m_scale, obj->m_scale, obj->m_scale));
+			}
+
 
 			modelsGroups[obj->m_modelIDs[index]].matrices.push_back(model);
 		}
 	}
+
 
 	for (auto&& obj : redUnits)
 	{
@@ -228,17 +234,21 @@ void RenderEngine::drawObjects(const std::vector<std::shared_ptr<Label>>& labels
 		// 0.5f - it's widht of one char
 		float stride = 0.5f * labels[labelIndex]->m_scale;
 
-		for (int charIndex = 0; charIndex < labels[labelIndex]->m_value.size(); charIndex++)
+		for (uint32_t charIndex = 0; charIndex < labels[labelIndex]->m_value.size(); charIndex++)
 		{
 			uint32_t modelIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[labels[labelIndex]->m_alphabet[labels[labelIndex]->m_value[charIndex]]].first;
 			uint32_t shaderIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[labels[labelIndex]->m_alphabet[charIndex]].second[0]; // 0 - this models has only one shader (INTERFACE)
 
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, { labels[labelIndex]->m_position.x + (charIndex * stride),
-											labels[labelIndex]->m_position.y,
-											labels[labelIndex]->m_position.z });
 
-			model = glm::scale(model, glm::vec3(labels[labelIndex]->m_scale, labels[labelIndex]->m_scale, labels[labelIndex]->m_scale));
+			glm::mat4 model = glm::mat4(0.0f);
+			if (labels[labelIndex]->m_visible)
+			{
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, { labels[labelIndex]->m_position.x + (charIndex * stride),
+												labels[labelIndex]->m_position.y,
+												labels[labelIndex]->m_position.z });
+				model = glm::scale(model, glm::vec3(labels[labelIndex]->m_scale, labels[labelIndex]->m_scale, labels[labelIndex]->m_scale));
+			}
 
 
 			resourceManager.m_shaders[shaderIndex].second.use();
@@ -248,7 +258,6 @@ void RenderEngine::drawObjects(const std::vector<std::shared_ptr<Label>>& labels
 			resourceManager.m_shaders[shaderIndex].second.setMat4("model", model);
 
 			std::get<1>(resourceManager.m_models[modelIndex]).Draw(resourceManager.m_shaders[shaderIndex].second);
-
 		}
 	}
 }

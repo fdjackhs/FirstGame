@@ -8,9 +8,7 @@ class Button : public Object
 {
 public:
 	Button(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, Game* game, const std::string& opt_prop);
-
-	//setFunciton
-	
+		
 	bool cursorIsOnButton(const glm::vec2& clickCoords);
 	void setButtonDown();
 	void setButtonUp();

@@ -167,5 +167,58 @@
 		"exsist": "true",
 		
 		"optionalProperties": "LABEL_ONE"
+	},
+	{
+		"object_type": "LABEL",
+		"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+		"posx": "-0.9",
+		"posy": "0.65",
+		"posz": "0.0",
+		
+		"scale": "0.05",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "LABEL_TWO"
+	},
+	{
+		"object_type": "LABEL",
+		"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+		"posx": "0.7",
+		"posy": "-0.78",
+		"posz": "0.0",
+		
+		"scale": "0.05",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "LABEL_THREE"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["MENU_BUTTON", "MENU_BUTTON"],
+		"posx": "0.0",
+		"posy": "-0.85",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "MENU_BUTTON"
+	},
+	
+	{
+		"object_type": "2D_LINE",
+		"models_type": ["2D_LINE"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "0.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": ""
 	}
 ]

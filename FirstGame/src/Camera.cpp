@@ -27,6 +27,10 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 	updateCameraVectors();
 }
 
+Camera::~Camera()
+{
+}
+
 glm::mat4 Camera::GetViewMatrix() const
 {
 	return glm::lookAt(Position, Position + Front, Up);

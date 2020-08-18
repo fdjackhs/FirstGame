@@ -2,8 +2,8 @@
 
 #include "Unit.h"
 
-#define pi 3.141592
-#define pi2 2 * pi
+#define pi 3.141592f
+#define pi2 2.0f * pi
 
 Unit::Unit(const std::vector<unsigned int>& ID, const glm::vec3& position, float scale, const std::string& opt_prop, const std::string fraction)
 {
@@ -69,89 +69,75 @@ void Unit::action(float deltaTime)
 {
 	if (m_state == "rest")
 	{
-		try
+		//m_physCounter += deltaTime;
+
+		if (m_physCounter > 60.0f)
 		{
-			//m_physCounter += deltaTime;
+			m_globCounter += 1;
+			m_physCounter = 0;
 
-			if (m_physCounter > 60.0f)
+			float dist = glm::distance(m_position, m_centerPosition);
+
+			if (dist == 0.0f)
+				dist = 0.01f;
+
+			dist = dist / 10.0f;
+
+			if (dist < 1.0f)
 			{
-				m_globCounter += 1;
-				m_physCounter = 0;
+				//dist = 0.99f;
 
-				float dist = glm::distance(m_position, m_centerPosition);
+				if (std::isnan(dist))
+					while (false);
 
-				if (dist == 0.0f)
-					dist = 0.01f;
+				float baseAngle = -pi * dist;
 
-				dist = dist / 10.0f;
+				float randAngle = 0.0f;
 
-				if (dist < 1.0f)
-				{
-					//dist = 0.99f;
-
-					if (std::isnan(dist))
-						while (false);
-
-					float baseAngle = -pi * dist;
-
-					float randAngle = 0.0f;
-
-					if (rand() % 2)
-						randAngle = glm::radians(float(rand() % 10));
-					else
-						randAngle = -glm::radians(float(rand() % 50));
-
-					if (std::isnan(randAngle))
-						while (false);
-
-					m_lastAngle += (baseAngle + randAngle);
-
-					m_currVector.x = sin(m_lastAngle) * 10.0f;
-					m_currVector.z = cos(m_lastAngle) * 10.0f;
-					m_currVector.y = 0.0f;
-
-					if (m_currVector.x == 0.0f && m_currVector.y == 0.0f)
-						m_currVector.x = 1.1f;
-
-
-					if (std::isnan(m_position.x) || std::isinf(m_position.x))
-						while (false);
-				}
+				if (rand() % 2)
+					randAngle = glm::radians(float(rand() % 10));
 				else
-				{
-					m_currVector = m_centerPosition - m_position;
-				}
+					randAngle = -glm::radians(float(rand() % 50));
 
+				if (std::isnan(randAngle))
+					while (false);
+
+				m_lastAngle += (baseAngle + randAngle);
+
+				m_currVector.x = sin(m_lastAngle) * 10.0f;
+				m_currVector.z = cos(m_lastAngle) * 10.0f;
+				m_currVector.y = 0.0f;
+
+				if (m_currVector.x == 0.0f && m_currVector.y == 0.0f)
+					m_currVector.x = 1.1f;
+
+
+				if (std::isnan(m_position.x) || std::isinf(m_position.x))
+					while (false);
 			}
 			else
 			{
-				if (std::isnan(m_position.x) || std::isinf(m_position.x))
-					while (false);
-
-				m_position += glm::normalize(m_currVector) * deltaTime;
-				m_physCounter++;
-
-				if (std::isnan(m_position.x) || std::isinf(m_position.x))
-					while (false);
+				m_currVector = m_centerPosition - m_position;
 			}
 
-			if (m_globCounter > 30)
-			{
-				m_centerPosition = m_position;
-				m_globCounter = 0.0f;
-			}
-
-			//draw3Dline(m_position, m_centerPosition - m_position, glm::vec3(1.0f, 0.0f, 0.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
-
-			//draw3Dline(m_position, m_currVector, glm::vec3(0.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
 		}
-		catch(...)
+		else
 		{
-			while (false);
+			if (std::isnan(m_position.x) || std::isinf(m_position.x))
+				while (false);
+
+			m_position += glm::normalize(m_currVector) * deltaTime;
+			m_physCounter++;
+
+			if (std::isnan(m_position.x) || std::isinf(m_position.x))
+				while (false);
 		}
 
-		//draw3Dline(m_position, localAngle, glm::vec3(0.0f, 1.0f, 0.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
-
+		if (m_globCounter > 30)
+		{
+			m_centerPosition = m_position;
+			m_globCounter = 0.0f;
+		}
 
 		//m_position += m_gravityOffset * deltaTime; 
 	}

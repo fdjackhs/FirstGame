@@ -57,6 +57,13 @@
 		"unique" : false
 	},
 	{
+		"type" : "MENU_BUTTON",
+		"path" : "../FirstGame/resources/models/MenuButton/Menu_button.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
 		"type" : "BUTTON_DOWN",
 		"path" : "../FirstGame/resources/models/Button/ButtonDOWN.obj",
 		"shaders_types" : ["INTERFACE"],
@@ -78,13 +85,6 @@
 		"unique" : false
 	},
 	{
-		"type" : "ALPHABET",
-		"path" : "../FirstGame/Resources/models/Alphabet/ALPHABET.obj",
-		"shaders_types" : ["INTERFACE"],
-		"depth_test" : "false",
-		"unique" : false
-	},
-	{
 		"type" : "CAPTURE_SCALE",
 		"path" : "../FirstGame/Resources/models/Capture_scale/Capture_scale.obj",
 		"shaders_types" : ["BASIC"],
@@ -99,7 +99,13 @@
 		"unique" : true
 	},
 	
-	
+	{
+		"type" : "ALPHABET",
+		"path" : "../FirstGame/Resources/models/Alphabet/ALPHABET.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
 	{
 		"type" : "0",
 		"path" : "../FirstGame/Resources/models/Alphabet/0.obj",
@@ -185,6 +191,13 @@
 		"unique" : false
 	},
 	
+	{
+		"type" : "2D_LINE",
+		"path" : "../FirstGame/Resources/models/Alphabet/0.obj",
+		"shaders_types" : ["2D_LINE"],
+		"depth_test" : "false",
+		"unique" : true
+	},
 	
 	{
 		"type" : "default",

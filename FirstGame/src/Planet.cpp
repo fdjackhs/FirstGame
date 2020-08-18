@@ -2,8 +2,8 @@
 
 #include "Planet.h"
 
-#define pi 3.141592
-#define pi2 2 * pi
+#define pi 3.141592f
+#define pi2 2.0f * pi
 
 Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, Game* game, const std::string fraction)
 {

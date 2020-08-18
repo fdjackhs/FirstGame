@@ -12,6 +12,7 @@
 #include "Button.h"
 #include "Utilities.h"
 #include "Label.h"
+#include "Statistic.h"
 
 class Game
 {
@@ -34,26 +35,32 @@ public:
 	bool checkButtonHits(const glm::vec2& cursorCoords, bool isPressed);
 	void setTargetForSelectedUnits(const glm::vec2& cursorCoords); 
 	void processArea(const bool& leftButton, const glm::vec2& cursorCoords);
+	bool checkEndGame();
+	void drawStatisticScreen();
 
+	void createGame(uint32_t& level, uint32_t& progress);
+	void loadResources(uint32_t level);
+
+	void freeResources();
 
 	//callback functions (for buttons)
 	friend void switchPause(Game& game);
 	friend void speedGameUp(Game& game);
 	friend void speedGameDown(Game& game);
 	friend void startButton(Game& game);
+	friend void toMenuButton(Game& game);
 
-	void createGame(uint32_t& level, uint32_t& progress); 
-	void loadResources();
 
 private:
+	bool m_run;
 	bool m_pause;
-	float lastTime;
+	float m_lastTime;
+
+	std::shared_ptr<Statistic> m_statistic;
 
 	std::vector<std::shared_ptr<Object>> m_objects;
-
 	std::vector<std::shared_ptr<Object>> m_red_units;
 	std::vector<std::shared_ptr<Object>> m_blue_units;
-
 	std::vector<std::shared_ptr<Label>> m_labels;
 
 	std::shared_ptr<select_area> m_area;
