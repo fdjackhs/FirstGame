@@ -8,6 +8,7 @@
 #include "RenderEngine.h"
 #include "Unit.h"
 #include "Planet.h"
+#include "WhiteStar.h"
 #include "SelectArea.h"
 #include "Button.h"
 #include "Utilities.h"
@@ -37,6 +38,7 @@ public:
 	void processArea(const bool& leftButton, const glm::vec2& cursorCoords);
 	bool checkEndGame();
 	void drawStatisticScreen();
+	void generateWhiteStars();
 
 	void createGame(uint32_t& level, uint32_t& progress);
 	void loadResources(uint32_t level);
@@ -54,7 +56,10 @@ public:
 private:
 	bool m_run;
 	bool m_pause;
+	bool m_inMenu;
 	float m_lastTime;
+
+	bool m_generateStar;
 
 	std::shared_ptr<Statistic> m_statistic;
 

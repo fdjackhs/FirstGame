@@ -40,6 +40,8 @@ public:
 
 	void SetNewPosition(const glm::vec3& position);
 
+	void menuMove(const float& deltaTime);
+
 private:
 	void updateCameraVectors();
 };

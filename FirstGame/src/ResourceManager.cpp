@@ -2,12 +2,19 @@
 
 ResourceManager::ResourceManager()
 {
+}
+
+void ResourceManager::init()
+{
 	ResourceManager::loadListPathLevels();
 	loadShaderPairs("../FirstGame/Resources/ResourceManager/shaders_type_path.txt", m_shaders_type_path);
 	loadModelPairs("../FirstGame/Resources/ResourceManager/models_type_path.txt", m_models_type_path);
 
-	while (false);
+	//For some reason, the first model is always loaded upside down
+	Model temp("../FirstGame/resources/models/Loading/LoadScreen.obj");
 
+	m_loadScreen = std::make_shared<Model>("../FirstGame/resources/models/Loading/LoadScreen.obj");
+	m_loadScreenShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.button_shader.vs", "../FirstGame/Resources/shaders/1.button_shader.fs");
 }
 
 void ResourceManager::loadListPathLevels()

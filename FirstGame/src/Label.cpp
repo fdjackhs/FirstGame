@@ -48,8 +48,7 @@ void Label::updateLabel()
 
 void Label::updateLabelVertices()
 {
-	std::vector<uint32_t> modelIDs = RenderEngine::resourceManager.m_map_complete_models["LABEL"];
-	for (auto&& modelId : modelIDs)
+	for (auto&& modelId : m_alphabet)
 	{
 		int modelIndex = RenderEngine::resourceManager.m_modelIndex_shadersIndices[modelId].first;
 		Model tempModel = std::get<1>(RenderEngine::resourceManager.m_models[modelIndex]);

@@ -53,3 +53,19 @@ void Camera::SetNewPosition(const glm::vec3& position)
 {
 	Position = position;
 }
+
+
+void Camera::menuMove(const float& deltaTime)
+{
+	static float counter = 0.0f;
+
+	counter += deltaTime * 5.0f;
+
+	if (counter > 360.0f) counter = 0.0f;
+
+	float x = sin(glm::radians(counter)) * 700.0f;
+	float z = cos(glm::radians(counter)) * 700.0f;
+	
+	Position.x = x;
+	Position.z = z;
+}

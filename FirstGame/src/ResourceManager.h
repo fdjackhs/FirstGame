@@ -72,11 +72,13 @@ public:
 	std::vector<std::pair<unsigned int, unsigned int>> m_manCrObj_indexs;
 
 
+	std::shared_ptr<Model> m_loadScreen;
+	std::shared_ptr<Shader> m_loadScreenShader;
 
 
 	ResourceManager();
 
-	//void init();
+	void init();
 	void loadListPathLevels();
 	void loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs);
 	void loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs);

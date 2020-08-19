@@ -94,8 +94,10 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	//
 	RenderEngine::firstMouse = true;
 	srand(unsigned int(time(NULL)));
-
 	m_timeKoef = 1.0f;
+
+	resourceManager.init();
+	RenderEngine::camera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	return 0;
 }
@@ -129,7 +131,7 @@ void RenderEngine::updateCameraView()
 	//camera->Position.y = camera->finalCameraPoint;
 
 	view = camera->GetViewMatrix();
-	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 1000.0f);
+	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 2000.0f);
 }
 
 void RenderEngine::updateScreen()

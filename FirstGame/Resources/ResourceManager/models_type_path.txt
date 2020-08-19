@@ -1,5 +1,12 @@
 [
 	{
+		"type" : "WHITE_STAR",
+		"path" : "../FirstGame/resources/models/White_star/White_star.obj",
+		"shaders_types" : ["BASIC", "INSTANSING"],
+		"depth_test" : "true",
+		"unique" : false
+	},
+	{
 		"type" : "RED_UNIT",
 		"path" : "../FirstGame/resources/models/Red_unit/Red_unit.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
@@ -102,6 +109,13 @@
 	{
 		"type" : "ALPHABET",
 		"path" : "../FirstGame/Resources/models/Alphabet/ALPHABET.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "PAUSE",
+		"path" : "../FirstGame/resources/models/Pause/Pause.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false

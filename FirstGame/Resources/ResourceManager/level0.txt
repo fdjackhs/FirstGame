@@ -10,7 +10,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "CAMERA"
+		"optionalProperties": "300.0"
 	},
 	{
 		"object_type": "AREA",
@@ -32,10 +32,23 @@
 		"posy": "0.0",
 		"posz": "0.0",
 		
-		"scale": "0.5",
+		"scale": "0.4",
 		
 		"exsist": "true",
 		
 		"optionalProperties": "BUTTON_START"
+	},
+	{
+		"object_type": "WHITE_STAR",
+		"models_type": ["WHITE_STAR"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "0.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "WHITE_STAR"
 	}
 ]
