@@ -11,11 +11,12 @@ select_area::select_area(uint32_t id)
 
 void select_area::updateVertices()
 {
-	for (unsigned int i = 0; i < (m_vertices.size() / 3); i++)
+	for (uint32_t i = 0; i < (m_vertices.size() / 3); i++)
 	{
-		float angle = pi2 * float(i) / (m_vertices.size() / 3);
+		float angle = glm::radians(float(i) * (360.0f / float(m_vertices.size() / 3)));
 
 		m_vertices[i * 3 + 0] = m_radius * (float)cos(angle);
+		m_vertices[i * 3 + 1] = 0.0f;
 		m_vertices[i * 3 + 2] = m_radius * (float)sin(angle);
 	}
 }

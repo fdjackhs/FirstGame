@@ -1,4 +1,5 @@
 [
+	редактор карт
 	{
 		"object_type": "CAMERA",
 		"models_type": [],
@@ -24,18 +25,5 @@
 		"exsist": "true",
 		
 		"optionalProperties": "WHITE_STAR"
-	},
-	{
-		"object_type": "BUTTON",
-		"models_type": ["BUTTON_START", "BUTTON_START"],
-		"posx": "0.0",
-		"posy": "0.2",
-		"posz": "0.0",
-		
-		"scale": "0.5",
-		
-		"exsist": "true",
-		
-		"optionalProperties": "BUTTON_START"
 	}
 ]

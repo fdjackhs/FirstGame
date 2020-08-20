@@ -13,32 +13,6 @@
 		"optionalProperties": "300.0"
 	},
 	{
-		"object_type": "AREA",
-		"models_type": [],
-		"posx": "0.0",
-		"posy": "0.0",
-		"posz": "0.0",
-		
-		"scale": "1.0",
-		
-		"exsist": "false",
-		
-		"optionalProperties": "AREA"
-	},
-	{
-		"object_type": "BUTTON",
-		"models_type": ["BUTTON_START", "BUTTON_START"],
-		"posx": "0.0",
-		"posy": "0.0",
-		"posz": "0.0",
-		
-		"scale": "0.4",
-		
-		"exsist": "true",
-		
-		"optionalProperties": "BUTTON_START"
-	},
-	{
 		"object_type": "WHITE_STAR",
 		"models_type": ["WHITE_STAR"],
 		"posx": "0.0",
@@ -50,5 +24,31 @@
 		"exsist": "true",
 		
 		"optionalProperties": "WHITE_STAR"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON_START", "BUTTON_START"],
+		"posx": "0.0",
+		"posy": "0.2",
+		"posz": "0.0",
+		
+		"scale": "0.5",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "BUTTON_START"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["BUTTON_CREATE_MAP", "BUTTON_CREATE_MAP"],
+		"posx": "0.0",
+		"posy": "-0.5",
+		"posz": "0.0",
+		
+		"scale": "0.25",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "BUTTON_CREATE_MAP"
 	}
 ]

@@ -1,8 +1,5 @@
 #pragma once
 #include <vector>
-#include <numeric>
-
-#include "RenderEngine.h"
 
 class Statistic
 {
@@ -28,8 +25,6 @@ public:
 
 		m_red_units.push_back({ 0, 0 });
 		m_blue_units.push_back({ 0, 0 });
-
-		m_start = RenderEngine::getCurrTime();
 	}
 
 	void saveStatisticTimePoint(float delta, const std::vector<std::shared_ptr<Object>>& red_units,

@@ -57,11 +57,21 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-	loadScreenWin = glfwCreateWindow(1, 1, "", NULL, NULL);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE); 
+	glfwWindowHint(GLFW_SAMPLES, 8);
 
 	glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
-	window = glfwCreateWindow((int)SCREEN.x, (int)SCREEN.y, windowName, NULL, loadScreenWin);
+
+	/*
+	GLFWmonitor* MyMonitor = glfwGetPrimaryMonitor(); // The primary monitor.. Later Occulus?..
+	const GLFWvidmode* mode = glfwGetVideoMode(MyMonitor);
+	SCREEN.x = mode->width;
+	SCREEN.y = mode->height;
+	window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, windowName, glfwGetPrimaryMonitor(), nullptr);
+	*/
+	
+	window = glfwCreateWindow((int)SCREEN.x, (int)SCREEN.y, windowName, nullptr, nullptr);
+	
 	if (!window)
 	{
 		std::cout << "glfwCreateWindow failed" << std::endl;
@@ -88,6 +98,7 @@ int RenderEngine::init(float x, float y, const char* windowName)
 	}
 
 	glViewport(0, 0, (int)SCREEN.x, (int)SCREEN.y);
+	glEnable(GL_MULTISAMPLE);
 
 	glfwSwapInterval(1);
 
@@ -131,7 +142,9 @@ void RenderEngine::updateCameraView()
 	//camera->Position.y = camera->finalCameraPoint;
 
 	view = camera->GetViewMatrix();
-	projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 2000.0f);
+
+	if (SCREEN.x != 0 && SCREEN.y != 0)
+		projection = glm::perspective(glm::radians(camera->Zoom), (float)SCREEN.x / (float)SCREEN.y, 0.1f, 2000.0f);
 }
 
 void RenderEngine::updateScreen()
@@ -427,5 +440,7 @@ void cursor_enter_callback(GLFWwindow* window, int entered)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+
+	RenderEngine::SCREEN = { width, height };
 }
 //------------------

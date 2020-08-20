@@ -20,8 +20,6 @@ public:
 
 	float m_scale;
 	glm::vec3 m_position;
-	/**/std::vector<GLfloat> m_vertices;
-
+	std::vector<GLfloat> m_vertices;
 	// prams for drawing
-
 };

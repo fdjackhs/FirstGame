@@ -7,7 +7,6 @@ Label::Label()
 	m_label = "";
 	m_optionalProperties = "";
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	//m_left_top_corner = glm::vec3(0.0f, 0.0f, 0.0f);
 	updateLabelVertices();
 }
 

@@ -150,14 +150,15 @@ void ResourceManager::loadModels(uint32_t number, std::vector<ObjectAttributes>&
 		m_map_complete_models[str] = indexes;
 		m_complete_models.push_back(indexes);
 
-		ObjectAttributes temp{  (m_complete_models.size() - 1),
+		ObjectAttributes temp{ (m_complete_models.size() - 1),
 								object_type.GetString(),
-								posx.GetString(), 
-								posy.GetString(), 
-								posz.GetString(), 
-								scale.GetString(), 
+								posx.GetString(),
+								posy.GetString(),
+								posz.GetString(),
+								scale.GetString(),
 								exsist.GetString(),
-								optionalProperties.GetString() };
+								optionalProperties.GetString()
+		};
 
 		objectsAttrib.push_back(temp);
 

@@ -30,6 +30,5 @@ public:
 	std::string m_optionalProperties;
 
 	//-------------------------------
-	virtual void action(float);
-	virtual glm::vec3 GetPosition() const;
+	virtual void action(float) {};
 };

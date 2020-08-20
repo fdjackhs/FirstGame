@@ -85,6 +85,13 @@
 		"unique" : false
 	},
 	{
+		"type" : "BUTTON_CREATE_MAP",
+		"path" : "../FirstGame/resources/models/CreateMap/CreateMap.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
 		"type" : "LOAD_SCREEN",
 		"path" : "../FirstGame/resources/models/Loading/LoadScreen.obj",
 		"shaders_types" : ["INTERFACE"],
@@ -116,6 +123,20 @@
 	{
 		"type" : "PAUSE",
 		"path" : "../FirstGame/resources/models/Pause/Pause.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "RED_WON",
+		"path" : "../FirstGame/resources/models/RedWon/RedWon.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "BLUE_WON",
+		"path" : "../FirstGame/resources/models/BlueWon/BlueWon.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false

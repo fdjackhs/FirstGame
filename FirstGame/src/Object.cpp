@@ -1,6 +1,7 @@
 #include "Object.h"
 #include <iostream>
 
+
 Object::Object() 
 {
 	m_visible = true;
@@ -25,13 +26,4 @@ Object::Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 Object::~Object()
 {
 
-}
-
-void Object::action(float deltaTime)
-{
-}
-
-glm::vec3 Object::GetPosition() const
-{
-	return m_position;
 }

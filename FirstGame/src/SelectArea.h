@@ -3,12 +3,9 @@
 
 #include <glm/glm.hpp>
 
-#include "RenderEngine.h"
 #include "Object.h"
+#include "RenderEngine.h"
 
-
-#define pi 3.141592f
-#define pi2 2.0f * pi
 
 class select_area
 {
