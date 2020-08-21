@@ -9,6 +9,8 @@ extern class Game;
 class Planet : public Object
 {
 public:
+	bool m_selected;
+
 	float m_capturePoints;
 	float m_upgradePoints;
 
@@ -19,8 +21,8 @@ public:
 	Game* m_gameState;
 
 	// index of capture and upgrade scales in resource manager in rm->m_models
-	uint32_t m_indexOfCaputreScaleRM;
-	uint32_t m_indexOfUpgradeScaleRM;
+	uint32_t m_Real_IndexOfCaputreScaleRM;
+	uint32_t m_Real_IndexOfUpgradeScaleRM;
 
 	const static int s_max_level = 3;
 
@@ -34,4 +36,7 @@ public:
 	void determineColor();
 
 	void updateScaleVertices();
+
+	void select();
+	void deselect();
 };

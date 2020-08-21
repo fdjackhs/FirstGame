@@ -1,4 +1,4 @@
-../FirstGame/Resources/ResourceManager/level0.txt
-../FirstGame/Resources/ResourceManager/level1.txt
-../FirstGame/Resources/ResourceManager/level2.txt
-../FirstGame/Resources/ResourceManager/level3.txt
+../FirstGame/resources/ResourceManager/level0.txt
+../FirstGame/resources/ResourceManager/level1.txt
+../FirstGame/resources/ResourceManager/level2.txt
+../FirstGame/resources/ResourceManager/level3.txt

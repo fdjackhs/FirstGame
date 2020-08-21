@@ -42,8 +42,15 @@
 		"unique" : false
 	},
 	{
-		"type" : "STENCIL",
-		"path" : "../FirstGame/resources/models/Stencil/Stencil.obj",
+		"type" : "STENCIL_UNIT",
+		"path" : "../FirstGame/resources/models/StencilUnit/StencilUnit.obj",
+		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "STENCIL_PLANET",
+		"path" : "../FirstGame/resources/models/StencilPlanet/StencilPlanet.obj",
 		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
 		"depth_test" : "false",
 		"unique" : false
@@ -87,6 +94,55 @@
 	{
 		"type" : "BUTTON_CREATE_MAP",
 		"path" : "../FirstGame/resources/models/CreateMap/CreateMap.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "SAVE_UP",
+		"path" : "../FirstGame/resources/models/SaveUp/SaveUp.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "SAVE_DOWN",
+		"path" : "../FirstGame/resources/models/SaveDown/SaveDown.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "DELETE_UP",
+		"path" : "../FirstGame/resources/models/DeleteUp/DeleteUp.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "DELETE_DOWN",
+		"path" : "../FirstGame/resources/models/DeleteDown/DeleteDown.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "CREATE_RED_PLANET",
+		"path" : "../FirstGame/resources/models/CrRedPlanet/CrRedPlanet.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "CREATE_BLUE_PLANET",
+		"path" : "../FirstGame/resources/models/CrBluePlanet/CrBluePlanet.obj",
+		"shaders_types" : ["INTERFACE"],
+		"depth_test" : "false",
+		"unique" : false
+	},
+	{
+		"type" : "CREATE_NEUTRAL_PLANET",
+		"path" : "../FirstGame/resources/models/CrNeutralPlanet/CrNeutralPlanet.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false

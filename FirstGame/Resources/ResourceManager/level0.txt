@@ -36,7 +36,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "BUTTON_START"
+		"optionalProperties": "{ 'func': 'BUTTON_START', 'visible': 'true' }"
 	},
 	{
 		"object_type": "BUTTON",
@@ -49,6 +49,6 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "BUTTON_CREATE_MAP"
+		"optionalProperties": "{ 'func': 'BUTTON_CREATE_MAP', 'visible': 'true' }"
 	}
 ]

@@ -79,7 +79,7 @@ void Unit::action(float deltaTime)
 		else
 		{
 			glm::vec3 nextPosition = m_position + glm::normalize(m_currVector) * deltaTime;
-			if (nextPosition.x > m_game->m_edgesOfMap.left && nextPosition.x < m_game->m_edgesOfMap.right && nextPosition.z > m_game->m_edgesOfMap.bot  && nextPosition.z < m_game->m_edgesOfMap.top)
+			if (nextPosition.x > m_game->m_edgesOfMap->left && nextPosition.x < m_game->m_edgesOfMap->right && nextPosition.z > m_game->m_edgesOfMap->bot  && nextPosition.z < m_game->m_edgesOfMap->top)
 				m_position = nextPosition;
 
 			//m_position += glm::normalize(m_currVector) * deltaTime;
@@ -111,8 +111,8 @@ void Unit::action(float deltaTime)
 		{
 			//m_position = nextPosition;
 						
-			if (nextPosition.x > m_game->m_edgesOfMap.left && nextPosition.x < m_game->m_edgesOfMap.right &&
-				nextPosition.z > m_game->m_edgesOfMap.bot  && nextPosition.z < m_game->m_edgesOfMap.top)
+			if (nextPosition.x > m_game->m_edgesOfMap->left && nextPosition.x < m_game->m_edgesOfMap->right &&
+				nextPosition.z > m_game->m_edgesOfMap->bot  && nextPosition.z < m_game->m_edgesOfMap->top)
 			{
 				m_position = nextPosition;
 			}

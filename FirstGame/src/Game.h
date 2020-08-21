@@ -30,12 +30,10 @@ public:
 	void createUnit(const std::string& unitType, const glm::vec3& position, const glm::vec3& targetPosition, const std::string& fraction);
 	void updateGameState(float deltaTime);
 	void processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords, double scroll);
-	void selectUnits();
 	void updatePhysics();
 	void collisionsDetected();
 	bool checkButtonHits(const glm::vec2& cursorCoords, bool isPressed);
 	void setTargetForSelectedUnits(const glm::vec2& cursorCoords); 
-	void processArea(const bool& leftButton, const glm::vec2& cursorCoords);
 	bool checkEndGame();
 	void drawStatisticScreen();
 	void generateWhiteStars();
@@ -51,7 +49,14 @@ public:
 	friend void startButton(Game& game);
 	friend void toMenuButton(Game& game);
 	friend void startMapEditor(Game& game);
-
+	friend void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& game);
+	friend void selectUnits(Game& game);
+	friend void selectPlanets(Game& game);
+	friend void deletePlanets(Game& game);
+	friend void createRedPlanet(Game& game);
+	friend void createBluePlanet(Game& game);
+	friend void createNeutralPlanet(Game& game);
+	friend void saveMap(Game& game);
 
 	struct Edges
 	{
@@ -59,15 +64,24 @@ public:
 		float right;
 		float top;
 		float bot;
-	} m_edgesOfMap;
+
+		Edges(float l, float r, float t, float b) : left(l), right(r), top(t), bot(b)
+			{}
+	};
+	std::shared_ptr<Edges> m_edgesOfMap;
 
 private:
 	bool m_run;
 	bool m_pause;
 	bool m_inMenu;
+	bool m_inMapEditor;
+	bool m_generateStar;
 	float m_lastTime;
 
-	bool m_generateStar;
+	//for map editor
+	Object* m_inHand;
+	void(*processLeftButton)(const bool& leftButton, const glm::vec2& cursorCoords, Game& game);
+	void(*selectOblects)(Game& game);
 
 	std::string m_player_fraction;
 	std::string m_ai_fraction;

@@ -1,5 +1,4 @@
 [
-	редактор карт
 	{
 		"object_type": "CAMERA",
 		"models_type": [],
@@ -14,6 +13,19 @@
 		"optionalProperties": "300.0"
 	},
 	{
+		"object_type": "AREA",
+		"models_type": [],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "AREA"
+	},
+	{
 		"object_type": "WHITE_STAR",
 		"models_type": ["WHITE_STAR"],
 		"posx": "0.0",
@@ -25,5 +37,122 @@
 		"exsist": "true",
 		
 		"optionalProperties": "WHITE_STAR"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["SAVE_UP", "SAVE_DOWN"],
+		"posx": "0.88",
+		"posy": "-0.85",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'SAVE', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["DELETE_UP", "DELETE_DOWN"],
+		"posx": "0.88",
+		"posy": "-0.6",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'DELETE', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["MENU_BUTTON", "MENU_BUTTON"],
+		"posx": "0.0",
+		"posy": "-0.85",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'MENU_BUTTON', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["CREATE_RED_PLANET", "CREATE_RED_PLANET"],
+		"posx": "-0.88",
+		"posy": "0.75",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'CREATE_RED_PLANET', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["CREATE_BLUE_PLANET", "CREATE_BLUE_PLANET"],
+		"posx": "-0.88",
+		"posy": "0.3",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'CREATE_BLUE_PLANET', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "BUTTON",
+		"models_type": ["CREATE_NEUTRAL_PLANET", "CREATE_NEUTRAL_PLANET"],
+		"posx": "-0.88",
+		"posy": "-0.15",
+		"posz": "0.0",
+		
+		"scale": "0.1",
+		
+		"exsist": "true",
+		
+		"optionalProperties": "{ 'func' : 'CREATE_NEUTRAL_PLANET', 'visible' : 'true' }"
+	},
+	{
+		"object_type": "RED_PLANET",
+		"models_type": ["STENCIL_PLANET", "RED_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "RED_PLANET"
+	},
+	{
+		"object_type": "BLUE_PLANET",
+		"models_type": ["STENCIL_PLANET", "BLUE_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "BLUE_PLANET"
+	},
+	{
+		"object_type": "NEUTRAL_PLANET",
+		"models_type": ["STENCIL_PLANET", "NEUTRAL_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE"],
+		"posx": "0.0",
+		"posy": "0.0",
+		"posz": "0.0",
+		
+		"scale": "1.0",
+		
+		"exsist": "false",
+		
+		"optionalProperties": "NEUTRAL_PLANET"
 	}
 ]

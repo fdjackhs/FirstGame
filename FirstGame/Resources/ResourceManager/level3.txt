@@ -118,7 +118,7 @@
 	},
 	{
 		"object_type": "RED_UNIT",
-		"models_type": ["STENCIL", "RED_UNIT"],
+		"models_type": ["STENCIL_UNIT", "RED_UNIT"],
 		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
@@ -131,7 +131,7 @@
 	},
 	{
 		"object_type": "BLUE_UNIT",
-		"models_type": ["STENCIL", "BLUE_UNIT"],
+		"models_type": ["STENCIL_UNIT", "BLUE_UNIT"],
 		"posx": "0.0",
 		"posy": "0.0",
 		"posz": "0.0",
@@ -153,7 +153,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "PAUSE"
+		"optionalProperties": "{ 'func' : 'PAUSE', 'visible' : 'true' }"
 	},
 	{
 		"object_type": "BUTTON",
@@ -166,7 +166,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "SPEED_UP"
+		"optionalProperties": "{ 'func' : 'SPEED_UP', 'visible' : 'true' }"
 	},
 	{
 		"object_type": "BUTTON",
@@ -179,7 +179,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "SPEED_DOWN"
+		"optionalProperties": "{ 'func' : 'SPEED_DOWN', 'visible' : 'true' }"
 	},
 	{
 		"object_type": "LABEL",
@@ -270,7 +270,7 @@
 		
 		"exsist": "true",
 		
-		"optionalProperties": "MENU_BUTTON"
+		"optionalProperties": "{ 'func' : 'MENU_BUTTON', 'visible' : 'false' }"
 	},
 	{
 		"object_type": "2D_LINE",

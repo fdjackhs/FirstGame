@@ -8,17 +8,21 @@
 Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, Game* game, const std::string fraction)
 {
 	m_fraction = fraction; //color
-
 	m_modelIDs = ID;
+
+	for (uint32_t i = 0; i < m_modelIDs.size(); i++)
+	{
+		if (std::get<0>(RenderEngine::resourceManager.m_models[RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first]) == "CAPTURE_SCALE")
+		{
+			m_Real_IndexOfCaputreScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first;
+		}
+		if (std::get<0>(RenderEngine::resourceManager.m_models[RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first]) == "UPGRADE_SCALE")
+		{
+			m_Real_IndexOfUpgradeScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first;
+		}
+	}
+
 	determineColor();
-
-	//capture scale always pre last
-	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 2);
-	//upgrade scale always pre last
-	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 1);
-
-	m_indexOfCaputreScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 2]].first;
-	m_indexOfUpgradeScaleRM = RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[m_modelIDs.size() - 1]].first;
 
 	m_position = pos;
 	m_scale = scale;
@@ -35,10 +39,8 @@ Planet::Planet(const std::vector<unsigned int>& ID, const glm::vec3& pos, float 
 	m_level = 1.0f;
 
 	m_gameState = game;
-	
-	//m_levelOneRadius = 10.0f;
-	//m_levelTwoRadius = 12.0f;
-	//m_levelThreeRadius = 14.0f;
+
+	m_selected = false;
 
 	m_radius = 10.0f;
 }
@@ -84,15 +86,31 @@ void Planet::determineColor()
 {
 	m_indexes_of_displayd_models.clear();
 
-	if (m_fraction == "RED")
-		m_indexes_of_displayd_models.push_back(0);
-	if (m_fraction == "BLUE")
-		m_indexes_of_displayd_models.push_back(1);
-	if (m_fraction == "NEUTRAL")
-		m_indexes_of_displayd_models.push_back(2);
+	//set color
+	for (uint32_t i = 0; i < m_modelIDs.size(); i++)
+	{
+		if (std::get<0>(RenderEngine::resourceManager.m_models[RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first]) == m_fraction + "_PLANET")
+		{
+			m_indexes_of_displayd_models.push_back(i);
+		}
+	}
 
-	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 1);
-	m_indexes_of_displayd_models.push_back(m_modelIDs.size() - 2);
+	//set capture scale
+	for (uint32_t i = 0; i < m_modelIDs.size(); i++)
+	{
+		if (std::get<0>(RenderEngine::resourceManager.m_models[RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first]) == "CAPTURE_SCALE")
+		{
+			m_indexes_of_displayd_models.push_back(i);
+		}
+	}
+	//set upgrade scale
+	for (uint32_t i = 0; i < m_modelIDs.size(); i++)
+	{
+		if (std::get<0>(RenderEngine::resourceManager.m_models[RenderEngine::resourceManager.m_modelIndex_shadersIndices[m_modelIDs[i]].first]) == "UPGRADE_SCALE")
+		{
+			m_indexes_of_displayd_models.push_back(i);
+		}
+	}
 }
 
 void Planet::plusOne()
@@ -156,7 +174,7 @@ void Planet::updateScaleVertices()
 	bool flag = false;
 	if (m_capturePoints > 0.0f)
 	{
-		indexOfScale = m_indexOfCaputreScaleRM;
+		indexOfScale = m_Real_IndexOfCaputreScaleRM;
 		topBorder = m_capturePoints;
 		flag = true;
 	}
@@ -164,7 +182,7 @@ void Planet::updateScaleVertices()
 	{
 		if (flag)
 			while (false);
-		indexOfScale = m_indexOfUpgradeScaleRM;
+		indexOfScale = m_Real_IndexOfUpgradeScaleRM;
 		topBorder = m_upgradePoints;
 	}
 
@@ -205,8 +223,8 @@ void Planet::updateScaleVertices()
 	}
 	else
 	{
-		Model captureScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]);
-		Model upgradeScale = std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]);
+		Model captureScale = std::get<1>(RenderEngine::resourceManager.m_models[m_Real_IndexOfCaputreScaleRM]);
+		Model upgradeScale = std::get<1>(RenderEngine::resourceManager.m_models[m_Real_IndexOfUpgradeScaleRM]);
 
 		captureScale.meshes[0].vertices.clear();
 		upgradeScale.meshes[0].vertices.clear();
@@ -226,7 +244,29 @@ void Planet::updateScaleVertices()
 		captureScale.meshes[0].updateMesh();
 		upgradeScale.meshes[0].updateMesh();
 
-		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfCaputreScaleRM]) = captureScale;
-		std::get<1>(RenderEngine::resourceManager.m_models[m_indexOfUpgradeScaleRM]) = upgradeScale;
+		std::get<1>(RenderEngine::resourceManager.m_models[m_Real_IndexOfCaputreScaleRM]) = captureScale;
+		std::get<1>(RenderEngine::resourceManager.m_models[m_Real_IndexOfUpgradeScaleRM]) = upgradeScale;
+	}
+}
+
+void Planet::select()
+{
+	if (!m_selected)
+	{
+		m_selected = true;
+
+		m_indexes_of_displayd_models.clear();
+		m_indexes_of_displayd_models.push_back(0);
+		m_indexes_of_displayd_models.push_back(1);
+	}
+}
+
+void Planet::deselect()
+{
+	if (m_selected)
+	{
+		m_selected = false;
+		m_indexes_of_displayd_models.clear();
+		m_indexes_of_displayd_models.push_back(1);
 	}
 }
