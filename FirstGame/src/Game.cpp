@@ -114,6 +114,11 @@ void Game::loop()
 		}
 
 		{
+			if (m_run && !m_pause && !m_inMapEditor)
+				artificialInteligence();
+		}
+
+		{
 			//LOG_DURATION("clearScreen");
 			RenderEngine::clearScreen();
 		}
@@ -182,6 +187,7 @@ void Game::loop()
 		
 		//std::cerr << "objects " << m_objects.size() + m_red_units.size() + m_blue_units.size() << std::endl;
 
+		/*
 		{
 			//LOG_DURATION("Profile");
 			if (RenderEngine::deltaTime > (1.0f / 59.0f) * RenderEngine::m_timeKoef)
@@ -207,187 +213,7 @@ void Game::loop()
 				system("pause");
 			}
 		}
-	}
-}
-
-void Game::createObject(ObjectAttributes& attributes)
-{
-	if (attributes.exsist == "true")
-	{
-		if (attributes.object_type == "RED_UNIT")
-		{
-			for (int i = 0; i < 50; i++)
-			{
-				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
-										  glm::vec3{ stof(attributes.posx) - 50.0f, stof(attributes.posy), stof(attributes.posz) + float(i) },
-										  stof(attributes.scale),
-										  "", "RED", this);
-				std::shared_ptr<Object> sp_unit(ptr_unit);
-				m_red_units.push_back(sp_unit);
-			}
-		}
-		else if (attributes.object_type == "BLUE_UNIT")
-		{
-			for (int i = 0; i < 0; i++)
-			{
-				Unit* ptr_unit = new Unit(RenderEngine::resourceManager.m_complete_models[attributes.id],
-										  glm::vec3{ stof(attributes.posx) + 50.0f, stof(attributes.posy), stof(attributes.posz) + float(i) },
-										  stof(attributes.scale),
-										  "", "BLUE", this);
-				std::shared_ptr<Object> sp_unit(ptr_unit);
-				m_blue_units.push_back(sp_unit);
-			}
-		}
-		else if (attributes.object_type == "RED_PLANET")
-		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
-											glm::vec3{ stof(attributes.posx), stof(attributes.posy), stof(attributes.posz) },
-											stof(attributes.scale),
-											"", this, "RED");
-			std::shared_ptr<Object> sh_planet(ptr_planet);
-			m_objects.push_back(sh_planet);
-		}
-		else if (attributes.object_type == "BLUE_PLANET")
-		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
-											glm::vec3{ stof(attributes.posx), stof(attributes.posy), stof(attributes.posz) },
-											stof(attributes.scale),
-											"", this, "BLUE");
-			std::shared_ptr<Object> sh_planet(ptr_planet);
-			m_objects.push_back(sh_planet);
-		}
-		else if (attributes.object_type == "NEUTRAL_PLANET")
-		{
-			Planet* ptr_planet = new Planet(RenderEngine::resourceManager.m_complete_models[attributes.id],
-											glm::vec3{ stof(attributes.posx), stof(attributes.posy), stof(attributes.posz) },
-											stof(attributes.scale),
-											"", this, "NEUTRAL");
-			std::shared_ptr<Object> sh_planet(ptr_planet);
-			m_objects.push_back(sh_planet);
-		}
-		else if (attributes.object_type == "WHITE_STAR")
-		{
-			m_generateStar = true;
-		}
-		else if (attributes.object_type == "BUTTON")
-		{
-			for (auto&& ch : attributes.optionalProperties) { if (ch == '\'') ch = '"'; };
-
-			rapidjson::Document d;
-			d.Parse(attributes.optionalProperties.c_str());
-
-			rapidjson::Value& func = d["func"];
-			rapidjson::Value& vis  = d["visible"];
-
-			std::string function = func.GetString();
-			std::string visible  = vis.GetString();
-
-
-			Button* ptr_button = new Button(RenderEngine::resourceManager.m_complete_models[attributes.id],
-										    glm::vec3{ stof(attributes.posx), stof(attributes.posy), stof(attributes.posz) },
-										    stof(attributes.scale),
-											this,
-											function);
-
-			ptr_button->m_visible = visible == "true";
-			std::shared_ptr<Button> sh_button(ptr_button);
-
-			if (function == "PAUSE")
-				sh_button->setCallbackFunc(switchPause);
-			if (function == "SPEED_UP")
-				sh_button->setCallbackFunc(speedGameUp);
-			if (function == "SPEED_DOWN")
-				sh_button->setCallbackFunc(speedGameDown);
-			if (function == "BUTTON_START")
-				sh_button->setCallbackFunc(startButton);
-			if (function == "BUTTON_CREATE_MAP")
-				sh_button->setCallbackFunc(startMapEditor);
-			if (function == "MENU_BUTTON")
-				sh_button->setCallbackFunc(toMenuButton);
-			if (function == "DELETE")
-				sh_button->setCallbackFunc(deletePlanets);
-			if (function == "CREATE_RED_PLANET")
-				sh_button->setCallbackFunc(createRedPlanet);
-			if (function == "CREATE_BLUE_PLANET")
-				sh_button->setCallbackFunc(createBluePlanet);
-			if (function == "CREATE_NEUTRAL_PLANET")
-				sh_button->setCallbackFunc(createNeutralPlanet);
-			if (function == "SAVE")
-				sh_button->setCallbackFunc(saveMap);
-
-			m_objects.push_back(sh_button);
-		}
-		else if (attributes.object_type == "LABEL")
-		{
-			Var trackedValue;
-			if (attributes.optionalProperties == "LABEL_ONE")
-				trackedValue = Var("float", &RenderEngine::m_timeKoef);
-			if (attributes.optionalProperties == "LABEL_TWO")
-				trackedValue = Var("int32_t", &m_statistic->m_maxUnits);
-			if (attributes.optionalProperties == "LABEL_THREE")
-				trackedValue = Var("int32_t", &m_statistic->m_maxTime);
-			if (attributes.optionalProperties == "PAUSE")
-				trackedValue = Var("int32_t", new int(0));
-			if (attributes.optionalProperties == "RED_WON")
-				trackedValue = Var("int32_t", new int(0));
-			if (attributes.optionalProperties == "BLUE_WON")
-				trackedValue = Var("int32_t", new int(0));
-
-			Label* label = new Label(RenderEngine::resourceManager.m_complete_models[attributes.id],
-									 trackedValue,
-									 glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)), 
-									 stof(attributes.scale),
-									 attributes.optionalProperties);
-
-			if (attributes.optionalProperties == "LABEL_ONE")
-				label->m_visible = true;
-			if (attributes.optionalProperties == "LABEL_TWO"   || 
-				attributes.optionalProperties == "LABEL_THREE" || 
-				attributes.optionalProperties == "PAUSE"	   ||
-				attributes.optionalProperties == "RED_WON"	   || 
-				attributes.optionalProperties == "BLUE_WON")
-				label->m_visible = false;
-
-			std::shared_ptr<Label> sh_obj(label);
-			m_labels.push_back(sh_obj);
-		}
-		else if (attributes.object_type == "CAMERA")
-		{
-			//RenderEngine::camera.reset();
-			//RenderEngine::camera = std::make_shared<Camera>(glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz)));
-			RenderEngine::camera->Position = glm::vec3(stof(attributes.posx), stof(attributes.posy), stof(attributes.posz));
-			RenderEngine::camera->finalCameraPoint = stof(attributes.optionalProperties);
-		}
-		else if (attributes.object_type == "AREA")
-		{
-			//create objects manually
-			uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
-			m_area = std::make_shared<select_area>(id);
-		}
-		else if (attributes.object_type == "EDGES")
-		{
-			for(auto&& ch : attributes.optionalProperties) { if (ch == '\'') ch = '"'; };
-
-			rapidjson::Document d;
-			d.Parse(attributes.optionalProperties.c_str());
-
-			rapidjson::Value& left  = d["left"];
-			rapidjson::Value& right = d["right"];
-			rapidjson::Value& top   = d["top"];
-			rapidjson::Value& bot   = d["bot"];
-
-			//Edges* edges = new Edges();
-			m_edgesOfMap = std::make_shared<Edges>(left.GetFloat(), right.GetFloat(), top.GetFloat(), bot.GetFloat());
-		}
-		else
-		{
-			Object* ptr_obj = new Object(RenderEngine::resourceManager.m_complete_models[attributes.id],
-										 glm::vec3{ stof(attributes.posx), stof(attributes.posy), stof(attributes.posz) },
-										 stof(attributes.scale),
-										 "", "");
-			std::shared_ptr<Object> sh_obj(ptr_obj);
-			m_objects.push_back(sh_obj);
-		}
+		*/
 	}
 }
 
@@ -471,10 +297,11 @@ void Game::collisionsDetected()
 			Unit* unit = (Unit*)objects[j].get();
 
 			if (unit->m_targetPos == planet->m_position &&
-				closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius) &&
+				//closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius) &&
+				closerThan(unit->m_position, planet->m_position, unit->m_radius + planet->m_radius / 10.0f) &&
 				!unit->m_annihilated)
 			{
-				if (planet->m_level < planet->s_max_level &&
+				if ((planet->m_level < planet->s_max_level || planet->m_capturePoints != 0) &&
 					unit->m_state == "update" && unit->m_fraction == planet->m_fraction)
 				{
 					planet->plusOne();
@@ -518,27 +345,6 @@ void Game::collisionsDetected()
 
 	eraseAnihilatedUnits(m_red_units);
 	eraseAnihilatedUnits(m_blue_units);
-
-	/*
-	for (uint32_t i = 0; i < m_red_units.size(); i++)
-	{
-		Unit* unit_i = (Unit*)m_red_units[i].get();
-
-		if (unit_i->m_annihilated)
-		{
-			m_red_units.erase(m_red_units.begin() + i);
-		}
-	}
-	for (uint32_t i = 0; i < m_blue_units.size(); i++)
-	{
-		Unit* unit_i = (Unit*)m_blue_units[i].get();
-
-		if (unit_i->m_annihilated)
-		{
-			m_blue_units.erase(m_blue_units.begin() + i);
-		}
-	}
-	*/
 }
 
 static int phys_counter = 0;
@@ -769,7 +575,8 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 
 void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& game)
 {
-	static glm::vec2 lastCursorCoords;
+	static glm::vec2 lastCursorCoordsDown;
+	static glm::vec2 lastCursorCoordsUP;
 	static bool leftButtonLastTime = false;
 	static bool clickOnButton = false;
 
@@ -782,10 +589,16 @@ void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& ga
 		//if last click was not on button and cursor moved while holding down the button - update area
 		if (game.m_area != nullptr && game.m_run && game.m_inHand == nullptr)
 		{
-			if (!clickOnButton && cursorCoords != lastCursorCoords)
-				game.m_area->updateArea(cursorCoords);
+			if (glm::distance(cursorCoords, lastCursorCoordsUP) > 5.0f)
+			{
+				if (!clickOnButton && cursorCoords != lastCursorCoordsDown)
+				{
+					game.m_area->updateArea(cursorCoords);
+				}
+			}
 		}
 
+		lastCursorCoordsUP = cursorCoords;
 		leftButtonLastTime = true;
 	}
 	else
@@ -812,7 +625,7 @@ void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& ga
 		leftButtonLastTime = false;
 	}
 
-	lastCursorCoords = cursorCoords;
+	lastCursorCoordsDown = cursorCoords;
 }
 
 bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
@@ -865,10 +678,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 {
 	glm::vec3 targetPos = RenderEngine::cursorCoordToWorldCoords({ cursorCoords.x, cursorCoords.y });
 
-	std::string planetFraction = "";
-	glm::vec3 planetPos;
-	float planetLevel = 0;
-	float planetLevelMAX = 0;
+	Planet* targetPlanet = nullptr;
 
 	for (auto&& obj : m_objects)
 	{
@@ -878,58 +688,61 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 			
 			if (closerThan(planet->m_position, targetPos, obj->m_radius)) // click was on planet
 			{
-				planetFraction = planet->m_fraction;
-				planetLevel = planet->m_level;
-				planetLevelMAX = planet->s_max_level;
-				planetPos = planet->m_position;
+				targetPlanet = planet;
 			}
 		}
 	}
 
-	auto setTarget = [&](std::vector<std::shared_ptr<Object>>& units) 
-	{
-		for (auto&& obj : units)
-		{
-			if (obj->m_type == Object::ObjectType::UNIT)
-			{
-				Unit* unit = (Unit*)obj.get();
+	setTarget(m_red_units, targetPos, targetPlanet);
+	setTarget(m_blue_units, targetPos, targetPlanet);
+}
 
-				if (unit->m_selected)
+void Game::setTarget(std::vector<std::shared_ptr<Object>>& units, glm::vec3& targetPos, Planet* targetPlanet)
+//void Game::setTarget(std::vector<std::shared_ptr<Object>>& units, glm::vec3& targetPos, glm::vec3& planetPos, std::string& planetFraction, float planetLevel, float planetLevelMAX)
+{
+	for (auto&& obj : units)
+	{
+		if (obj->m_type == Object::ObjectType::UNIT)
+		{
+			Unit* unit = (Unit*)obj.get();
+
+			if (unit->m_selected)
+			{
+				if (targetPlanet == nullptr)
 				{
-					if (planetFraction == "")
+					unit->m_state = "move";
+					unit->m_targetPos = targetPos;
+				}
+				else
+				{
+					if (targetPlanet->m_fraction == unit->m_fraction)
 					{
-						unit->m_state = "move";
-						unit->m_targetPos = targetPos;
-					}
-					else
-					{
-						if (planetFraction == unit->m_fraction)
+						//if (targetPlanet->m_level < targetPlanet->s_max_level)
 						{
-							if (planetLevel < planetLevelMAX)
-							{
-								unit->m_state = "update";
-								unit->m_targetPos = planetPos;
-							}
-							else
-							{
-								unit->m_state = "move";
-								unit->m_targetPos = targetPos;
-							}
+							unit->m_state = "update";
+							unit->m_targetPos = targetPlanet->m_position;
+						}
+						/*else if (targetPlanet->m_capturePoints > 0)
+						{
+							unit->m_state = "update";
+							unit->m_targetPos = targetPlanet->m_position;
 						}
 						else
 						{
-							unit->m_state = "attack";
-							unit->m_targetPos = planetPos;
-						}
+							unit->m_state = "move";
+							unit->m_targetPos = targetPos;
+						}*/
+					}
+					else
+					{
+						unit->m_state = "attack";
+						unit->m_targetPos = targetPlanet->m_position;
 					}
 				}
 			}
 		}
-	};
-
-	setTarget(m_red_units);
-	setTarget(m_blue_units);
-}
+	}
+};
 
 bool Game::checkEndGame()
 {
@@ -1061,8 +874,8 @@ void switchPause(Game& game)
 void speedGameUp(Game& game)
 {
 	RenderEngine::m_timeKoef += 0.25f;
-	if (RenderEngine::m_timeKoef > 4.0f)
-		RenderEngine::m_timeKoef = 4.0f;
+	if (RenderEngine::m_timeKoef > 6.0f)
+		RenderEngine::m_timeKoef = 6.0f;
 }
 
 void speedGameDown(Game& game)
@@ -1084,7 +897,7 @@ void toMenuButton(Game& game)
 void startButton(Game& game)
 {
 	game.freeResources();
-	game.loadResources(4);
+	game.loadResources(RenderEngine::resourceManager.m_listPathLevels.size() - 1);
 	game.m_run = true;
 	game.m_pause = false;
 	game.m_inMenu = false;
@@ -1107,7 +920,7 @@ void selectUnits(Game& game)
 		{
 			for (auto&& obj : game.m_red_units)
 			{
-				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
+				if (obj->m_type == Object::ObjectType::UNIT)
 				{
 					Unit* unit = (Unit*)obj.get();
 					if (glm::distance(game.m_area->m_position, unit->m_position) <= game.m_area->m_radius)
@@ -1116,9 +929,10 @@ void selectUnits(Game& game)
 						unit->deselect();
 				}
 			}
+			/*
 			for (auto&& obj : game.m_blue_units)
 			{
-				if (obj->m_type == Object::ObjectType::UNIT /*&& obj->m_fraction == m_player_fraction*/)
+				if (obj->m_type == Object::ObjectType::UNIT)
 				{
 					Unit* unit = (Unit*)obj.get();
 					if (glm::distance(game.m_area->m_position, unit->m_position) <= game.m_area->m_radius)
@@ -1127,6 +941,7 @@ void selectUnits(Game& game)
 						unit->deselect();
 				}
 			}
+			*/
 		}
 	}
 }
@@ -1207,264 +1022,12 @@ void createNeutralPlanet(Game& game)
 	}
 }
 
-void saveMap(Game& game)
-{
-	std::vector<std::shared_ptr<Object>> planets;
-
-	for (auto&& obj : game.m_objects)
-	{
-		if (obj->m_type == Object::ObjectType::PLANET)
-		{
-			planets.push_back(obj);
-		}
-	}
-
-	uint32_t indexLeft = 0;
-	uint32_t indexRight = 0;
-	uint32_t indexBot = 0;
-	uint32_t indexTop = 0;
-
-	for (uint32_t i = 0; i < planets.size(); i++)
-	{
-		if (planets[i]->m_position.x < planets[indexLeft]->m_position.x)
-			indexLeft = i;
-		if (planets[i]->m_position.x > planets[indexRight]->m_position.x)
-			indexRight = i;
-		if (planets[i]->m_position.z < planets[indexBot]->m_position.z)
-			indexBot = i;
-		if (planets[i]->m_position.z > planets[indexTop]->m_position.z)
-			indexTop = i;
-	}
-
-	uint32_t numLevel = RenderEngine::resourceManager.m_listPathLevels.size();
-	std::string path = "../FirstGame/resources/ResourceManager/level" + std::to_string(numLevel) + ".txt";
-
-	RenderEngine::resourceManager.m_listPathLevels.push_back(path);
-	std::ofstream list_path_level;
-	list_path_level.open("../FirstGame/Resources/ResourceManager/list_path_levels.txt", std::ios::app);
-	list_path_level << "\n" << path;
-	//list_path_level.flush();
-	list_path_level.close();
-
-	std::ofstream output;
-	output.open(path);
-
-	output << "[\n";
-	output << "{\n";
-	output << "\"object_type\": \"CAMERA\",\n";
-	output << "\"models_type\": [],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"300.0\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"EDGES\",\n";
-	output << "\"models_type\": [],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"{ 'left' :"  << std::to_string(planets[indexLeft]->m_position.x + -100.0f) <<
-										", 'right': " << std::to_string(planets[indexRight]->m_position.x + 100.0f) <<
-										", 'top' : "  << std::to_string(planets[indexTop]->m_position.z + 100.0f) <<
-										", 'bot' : "  << std::to_string(planets[indexBot]->m_position.z + -100.0f) << "}\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"AREA\",\n";
-	output << "\"models_type\": [],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"AREA\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"WHITE_STAR\",\n";
-	output << "\"models_type\": [\"WHITE_STAR\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"WHITE_STAR\"\n";
-	output << "}\n";
-	output << ",\n"; 
-	output << "{\n";
-	output << "\"object_type\": \"RED_UNIT\",\n";
-	output << "\"models_type\": [\"STENCIL_UNIT\", \"RED_UNIT\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"false\",\n";
-	output << "\"optionalProperties\": \"RED_UNIT\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"BLUE_UNIT\",\n";
-	output << "\"models_type\": [\"STENCIL_UNIT\", \"BLUE_UNIT\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"1.0\",\n";
-	output << "\"exsist\": \"false\",\n";
-	output << "\"optionalProperties\": \"BLUE_UNIT\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"BUTTON\",\n";
-	output << "\"models_type\": [\"BUTTON\", \"BUTTON_DOWN\"],\n";
-	output << "\"posx\": \"0.925\",\n";
-	output << "\"posy\": \"-0.85\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.1\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"{ 'func' : 'PAUSE', 'visible' : 'true' }\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"BUTTON\",\n";
-	output << "\"models_type\": [\"BUTTON\", \"BUTTON_DOWN\"],\n";
-	output << "\"posx\": \"0.93\",\n";
-	output << "\"posy\": \"0.85\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.05\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"{ 'func' : 'SPEED_UP', 'visible' : 'true' }\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"BUTTON\",\n";
-	output << "\"models_type\": [\"BUTTON\", \"BUTTON_DOWN\"],\n";
-	output << "\"posx\": \"0.77\",\n";
-	output << "\"posy\": \"0.85\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.05\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"{ 'func' : 'SPEED_DOWN', 'visible' : 'true' }\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"PAUSE\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.35\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"PAUSE\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"RED_WON\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.7\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.25\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"RED_WON\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"BLUE_WON\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.7\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.25\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"BLUE_WON\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"COMMA\", \"DOT\"],\n";
-	output << "\"posx\": \"0.8125\",\n";
-	output << "\"posy\": \"0.85\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.05\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"LABEL_ONE\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"COMMA\", \"DOT\"],\n";
-	output << "\"posx\": \"-0.9\",\n";
-	output << "\"posy\": \"0.65\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.05\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"LABEL_TWO\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"LABEL\",\n";
-	output << "\"models_type\": [\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"COMMA\", \"DOT\"],\n";
-	output << "\"posx\": \"0.75\",\n";
-	output << "\"posy\": \"-0.78\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.05\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"LABEL_THREE\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"BUTTON\",\n";
-	output << "\"models_type\": [\"MENU_BUTTON\", \"MENU_BUTTON\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"-0.85\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.1\",\n";
-	output << "\"exsist\": \"true\",\n";
-	output << "\"optionalProperties\": \"{ 'func' : 'MENU_BUTTON', 'visible' : 'false' }\"\n";
-	output << "}\n";
-	output << ",\n";
-	output << "{\n";
-	output << "\"object_type\": \"2D_LINE\",\n";
-	output << "\"models_type\": [\"2D_LINE\"],\n";
-	output << "\"posx\": \"0.0\",\n";
-	output << "\"posy\": \"0.0\",\n";
-	output << "\"posz\": \"0.0\",\n";
-	output << "\"scale\": \"0.0\",\n";
-	output << "\"exsist\": \"false\",\n";
-	output << "\"optionalProperties\": \"\"\n";
-	output << "}\n";
-
-	for (uint32_t i = 0; i < planets.size(); i++)
-	{
-		output << ",\n";
-		output << "{\n";
-		output << "\"object_type\": \"" << planets[i]->m_fraction + "_PLANET\",\n";
-		output << "\"models_type\": [ \"RED_PLANET\", \"BLUE_PLANET\", \"NEUTRAL_PLANET\", \"CAPTURE_SCALE\", \"UPGRADE_SCALE\" ],\n";
-		output << "\"posx\": \"" << std::to_string(planets[i]->m_position.x) << "\",\n";
-		output << "\"posy\": \"" << std::to_string(planets[i]->m_position.y) << "\",\n";
-		output << "\"posz\": \"" << std::to_string(planets[i]->m_position.z) << "\",\n";
-		output << "\"scale\": \"1.0\",\n";
-		output << "\"exsist\": \"true\",\n";
-		output << "\"optionalProperties\": \"" << planets[i]->m_fraction + "_PLANET\"\n";
-		output << "}\n";
-	}
-	output << "]\n";
-
-	output.flush();
-	output.close();
-}
-
 //TODO
 /*
+	- сделать ai
+
 	- кнопка старт ведёт на выбор уровня а не на загрузку первого уровня
 
-	- сделать api для удобста использования ai
 
 	Решено:
 		- сделать редактор карт

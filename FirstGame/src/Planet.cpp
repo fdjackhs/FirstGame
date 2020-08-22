@@ -115,7 +115,7 @@ void Planet::determineColor()
 
 void Planet::plusOne()
 {
-	if (m_level < s_max_level)
+	//if (m_level < s_max_level)
 	{
 		if (m_capturePoints == 0.0f)
 		{

@@ -15,6 +15,8 @@
 #include "Label.h"
 #include "Statistic.h"
 
+extern class Planet;
+
 class Game
 {
 public:
@@ -41,6 +43,9 @@ public:
 	void createGame(uint32_t& level, uint32_t& progress);
 	void loadResources(uint32_t level);
 	void freeResources();
+	void artificialInteligence();
+	//void setTarget(std::vector<std::shared_ptr<Object>>& units, glm::vec3& targetPos, glm::vec3& planetPos, std::string& planetFraction, float planetLevel, float planetLevelMAX);
+	void setTarget(std::vector<std::shared_ptr<Object>>& units, glm::vec3& targetPos, Planet* targetPlanet);
 
 	//callback functions (for buttons)
 	friend void switchPause(Game& game);

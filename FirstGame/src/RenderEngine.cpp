@@ -62,16 +62,16 @@ int RenderEngine::init(float x, float y, const char* windowName)
 
 	glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
 
-	/*
+	
 	GLFWmonitor* MyMonitor = glfwGetPrimaryMonitor(); // The primary monitor.. Later Occulus?..
 	const GLFWvidmode* mode = glfwGetVideoMode(MyMonitor);
 	SCREEN.x = mode->width;
 	SCREEN.y = mode->height;
 	window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width, glfwGetVideoMode(glfwGetPrimaryMonitor())->height, windowName, glfwGetPrimaryMonitor(), nullptr);
-	*/
 	
+	/*
 	window = glfwCreateWindow((int)SCREEN.x, (int)SCREEN.y, windowName, nullptr, nullptr);
-	
+	*/
 	if (!window)
 	{
 		std::cout << "glfwCreateWindow failed" << std::endl;

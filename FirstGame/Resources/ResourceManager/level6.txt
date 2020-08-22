@@ -1,0 +1,221 @@
+[
+{
+"object_type": "CAMERA",
+"models_type": [],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "300.0"
+}
+,
+{
+"object_type": "EDGES",
+"models_type": [],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "{ 'left' :-131.070389, 'right': 193.560944, 'top' : 138.610794, 'bot' : -196.260513}"
+}
+,
+{
+"object_type": "AREA",
+"models_type": [],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "AREA"
+}
+,
+{
+"object_type": "WHITE_STAR",
+"models_type": ["WHITE_STAR"],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "WHITE_STAR"
+}
+,
+{
+"object_type": "RED_UNIT",
+"models_type": ["STENCIL_UNIT", "RED_UNIT"],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "false",
+"optionalProperties": "RED_UNIT"
+}
+,
+{
+"object_type": "BLUE_UNIT",
+"models_type": ["STENCIL_UNIT", "BLUE_UNIT"],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "1.0",
+"exsist": "false",
+"optionalProperties": "BLUE_UNIT"
+}
+,
+{
+"object_type": "BLUE_PLANET",
+"models_type": [ "RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE" ],
+"posx": "-31.070393",
+"posy": "0.000000",
+"posz": "-24.447828",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "BLUE_PLANET"
+}
+,
+{
+"object_type": "RED_PLANET",
+"models_type": [ "RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE" ],
+"posx": "93.560944",
+"posy": "0.000000",
+"posz": "-96.260513",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "RED_PLANET"
+}
+,
+{
+"object_type": "NEUTRAL_PLANET",
+"models_type": [ "RED_PLANET", "BLUE_PLANET", "NEUTRAL_PLANET", "CAPTURE_SCALE", "UPGRADE_SCALE" ],
+"posx": "79.821609",
+"posy": "0.000000",
+"posz": "38.610798",
+"scale": "1.0",
+"exsist": "true",
+"optionalProperties": "NEUTRAL_PLANET"
+}
+,
+{
+"object_type": "BUTTON",
+"models_type": ["BUTTON", "BUTTON_DOWN"],
+"posx": "0.925",
+"posy": "-0.85",
+"posz": "0.0",
+"scale": "0.1",
+"exsist": "true",
+"optionalProperties": "{ 'func' : 'PAUSE', 'visible' : 'true' }"
+}
+,
+{
+"object_type": "BUTTON",
+"models_type": ["BUTTON", "BUTTON_DOWN"],
+"posx": "0.93",
+"posy": "0.85",
+"posz": "0.0",
+"scale": "0.05",
+"exsist": "true",
+"optionalProperties": "{ 'func' : 'SPEED_UP', 'visible' : 'true' }"
+}
+,
+{
+"object_type": "BUTTON",
+"models_type": ["BUTTON", "BUTTON_DOWN"],
+"posx": "0.77",
+"posy": "0.85",
+"posz": "0.0",
+"scale": "0.05",
+"exsist": "true",
+"optionalProperties": "{ 'func' : 'SPEED_DOWN', 'visible' : 'true' }"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["PAUSE"],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "0.35",
+"exsist": "true",
+"optionalProperties": "PAUSE"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["RED_WON"],
+"posx": "0.0",
+"posy": "0.7",
+"posz": "0.0",
+"scale": "0.25",
+"exsist": "true",
+"optionalProperties": "RED_WON"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["BLUE_WON"],
+"posx": "0.0",
+"posy": "0.7",
+"posz": "0.0",
+"scale": "0.25",
+"exsist": "true",
+"optionalProperties": "BLUE_WON"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+"posx": "0.8125",
+"posy": "0.85",
+"posz": "0.0",
+"scale": "0.05",
+"exsist": "true",
+"optionalProperties": "LABEL_ONE"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+"posx": "-0.9",
+"posy": "0.65",
+"posz": "0.0",
+"scale": "0.05",
+"exsist": "true",
+"optionalProperties": "LABEL_TWO"
+}
+,
+{
+"object_type": "LABEL",
+"models_type": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "COMMA", "DOT"],
+"posx": "0.75",
+"posy": "-0.78",
+"posz": "0.0",
+"scale": "0.05",
+"exsist": "true",
+"optionalProperties": "LABEL_THREE"
+}
+,
+{
+"object_type": "BUTTON",
+"models_type": ["MENU_BUTTON", "MENU_BUTTON"],
+"posx": "0.0",
+"posy": "-0.85",
+"posz": "0.0",
+"scale": "0.1",
+"exsist": "true",
+"optionalProperties": "{ 'func' : 'MENU_BUTTON', 'visible' : 'false' }"
+}
+,
+{
+"object_type": "2D_LINE",
+"models_type": ["2D_LINE"],
+"posx": "0.0",
+"posy": "0.0",
+"posz": "0.0",
+"scale": "0.0",
+"exsist": "false",
+"optionalProperties": ""
+}
+]

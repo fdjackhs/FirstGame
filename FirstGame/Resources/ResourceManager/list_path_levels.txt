@@ -2,3 +2,12 @@
 ../FirstGame/resources/ResourceManager/level1.txt
 ../FirstGame/resources/ResourceManager/level2.txt
 ../FirstGame/resources/ResourceManager/level3.txt
+../FirstGame/resources/ResourceManager/level4.txt
+../FirstGame/resources/ResourceManager/level5.txt
+../FirstGame/resources/ResourceManager/level6.txt
+../FirstGame/resources/ResourceManager/level7.txt
+../FirstGame/resources/ResourceManager/level8.txt
+../FirstGame/resources/ResourceManager/level9.txt
+../FirstGame/resources/ResourceManager/level10.txt
+../FirstGame/resources/ResourceManager/level11.txt
+../FirstGame/resources/ResourceManager/level12.txt
