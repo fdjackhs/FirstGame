@@ -575,8 +575,8 @@ void Game::processInput(bool* keys, bool* buttons, const glm::vec2& cursorCoords
 
 void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& game)
 {
-	static glm::vec2 lastCursorCoordsDown;
-	static glm::vec2 lastCursorCoordsUP;
+	static glm::vec2 firstPushPoint;
+	static glm::vec2 lastCursorCoords;
 	static bool leftButtonLastTime = false;
 	static bool clickOnButton = false;
 
@@ -589,16 +589,17 @@ void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& ga
 		//if last click was not on button and cursor moved while holding down the button - update area
 		if (game.m_area != nullptr && game.m_run && game.m_inHand == nullptr)
 		{
-			if (glm::distance(cursorCoords, lastCursorCoordsUP) > 5.0f)
+			if (glm::distance(cursorCoords, firstPushPoint) > 5.0f)
 			{
-				if (!clickOnButton && cursorCoords != lastCursorCoordsDown)
+				if (!clickOnButton && cursorCoords != lastCursorCoords)
 				{
 					game.m_area->updateArea(cursorCoords);
 				}
 			}
 		}
 
-		lastCursorCoordsUP = cursorCoords;
+		if (leftButtonLastTime == false)
+			firstPushPoint = cursorCoords;
 		leftButtonLastTime = true;
 	}
 	else
@@ -611,6 +612,8 @@ void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& ga
 				{
 					game.setTargetForSelectedUnits(cursorCoords);
 					game.m_area->collapseArea();
+					game.m_area->m_fixed = false;
+					game.m_area->m_exsist = false;
 				}
 			}
 
@@ -622,10 +625,11 @@ void processArea(const bool& leftButton, const glm::vec2& cursorCoords, Game& ga
 
 		if (game.m_area != nullptr)
 			game.m_area->m_fixed = true;
+			
 		leftButtonLastTime = false;
 	}
 
-	lastCursorCoordsDown = cursorCoords;
+	lastCursorCoords = cursorCoords;
 }
 
 bool Game::checkButtonHits(const glm::vec2& cursorCoords, bool isPressed)
@@ -694,7 +698,7 @@ void Game::setTargetForSelectedUnits(const glm::vec2& cursorCoords)
 	}
 
 	setTarget(m_red_units, targetPos, targetPlanet);
-	setTarget(m_blue_units, targetPos, targetPlanet);
+	//setTarget(m_blue_units, targetPos, targetPlanet);
 }
 
 void Game::setTarget(std::vector<std::shared_ptr<Object>>& units, glm::vec3& targetPos, Planet* targetPlanet)
@@ -840,7 +844,7 @@ void Game::drawStatisticScreen()
 
 	for (uint32_t i = 1; i < forDraw.size(); i++)
 	{
-		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(1.0f, 0.0f, 0.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(1.0f, 0.0f, 0.0f), RenderEngine::resourceManager.m_shaders);
 	}
 
 	//------------------------------------------------------
@@ -850,11 +854,11 @@ void Game::drawStatisticScreen()
 
 	for (uint32_t i = 1; i < forDraw.size(); i++)
 	{
-		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(0.0f, 0.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+		draw2Dline(glm::vec2(forDraw[i - 1].first, forDraw[i - 1].second), glm::vec2(forDraw[i].first, forDraw[i].second), glm::vec3(0.0f, 0.0f, 1.0f), RenderEngine::resourceManager.m_shaders);
 	}
 
-	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(leftWindow, topWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
-	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(rightWindow, botWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
+	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(leftWindow, topWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders);
+	draw2Dline(glm::vec2(leftWindow, botWindow), glm::vec2(rightWindow, botWindow), glm::vec3(1.0f, 1.0f, 1.0f), RenderEngine::resourceManager.m_shaders);
 }
 
 void switchPause(Game& game)

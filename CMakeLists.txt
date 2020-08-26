@@ -34,6 +34,16 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_NAME}/src/Planet.h
 	${PROJECT_NAME}/src/Planet.cpp
 	${PROJECT_NAME}/src/Profile.h
+	${PROJECT_NAME}/src/Button.h
+	${PROJECT_NAME}/src/Button.cpp
+	${PROJECT_NAME}/src/Label.h
+	${PROJECT_NAME}/src/Label.cpp
+	${PROJECT_NAME}/src/Statistic.h
+	${PROJECT_NAME}/src/Utilities.h
+	${PROJECT_NAME}/src/WhiteStar.h
+	${PROJECT_NAME}/src/AI.cpp
+	${PROJECT_NAME}/src/CreateObject.cpp
+	${PROJECT_NAME}/src/SaveMap.cpp
 	
 	${PROJECT_NAME}/src/stb_image.cpp
 )

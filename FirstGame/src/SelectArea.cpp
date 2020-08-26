@@ -48,7 +48,6 @@ void select_area::updateArea(const glm::vec2& cursorCoords)
 
 void select_area::collapseArea()
 {
-	m_exsist = false;
 	m_radius = 0.0f;
 	updateVertices();
 	RenderEngine::resourceManager.updateVBO(m_ID, m_vertices);

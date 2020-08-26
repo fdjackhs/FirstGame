@@ -97,10 +97,11 @@ void Game::artificialInteligence()
 					}
 
 					//отправить
-					//setTarget(m_blue_units, closestToUpdatePlanet->m_position, closestToUpdatePlanet->m_position, closestToUpdatePlanet->m_fraction, closestToUpdatePlanet->m_level, closestToUpdatePlanet->s_max_level);
 					setTarget(m_blue_units, closestToUpdatePlanet->m_position, closestToUpdatePlanet);
 				}
 			}
+			
+			drawSquare(closestToUpdatePlanet->m_position, RenderEngine::resourceManager.m_shaders, *RenderEngine::camera);
 		}
 	}
 

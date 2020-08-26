@@ -12,7 +12,7 @@ public:
 
 	Object();
 	Object(const std::vector<unsigned int>& ID, const glm::vec3& pos, float scale, const std::string& opt_prop, const std::string fraction);
-	~Object();
+	virtual ~Object();
 	
 	float m_radius;
 	float m_scale;
