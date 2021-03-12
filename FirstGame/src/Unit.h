@@ -3,7 +3,7 @@
 
 #include "Object.h"
 
-extern class Game;
+class Game;
 
 class Unit : public Object
 {

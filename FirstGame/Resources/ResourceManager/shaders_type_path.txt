@@ -1,33 +1,33 @@
 [
 	{
 		"type" : "BASIC",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.basic_vertex_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.basic_fragment_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.basic_vertex_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.basic_fragment_shader.fs"
 	},
 	{
 		"type" : "INSTANSING",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.instansing_vertex_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.instansing_fragment_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.instansing_vertex_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.instansing_fragment_shader.fs"
 	},
 	{
 		"type" : "STENCIL_B",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.stencil_basic_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.stencil_basic_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.stencil_basic_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.stencil_basic_shader.fs"
 	},
 	{
 		"type" : "STENCIL_I",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.stencil_instansing_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.stencil_instansing_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.stencil_instansing_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.stencil_instansing_shader.fs"
 	},
 	{
 		"type" : "INTERFACE",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.button_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.button_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.button_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.button_shader.fs"
 	},
 	{
 		"type" : "2D_LINE",
-		"path_vertex" : "../FirstGame/Resources/shaders/1.2D_LINE_shader.vs",
-		"path_fragment" : "../FirstGame/Resources/shaders/1.2D_LINE_shader.fs"
+		"path_vertex" : "./FirstGame/resources/shaders/1.2D_LINE_shader.vs",
+		"path_fragment" : "./FirstGame/resources/shaders/1.2D_LINE_shader.fs"
 	},
 	{
 		"type" : "default",

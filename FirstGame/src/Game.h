@@ -15,7 +15,7 @@
 #include "Label.h"
 #include "Statistic.h"
 
-extern class Planet;
+class Planet;
 
 class Game
 {

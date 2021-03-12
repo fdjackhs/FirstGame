@@ -1,56 +1,56 @@
 [
 	{
 		"type" : "WHITE_STAR",
-		"path" : "../FirstGame/resources/models/White_star/White_star.obj",
+		"path" : "./FirstGame/resources/models/White_star/White_star.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "RED_UNIT",
-		"path" : "../FirstGame/resources/models/Red_unit/Red_unit.obj",
+		"path" : "./FirstGame/resources/models/Red_unit/Red_unit.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "RED_PLANET",
-		"path" : "../FirstGame/resources/models/Red_planet/Red_planet.obj",
+		"path" : "./FirstGame/resources/models/Red_planet/Red_planet.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "BLUE_UNIT",
-		"path" : "../FirstGame/resources/models/Blue_unit/Blue_unit.obj",
+		"path" : "./FirstGame/resources/models/Blue_unit/Blue_unit.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "BLUE_PLANET",
-		"path" : "../FirstGame/resources/models/Blue_planet/Blue_planet.obj",
+		"path" : "./FirstGame/resources/models/Blue_planet/Blue_planet.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "NEUTRAL_PLANET",
-		"path" : "../FirstGame/resources/models/Neutral_planet/Neutral_planet.obj",
+		"path" : "./FirstGame/resources/models/Neutral_planet/Neutral_planet.obj",
 		"shaders_types" : ["BASIC", "INSTANSING"],
 		"depth_test" : "true",
 		"unique" : false
 	},
 	{
 		"type" : "STENCIL_UNIT",
-		"path" : "../FirstGame/resources/models/StencilUnit/StencilUnit.obj",
+		"path" : "./FirstGame/resources/models/StencilUnit/StencilUnit.obj",
 		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "STENCIL_PLANET",
-		"path" : "../FirstGame/resources/models/StencilPlanet/StencilPlanet.obj",
+		"path" : "./FirstGame/resources/models/StencilPlanet/StencilPlanet.obj",
 		"shaders_types" : ["STENCIL_B", "STENCIL_I"],
 		"depth_test" : "false",
 		"unique" : false
@@ -58,112 +58,112 @@
 	
 	{
 		"type" : "TEST",
-		"path" : "../FirstGame/resources/models/testModel/untitled.obj",
+		"path" : "./FirstGame/resources/models/testModel/untitled.obj",
 		"shaders_types" : ["BASIC"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "BUTTON",
-		"path" : "../FirstGame/resources/models/Button/Button.obj",
+		"path" : "./FirstGame/resources/models/Button/Button.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "MENU_BUTTON",
-		"path" : "../FirstGame/resources/models/MenuButton/Menu_button.obj",
+		"path" : "./FirstGame/resources/models/MenuButton/Menu_button.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "BUTTON_DOWN",
-		"path" : "../FirstGame/resources/models/Button/ButtonDOWN.obj",
+		"path" : "./FirstGame/resources/models/Button/ButtonDOWN.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "BUTTON_START",
-		"path" : "../FirstGame/resources/models/StartButton/StartButton.obj",
+		"path" : "./FirstGame/resources/models/StartButton/StartButton.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "BUTTON_CREATE_MAP",
-		"path" : "../FirstGame/resources/models/CreateMap/CreateMap.obj",
+		"path" : "./FirstGame/resources/models/CreateMap/CreateMap.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "SAVE_UP",
-		"path" : "../FirstGame/resources/models/SaveUp/SaveUp.obj",
+		"path" : "./FirstGame/resources/models/SaveUp/SaveUp.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "SAVE_DOWN",
-		"path" : "../FirstGame/resources/models/SaveDown/SaveDown.obj",
+		"path" : "./FirstGame/resources/models/SaveDown/SaveDown.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "DELETE_UP",
-		"path" : "../FirstGame/resources/models/DeleteUp/DeleteUp.obj",
+		"path" : "./FirstGame/resources/models/DeleteUp/DeleteUp.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "DELETE_DOWN",
-		"path" : "../FirstGame/resources/models/DeleteDown/DeleteDown.obj",
+		"path" : "./FirstGame/resources/models/DeleteDown/DeleteDown.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "CREATE_RED_PLANET",
-		"path" : "../FirstGame/resources/models/CrRedPlanet/CrRedPlanet.obj",
+		"path" : "./FirstGame/resources/models/CrRedPlanet/CrRedPlanet.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "CREATE_BLUE_PLANET",
-		"path" : "../FirstGame/resources/models/CrBluePlanet/CrBluePlanet.obj",
+		"path" : "./FirstGame/resources/models/CrBluePlanet/CrBluePlanet.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "CREATE_NEUTRAL_PLANET",
-		"path" : "../FirstGame/resources/models/CrNeutralPlanet/CrNeutralPlanet.obj",
+		"path" : "./FirstGame/resources/models/CrNeutralPlanet/CrNeutralPlanet.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "LOAD_SCREEN",
-		"path" : "../FirstGame/resources/models/Loading/LoadScreen.obj",
+		"path" : "./FirstGame/resources/models/Loading/LoadScreen.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "CAPTURE_SCALE",
-		"path" : "../FirstGame/Resources/models/Capture_scale/Capture_scale.obj",
+		"path" : "./FirstGame/Resources/models/Capture_scale/Capture_scale.obj",
 		"shaders_types" : ["BASIC"],
 		"depth_test" : "true",
 		"unique" : true
 	},
 	{
 		"type" : "UPGRADE_SCALE",
-		"path" : "../FirstGame/Resources/models/Upgrade_scale/Upgrade_scale.obj",
+		"path" : "./FirstGame/Resources/models/Upgrade_scale/Upgrade_scale.obj",
 		"shaders_types" : ["BASIC"],
 		"depth_test" : "true",
 		"unique" : true
@@ -171,112 +171,112 @@
 	
 	{
 		"type" : "ALPHABET",
-		"path" : "../FirstGame/Resources/models/Alphabet/ALPHABET.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/ALPHABET.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "PAUSE",
-		"path" : "../FirstGame/resources/models/Pause/Pause.obj",
+		"path" : "./FirstGame/resources/models/Pause/Pause.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "RED_WON",
-		"path" : "../FirstGame/resources/models/RedWon/RedWon.obj",
+		"path" : "./FirstGame/resources/models/RedWon/RedWon.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "BLUE_WON",
-		"path" : "../FirstGame/resources/models/BlueWon/BlueWon.obj",
+		"path" : "./FirstGame/resources/models/BlueWon/BlueWon.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "0",
-		"path" : "../FirstGame/Resources/models/Alphabet/0.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/0.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "1",
-		"path" : "../FirstGame/Resources/models/Alphabet/1.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/1.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "2",
-		"path" : "../FirstGame/Resources/models/Alphabet/2.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/2.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "3",
-		"path" : "../FirstGame/Resources/models/Alphabet/3.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/3.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "4",
-		"path" : "../FirstGame/Resources/models/Alphabet/4.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/4.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "5",
-		"path" : "../FirstGame/Resources/models/Alphabet/5.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/5.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "6",
-		"path" : "../FirstGame/Resources/models/Alphabet/6.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/6.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "7",
-		"path" : "../FirstGame/Resources/models/Alphabet/7.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/7.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "8",
-		"path" : "../FirstGame/Resources/models/Alphabet/8.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/8.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "9",
-		"path" : "../FirstGame/Resources/models/Alphabet/9.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/9.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "COMMA",
-		"path" : "../FirstGame/Resources/models/Alphabet/10.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/10.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
 	},
 	{
 		"type" : "DOT",
-		"path" : "../FirstGame/Resources/models/Alphabet/11.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/11.obj",
 		"shaders_types" : ["INTERFACE"],
 		"depth_test" : "false",
 		"unique" : false
@@ -284,7 +284,7 @@
 	
 	{
 		"type" : "2D_LINE",
-		"path" : "../FirstGame/Resources/models/Alphabet/0.obj",
+		"path" : "./FirstGame/Resources/models/Alphabet/0.obj",
 		"shaders_types" : ["2D_LINE"],
 		"depth_test" : "false",
 		"unique" : true

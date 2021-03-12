@@ -152,7 +152,7 @@ void Game::createObject(ObjectAttributes& attributes)
 		else if (attributes.object_type == "AREA")
 		{
 			//create objects manually
-			uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "../FirstGame/Resources/shaders/1.area_shader.vs", "../FirstGame/Resources/shaders/1.area_shader.fs");
+			uint32_t id = RenderEngine::resourceManager.createObject(std::vector<float>(240), "./FirstGame/Resources/shaders/1.area_shader.vs", "./FirstGame/Resources/shaders/1.area_shader.fs");
 			m_area = std::make_shared<select_area>(id);
 		}
 		else if (attributes.object_type == "EDGES")

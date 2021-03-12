@@ -49,6 +49,7 @@ void Game::createGame(uint32_t& level, uint32_t& progress)
 	m_run = false;
 	m_generateStar = false;
 	m_inMapEditor = level == 2;
+	m_inMenu = level == 0;
 	m_pause = !m_inMapEditor;
 
 	processLeftButton = processArea;
@@ -1028,12 +1029,12 @@ void createNeutralPlanet(Game& game)
 
 //TODO
 /*
-	- сделать ai
-
 	- кнопка старт ведёт на выбор уровня а не на загрузку первого уровня
 
 
 	Решено:
+		- сделать ai
+
 		- сделать редактор карт
 
 		- в меню сделать кнопку редактора карт

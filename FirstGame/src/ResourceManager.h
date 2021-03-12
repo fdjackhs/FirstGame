@@ -2,6 +2,9 @@
 #include <map>
 #include <vector>
 #include <fstream>
+#include <filesystem>
+#include <iostream>
+#include <string>
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -80,8 +83,8 @@ public:
 
 	void init();
 	void loadListPathLevels();
-	void loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs);
-	void loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs);
+	void loadModelPairs(const std::string& path, std::map<std::string, model_bunch>& vector_pairs);
+	void loadShaderPairs(const std::string& path, std::map<std::string, shader_path>& shader_pairs);
 	void loadModels(uint32_t number, std::vector<ObjectAttributes>& objectsAttrib, uint32_t& progress);
 	void clear();
 
@@ -93,4 +96,7 @@ private:
 	uint32_t getModelIndex(const std::string& type_of_model);
 	std::vector<uint32_t> getShadersIndices(const std::string& type_of_shader);
 	std::string readFile(const std::string& path);
+
+	//The root directory is always different depending on the selected configuration (debug or release)
+	void find_and_set_root_directory(); 
 };

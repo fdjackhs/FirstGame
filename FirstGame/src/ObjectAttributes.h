@@ -4,7 +4,7 @@
 struct ObjectAttributes
 {
 	//for create object
-	uint32_t id;
+	unsigned int id;
 
 	std::string object_type;
 

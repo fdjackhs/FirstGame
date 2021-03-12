@@ -30,11 +30,11 @@ void saveMap(Game& game)
 	}
 
 	uint32_t numLevel = RenderEngine::resourceManager.m_listPathLevels.size();
-	std::string path = "../FirstGame/resources/ResourceManager/level" + std::to_string(numLevel) + ".txt";
+	std::string path = "./FirstGame/resources/ResourceManager/level" + std::to_string(numLevel) + ".txt";
 
 	RenderEngine::resourceManager.m_listPathLevels.push_back(path);
 	std::ofstream list_path_level;
-	list_path_level.open("../FirstGame/Resources/ResourceManager/list_path_levels.txt", std::ios::app);
+	list_path_level.open("./FirstGame/Resources/ResourceManager/list_path_levels.txt", std::ios::app);
 	list_path_level << "\n" << path;
 	//list_path_level.flush();
 	list_path_level.close();

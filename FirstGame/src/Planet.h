@@ -4,7 +4,7 @@
 #include "Object.h"
 #include "Game.h"
 
-extern class Game;
+class Game;
 
 class Planet : public Object
 {

@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 set(PROJECT_NAME FirstGame)
 project(FirstGame)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif(MSVC)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
@@ -63,6 +65,12 @@ include_directories(includes)
 include_directories(includes/stb)
 include_directories(includes/glm)
 
-target_link_libraries(${PROJECT_NAME} assimp-vc140-mt)
+target_link_libraries(${PROJECT_NAME} assimp-vc142-mtd.lib)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/)
+
+file(MAKE_DIRECTORY bin/Release)
+file(MAKE_DIRECTORY bin/Debug)
+
+configure_file(lib/assimp-vc142-mtd.dll ../bin/Release/assimp-vc142-mtd.dll COPYONLY)
+configure_file(lib/assimp-vc142-mtd.dll ../bin/Debug/assimp-vc142-mtd.dll   COPYONLY)

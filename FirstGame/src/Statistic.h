@@ -84,6 +84,21 @@ public:
 
 	float getMaxUnit()
 	{
+		int32_t max_value = 0;
+
+		for (auto&& [ _ , second] : m_red_units)
+		{
+			if (second > max_value)
+				max_value = second;
+		}
+
+		for (auto&& [_, second] : m_blue_units)
+		{
+			if (second > max_value)
+				max_value = second;
+		}
+
+		/*
 		auto pred = [&](std::pair<int32_t, int32_t>& element)
 		{
 			if (element.second > m_maxUnits)
@@ -93,6 +108,9 @@ public:
 
 		std::find_if(m_red_units.begin(), m_red_units.end(), pred);
 		std::find_if(m_blue_units.begin(), m_blue_units.end(), pred);
+		*/
+
+		m_maxUnits = max_value;
 
 		return (float)m_maxUnits;
 	}

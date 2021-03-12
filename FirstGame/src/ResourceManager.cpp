@@ -6,22 +6,23 @@ ResourceManager::ResourceManager()
 
 void ResourceManager::init()
 {
+	find_and_set_root_directory();
+
 	ResourceManager::loadListPathLevels();
-	loadShaderPairs("../FirstGame/Resources/ResourceManager/shaders_type_path.txt", m_shaders_type_path);
-	loadModelPairs("../FirstGame/Resources/ResourceManager/models_type_path.txt", m_models_type_path);
+	loadShaderPairs("./FirstGame/resources/ResourceManager/shaders_type_path.txt", m_shaders_type_path);
+	loadModelPairs("./FirstGame/resources/ResourceManager/models_type_path.txt", m_models_type_path);
 
 	//For some reason, the first model is always loaded upside down
-	Model temp("../FirstGame/resources/models/Loading/LoadScreen.obj");
+	Model temp("./FirstGame/resources/models/Loading/LoadScreen.obj");
 
-	m_loadScreen = std::make_shared<Model>("../FirstGame/resources/models/Loading/LoadScreen.obj");
-	m_loadScreenShader = std::make_shared<Shader>("../FirstGame/Resources/shaders/1.button_shader.vs", "../FirstGame/Resources/shaders/1.button_shader.fs");
+	m_loadScreen = std::make_shared<Model>("./FirstGame/resources/models/Loading/LoadScreen.obj");
+	m_loadScreenShader = std::make_shared<Shader>("./FirstGame/resources/shaders/1.button_shader.vs", "./FirstGame/resources/shaders/1.button_shader.fs");
 }
 
 void ResourceManager::loadListPathLevels()
 {
 	std::ifstream levelPathsFile;
-
-	levelPathsFile.open("../FirstGame/Resources/ResourceManager/list_path_levels.txt");
+	levelPathsFile.open("./FirstGame/resources/ResourceManager/list_path_levels.txt");
 
 	if (levelPathsFile)
 	{
@@ -37,7 +38,8 @@ void ResourceManager::loadListPathLevels()
 	}
 }
 
-void ResourceManager::loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs)
+//void ResourceManager::loadModelPairs(const char* path, std::map<std::string, model_bunch>& vector_pairs)
+void ResourceManager::loadModelPairs(const std::string& path, std::map<std::string, model_bunch>& vector_pairs)
 {
 	std::ifstream pair_File;
 	pair_File.open(path);
@@ -81,7 +83,8 @@ void ResourceManager::loadModelPairs(const char* path, std::map<std::string, mod
 }
 
 
-void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs)
+//void ResourceManager::loadShaderPairs(const char* path, std::map<std::string, shader_path>& shader_pairs)
+void ResourceManager::loadShaderPairs(const std::string& path, std::map<std::string, shader_path>& shader_pairs)
 {
 	std::ifstream pair_File;
 	pair_File.open(path);
@@ -127,7 +130,7 @@ void ResourceManager::loadModels(uint32_t number, std::vector<ObjectAttributes>&
 		rapidjson::Value& type = d[i]["models_type"];
 		auto types = type.GetArray();
 		
-		std::vector<size_t> indexes;
+		std::vector<unsigned int> indexes;
 		for (auto&& type : types)
 		{
 			uint32_t model_index = getModelIndex(type.GetString());
@@ -150,7 +153,7 @@ void ResourceManager::loadModels(uint32_t number, std::vector<ObjectAttributes>&
 		m_map_complete_models[str] = indexes;
 		m_complete_models.push_back(indexes);
 
-		ObjectAttributes temp{ (m_complete_models.size() - 1),
+		ObjectAttributes temp{ (unsigned int)(m_complete_models.size() - 1),
 								object_type.GetString(),
 								{},
 								posx.GetString(),
@@ -244,7 +247,7 @@ GLuint ResourceManager::createObject(std::vector<GLfloat> vertices, const std::s
 {
 	Shader shader(vertexPath.c_str(), fragmentPath.c_str());
 	m_shaders.push_back({ "AREA", shader });
-	uint32_t shaderIndex = m_shaders.size() - 1;
+	unsigned int shaderIndex = m_shaders.size() - 1;
 
 	std::vector<GLuint> indices(vertices.size() / 3);
 	for (uint32_t i = 0; i < indices.size(); i++) indices[i] = i;
@@ -267,7 +270,7 @@ GLuint ResourceManager::createObject(std::vector<GLfloat> vertices, const std::s
 	ManuallyCreatedObject manObj(VAO, VBO, EBO, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), vertices);
 	m_manuallyCreaatedObjects.push_back(manObj);
 
-	m_manCrObj_indexs.push_back({ m_manuallyCreaatedObjects.size() - 1, shaderIndex });
+	m_manCrObj_indexs.push_back({ (unsigned int)(m_manuallyCreaatedObjects.size() - 1), shaderIndex });
 
 	return m_manCrObj_indexs.size() - 1;
 }
@@ -312,4 +315,29 @@ void ResourceManager::clear()
 	m_complete_models.clear();
 	m_manCrObj_indexs.clear();
 	m_map_complete_models.clear();
+}
+
+void ResourceManager::find_and_set_root_directory()
+{
+	std::filesystem::path curr_dir = std::filesystem::current_path();
+
+	while (curr_dir != curr_dir.parent_path()) // until curr_dir is not root of disk
+	{
+		for (auto&& entry : std::filesystem::directory_iterator(curr_dir))
+		{
+			for (auto&& chunk : entry.path())
+			{
+				if (chunk == "lib") // find lib folder
+				{
+					//std::cout << "old dir " << curr_dir << std::endl;
+					std::filesystem::current_path(curr_dir);
+					//std::cout << "new dir " << curr_dir << std::endl;
+					return;
+				}
+			}
+		}
+		curr_dir = curr_dir.parent_path();
+	}
+
+	throw new std::exception();
 }
