@@ -1,15 +1,15 @@
 # My first game
 
-![menu](https://github.com/fdjackhs/test/blob/master/images/menu.png)
+![menu](https://github.com/fdjackhs/FirstGame/blob/master/images/menu.png)
 Menu
 
-![map_editor](https://github.com/fdjackhs/test/blob/master/images/map_editor.png)
+![map_editor](https://github.com/fdjackhs/FirstGame/blob/master/images/map_editor.png)
 Map editor
 
-![gameplay](https://github.com/fdjackhs/test/blob/master/images/gameplay.png)
+![gameplay](https://github.com/fdjackhs/FirstGame/blob/master/images/gameplay.png)
 Gameplay
 
-![statistic_screen](https://github.com/fdjackhs/test/blob/master/images/statistic_screen.png)
+![statistic_screen](https://github.com/fdjackhs/FirstGame/blob/master/images/statistic_screen.png)
 Statistic screen
 
 
